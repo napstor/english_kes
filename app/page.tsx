@@ -12,6 +12,7 @@ import {
   RotateCcw,
   Sparkles,
   Target,
+  UserRoundPlus,
   Volume2
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -25,7 +26,21 @@ type ProgressState = {
   score: number;
 };
 
-const progressKey = "english-kes-progress-v1";
+type LocalProfile = {
+  id: string;
+  name: string;
+};
+
+const profilesKey = "english-kes-profiles-v1";
+const activeProfileKey = "english-kes-active-profile-v1";
+const defaultProfile: LocalProfile = {
+  id: "profile-default",
+  name: "Alex"
+};
+
+function progressKey(profileId: string) {
+  return `english-kes-progress-v1:${profileId}`;
+}
 
 const initialProgress: ProgressState = {
   activeStep: 0,
@@ -36,6 +51,8 @@ const initialProgress: ProgressState = {
 
 export default function Home() {
   const [locale, setLocale] = useState<Locale>("ru");
+  const [profiles, setProfiles] = useState<LocalProfile[]>([defaultProfile]);
+  const [activeProfileId, setActiveProfileId] = useState(defaultProfile.id);
   const [progress, setProgress] = useState<ProgressState>(initialProgress);
   const [answer, setAnswer] = useState("");
   const [checked, setChecked] = useState<ReturnType<typeof compareAnswer> | null>(null);
@@ -45,17 +62,34 @@ export default function Home() {
   const timerRef = useRef<number | null>(null);
   const current = lessonOne.steps[progress.activeStep];
   const copy = uiCopy[locale];
+  const activeProfile = profiles.find((profile) => profile.id === activeProfileId) ?? profiles[0] ?? defaultProfile;
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(progressKey);
+    const savedProfiles = window.localStorage.getItem(profilesKey);
+    const parsedProfiles = savedProfiles ? (JSON.parse(savedProfiles) as LocalProfile[]) : [defaultProfile];
+    const usableProfiles = parsedProfiles.length ? parsedProfiles : [defaultProfile];
+    const savedActiveProfileId = window.localStorage.getItem(activeProfileKey) ?? usableProfiles[0].id;
+    const nextActiveProfileId = usableProfiles.some((profile) => profile.id === savedActiveProfileId)
+      ? savedActiveProfileId
+      : usableProfiles[0].id;
+
+    setProfiles(usableProfiles);
+    setActiveProfileId(nextActiveProfileId);
+
+    const saved = window.localStorage.getItem(progressKey(nextActiveProfileId));
     if (saved) {
       setProgress(JSON.parse(saved) as ProgressState);
     }
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem(progressKey, JSON.stringify(progress));
-  }, [progress]);
+    window.localStorage.setItem(profilesKey, JSON.stringify(profiles));
+  }, [profiles]);
+
+  useEffect(() => {
+    window.localStorage.setItem(activeProfileKey, activeProfileId);
+    window.localStorage.setItem(progressKey(activeProfileId), JSON.stringify(progress));
+  }, [activeProfileId, progress]);
 
   useEffect(() => {
     setAnswer("");
@@ -136,6 +170,25 @@ export default function Home() {
     window.speechSynthesis.speak(utterance);
   }
 
+  function switchProfile(profileId: string) {
+    window.localStorage.setItem(progressKey(activeProfileId), JSON.stringify(progress));
+    const saved = window.localStorage.getItem(progressKey(profileId));
+    setActiveProfileId(profileId);
+    setProgress(saved ? (JSON.parse(saved) as ProgressState) : initialProgress);
+  }
+
+  function addProfile() {
+    const profileName = window.prompt(copy.newProfilePrompt);
+    if (!profileName?.trim()) return;
+    const profile = {
+      id: `profile-${Date.now()}`,
+      name: profileName.trim().slice(0, 28)
+    };
+    setProfiles((prev) => [...prev, profile]);
+    setActiveProfileId(profile.id);
+    setProgress(initialProgress);
+  }
+
   return (
     <main className="app-shell">
       <aside className="sidebar">
@@ -175,6 +228,19 @@ export default function Home() {
             <h1>{lessonOne.title[locale]}</h1>
           </div>
           <div className="top-actions">
+            <label className="profile-picker">
+              <span>{copy.activeProfile}</span>
+              <select value={activeProfile.id} onChange={(event) => switchProfile(event.target.value)}>
+                {profiles.map((profile) => (
+                  <option key={profile.id} value={profile.id}>
+                    {profile.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button className="icon-button" type="button" onClick={addProfile} aria-label={copy.addProfile}>
+              <UserRoundPlus size={18} />
+            </button>
             <button
               className="segmented"
               type="button"
@@ -270,6 +336,14 @@ export default function Home() {
           </article>
 
           <aside className="coach-panel">
+            <section className="coach-card">
+              <UserRoundPlus size={20} />
+              <div>
+                <h3>{copy.localProfilesTitle}</h3>
+                <p>{copy.localProfilesBody}</p>
+              </div>
+            </section>
+
             <section className="coach-card">
               <Sparkles size={20} />
               <div>

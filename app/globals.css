@@ -170,6 +170,12 @@ button {
   margin-bottom: 24px;
 }
 
+.top-actions {
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .eyebrow {
   margin: 0 0 6px;
   text-transform: uppercase;
@@ -210,6 +216,33 @@ h1 {
   padding: 0 14px;
   background: #fff;
   border: 1px solid var(--line);
+}
+
+.profile-picker {
+  min-height: 44px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+
+.profile-picker span {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.profile-picker select {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 850;
+  max-width: 150px;
 }
 
 .lesson-grid {
@@ -570,6 +603,12 @@ textarea:focus {
 
   .topbar {
     align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .top-actions {
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .lesson-grid,

@@ -214,6 +214,12 @@ export const uiCopy = {
     recordingMvp:
       "Следующий этап: отправка аудио в STT, сравнение с эталоном и подсветка слов, которые нужно повторить.",
     playNative: "Проиграть эталон",
+    activeProfile: "Профиль",
+    addProfile: "Добавить локальный профиль",
+    newProfilePrompt: "Имя нового профиля",
+    localProfilesTitle: "Без авторизации",
+    localProfilesBody:
+      "Сейчас прогресс хранится отдельно для каждого локального профиля в этом браузере. Для синхронизации между устройствами позже подключим базу и вход.",
     stepTypes: {
       theory: "Теория",
       vocabulary: "Лексика",
@@ -254,6 +260,12 @@ export const uiCopy = {
     recordingMvp:
       "Next stage: send audio to STT, compare it with the expected text and highlight words to repeat.",
     playNative: "Play native sample",
+    activeProfile: "Profile",
+    addProfile: "Add local profile",
+    newProfilePrompt: "New profile name",
+    localProfilesTitle: "No sign-in",
+    localProfilesBody:
+      "Progress is stored separately for each local profile in this browser. We will add database sync and sign-in later.",
     stepTypes: {
       theory: "Theory",
       vocabulary: "Vocabulary",
