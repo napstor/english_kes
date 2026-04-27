@@ -1278,6 +1278,7 @@ function CompositionStep({
   const filledCount = lines.filter((line) => line.trim()).length;
   const minSentences = step.composition?.minSentences ?? 10;
   const maxSentences = step.composition?.maxSentences ?? 20;
+  const issuesByLine = new Map(feedback?.issues.map((issue) => [issue.line, issue]) ?? []);
 
   return (
     <div className="content-panel composition-panel">
@@ -1292,16 +1293,29 @@ function CompositionStep({
       </section>
 
       <section className="composition-editor" aria-label={copy.compositionTitle}>
-        {lines.map((line, index) => (
-          <label className="composition-line" key={index}>
-            <span>{index + 1}</span>
-            <input
-              value={line}
-              onChange={(event) => onChangeLine(index, event.target.value)}
-              placeholder={`${copy.compositionPlaceholder} ${index + 1}`}
-            />
-          </label>
-        ))}
+        {lines.map((line, index) => {
+          const lineIssue = issuesByLine.get(index + 1);
+          return (
+            <label
+              className={[
+                "composition-line",
+                lineIssue ? "has-issue" : "",
+                lineIssue?.severity === "polish" ? "polish" : "",
+                lineIssue?.severity === "fix" ? "fix" : ""
+              ].join(" ")}
+              key={index}
+            >
+              <span>{index + 1}</span>
+              <input
+                value={line}
+                onChange={(event) => onChangeLine(index, event.target.value)}
+                placeholder={`${copy.compositionPlaceholder} ${index + 1}`}
+                aria-invalid={lineIssue?.severity === "fix"}
+              />
+              {lineIssue ? <em>{lineIssue.severity === "fix" ? "исправить" : "улучшить"}</em> : null}
+            </label>
+          );
+        })}
       </section>
 
       <div className="composition-actions">

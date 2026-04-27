@@ -803,9 +803,16 @@ h1 {
 
 .composition-line {
   display: grid;
-  grid-template-columns: 38px minmax(0, 1fr);
+  grid-template-columns: 38px minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
+  padding: 4px;
+  border-radius: 18px;
+  border: 1px solid transparent;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .composition-line span {
@@ -817,6 +824,57 @@ h1 {
   background: #eef4ef;
   color: var(--primary-dark);
   font-weight: 900;
+}
+
+.composition-line em {
+  min-width: 82px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-style: normal;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-align: center;
+}
+
+.composition-line.has-issue.fix {
+  background: #fff8e7;
+  border-color: #eecb68;
+  box-shadow: 0 8px 22px rgba(183, 121, 0, 0.08);
+}
+
+.composition-line.has-issue.polish {
+  background: #eef5ff;
+  border-color: #b8d0ff;
+}
+
+.composition-line.has-issue.fix span {
+  background: #132017;
+  color: #fff;
+}
+
+.composition-line.has-issue.polish span {
+  background: #2f6fe8;
+  color: #fff;
+}
+
+.composition-line.fix input {
+  border-color: #e6bc42;
+  background: #fffdf7;
+}
+
+.composition-line.polish input {
+  border-color: #b8d0ff;
+  background: #fbfdff;
+}
+
+.composition-line.fix em {
+  background: #fff0ca;
+  color: #7a5900;
+}
+
+.composition-line.polish em {
+  background: #dfeaff;
+  color: #214f9b;
 }
 
 .composition-line input {
