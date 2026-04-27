@@ -71,6 +71,21 @@ type CoachFeedback = {
   drillRu: string;
 };
 
+type CompositionFeedback = {
+  verdict: "ready" | "needs_revision";
+  score: number;
+  summaryRu: string;
+  theoryRu: string;
+  issues: Array<{
+    line: number;
+    focusRu: string;
+    questionRu: string;
+    hintRu: string;
+    severity: "fix" | "polish";
+  }>;
+  nextActionRu: string;
+};
+
 function mergeCoachFeedbackWithHint(feedback: CoachFeedback, hint: GrammarHint | null): CoachFeedback {
   if (!hint) {
     return feedback;
@@ -207,6 +222,10 @@ export default function Home() {
   const [coachFeedback, setCoachFeedback] = useState<CoachFeedback | null>(null);
   const [coachLoading, setCoachLoading] = useState(false);
   const [coachError, setCoachError] = useState("");
+  const [compositionLines, setCompositionLines] = useState<string[]>(() => Array.from({ length: 10 }, () => ""));
+  const [compositionFeedback, setCompositionFeedback] = useState<CompositionFeedback | null>(null);
+  const [compositionLoading, setCompositionLoading] = useState(false);
+  const [compositionError, setCompositionError] = useState("");
   const [recording, setRecording] = useState(false);
   const [recorded, setRecorded] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -224,6 +243,7 @@ export default function Home() {
   const chunksRef = useRef<BlobPart[]>([]);
   const activeStepIndex = Math.min(Math.max(progress.activeStep, 0), lessonOne.steps.length - 1);
   const current = lessonOne.steps[activeStepIndex] ?? lessonOne.steps[0];
+  const currentCompositionMin = current.composition?.minSentences ?? 10;
   const copy = uiCopy[locale];
   const activeProfile = profiles.find((profile) => profile.id === activeProfileId) ?? profiles[0] ?? defaultProfile;
 
@@ -281,6 +301,10 @@ export default function Home() {
     setCoachFeedback(null);
     setCoachLoading(false);
     setCoachError("");
+    setCompositionLines(Array.from({ length: currentCompositionMin }, () => ""));
+    setCompositionFeedback(null);
+    setCompositionLoading(false);
+    setCompositionError("");
     setRecording(false);
     setRecorded(false);
     setElapsed(0);
@@ -293,7 +317,7 @@ export default function Home() {
     });
     nativeAudioRef.current?.pause();
     if (timerRef.current) window.clearInterval(timerRef.current);
-  }, [progress.activeStep]);
+  }, [currentCompositionMin, progress.activeStep]);
 
   const completedCount = progress.completedSteps.length;
   const completion = Math.round((completedCount / lessonOne.steps.length) * 100);
@@ -454,6 +478,50 @@ export default function Home() {
       setCoachError(error instanceof Error ? error.message : copy.coachFailed);
     } finally {
       setCoachLoading(false);
+    }
+  }
+
+  async function checkComposition(step: TrainingStep) {
+    const filledLines = compositionLines.map((line) => line.trim()).filter(Boolean);
+    const minSentences = step.composition?.minSentences ?? 10;
+
+    setCompositionFeedback(null);
+    setCompositionError("");
+
+    if (filledLines.length < minSentences) {
+      setCompositionError(copy.compositionEnough);
+      return;
+    }
+
+    setCompositionLoading(true);
+
+    try {
+      const response = await fetch("/api/coach/composition", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          lessonTitle: lessonOne.title.ru,
+          model: step.composition?.model.ru ?? step.targetText,
+          sentences: filledLines,
+          vocabulary: lessonOne.steps.filter((item) => item.type === "vocabulary").flatMap((item) => item.notes.ru)
+        })
+      });
+      const result = (await response.json()) as CompositionFeedback & { error?: string };
+
+      if (!response.ok) {
+        throw new Error(result.error || copy.coachFailed);
+      }
+
+      setCompositionFeedback(result);
+      if (result.verdict === "ready" || result.score >= 80) {
+        markComplete(4);
+      }
+    } catch (error) {
+      setCompositionError(error instanceof Error ? error.message : copy.coachFailed);
+    } finally {
+      setCompositionLoading(false);
     }
   }
 
@@ -865,6 +933,26 @@ export default function Home() {
               />
             ) : null}
 
+            {current.type === "composition" ? (
+              <CompositionStep
+                copy={copy}
+                feedback={compositionFeedback}
+                lines={compositionLines}
+                loading={compositionLoading}
+                error={compositionError}
+                step={current}
+                onChangeLine={(index, value) =>
+                  setCompositionLines((prev) => prev.map((line, lineIndex) => (lineIndex === index ? value : line)))
+                }
+                onAddLine={() =>
+                  setCompositionLines((prev) =>
+                    prev.length >= (current.composition?.maxSentences ?? 20) ? prev : [...prev, ""]
+                  )
+                }
+                onCheck={() => void checkComposition(current)}
+              />
+            ) : null}
+
             {current.type === "speaking" ? (
               <SpeakingStep
                 copy={copy}
@@ -1163,6 +1251,111 @@ function TheoryStep({
         <Check size={18} /> {uiCopy[locale].understood}
       </button>
     </div>
+  );
+}
+
+function CompositionStep({
+  copy,
+  feedback,
+  lines,
+  loading,
+  error,
+  step,
+  onChangeLine,
+  onAddLine,
+  onCheck
+}: {
+  copy: (typeof uiCopy)[Locale];
+  feedback: CompositionFeedback | null;
+  lines: string[];
+  loading: boolean;
+  error: string;
+  step: TrainingStep;
+  onChangeLine: (index: number, value: string) => void;
+  onAddLine: () => void;
+  onCheck: () => void;
+}) {
+  const filledCount = lines.filter((line) => line.trim()).length;
+  const minSentences = step.composition?.minSentences ?? 10;
+  const maxSentences = step.composition?.maxSentences ?? 20;
+
+  return (
+    <div className="content-panel composition-panel">
+      <section className="composition-brief">
+        <div>
+          <span>{copy.compositionTitle}</span>
+          <h3>{step.composition?.model.ru ?? step.targetText}</h3>
+        </div>
+        <ul>
+          {step.composition?.requirements.ru.map((requirement) => <li key={requirement}>{requirement}</li>)}
+        </ul>
+      </section>
+
+      <section className="composition-editor" aria-label={copy.compositionTitle}>
+        {lines.map((line, index) => (
+          <label className="composition-line" key={index}>
+            <span>{index + 1}</span>
+            <input
+              value={line}
+              onChange={(event) => onChangeLine(index, event.target.value)}
+              placeholder={`${copy.compositionPlaceholder} ${index + 1}`}
+            />
+          </label>
+        ))}
+      </section>
+
+      <div className="composition-actions">
+        <button className="secondary-button" type="button" onClick={onAddLine} disabled={lines.length >= maxSentences}>
+          + {Math.min(lines.length + 1, maxSentences)}
+        </button>
+        <span>
+          {filledCount}/{minSentences}
+        </span>
+        <button className="primary-button" type="button" onClick={onCheck} disabled={loading || filledCount < minSentences}>
+          {loading ? copy.compositionLoading : copy.compositionCheck}
+        </button>
+      </div>
+
+      {error ? <div className="coach-feedback error">{error}</div> : null}
+      {feedback ? <CompositionFeedbackPanel feedback={feedback} copy={copy} /> : null}
+    </div>
+  );
+}
+
+function CompositionFeedbackPanel({
+  feedback,
+  copy
+}: {
+  feedback: CompositionFeedback;
+  copy: (typeof uiCopy)[Locale];
+}) {
+  return (
+    <section className={`composition-feedback ${feedback.verdict}`}>
+      <div className="coach-feedback-head">
+        <strong>{feedback.summaryRu}</strong>
+        <span>{feedback.score}/100</span>
+      </div>
+      <div className="grammar-brief">
+        <span>{copy.compositionTheory}</span>
+        <p>{feedback.theoryRu}</p>
+      </div>
+      {feedback.issues.length ? (
+        <div className="socratic-list">
+          <h3>{copy.compositionQuestions}</h3>
+          {feedback.issues.map((issue) => (
+            <article key={`${issue.line}-${issue.focusRu}`}>
+              <span>#{issue.line}</span>
+              <div>
+                <strong>{issue.focusRu}</strong>
+                <p>{issue.questionRu}</p>
+                <small>{issue.hintRu}</small>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : null}
+      <div className="drill-note">{feedback.nextActionRu}</div>
+    </section>
   );
 }
 

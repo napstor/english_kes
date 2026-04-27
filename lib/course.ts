@@ -1,6 +1,6 @@
 export type Locale = "ru" | "en";
 
-export type StepType = "theory" | "vocabulary" | "translate" | "drill" | "speaking";
+export type StepType = "theory" | "vocabulary" | "composition" | "translate" | "drill" | "speaking";
 
 export type VocabularyItem = {
   ru: string;
@@ -39,6 +39,12 @@ export type TrainingStep = {
   notes: Record<Locale, string[]>;
   theory?: TheoryContent;
   vocabulary?: VocabularyItem[];
+  composition?: {
+    minSentences: number;
+    maxSentences: number;
+    model: Record<Locale, string>;
+    requirements: Record<Locale, string[]>;
+  };
 };
 
 type LessonOneItem = {
@@ -569,6 +575,59 @@ export const lessonOne = {
     },
     ...techniqueOne.map(makeTechniqueOneStep),
     ...techniqueOne.map(makeTechniqueOneSpeakingStep),
+    {
+      id: "l1-compose-own-sentences",
+      type: "composition",
+      label: {
+        ru: "Свои фразы",
+        en: "Own sentences"
+      },
+      prompt: {
+        ru: "Составь 10-20 своих предложений по образцу Техники речи 1.",
+        en: "Create 10-20 own sentences using Speech Drill 1 as the model."
+      },
+      sourceText: "Используя новые слова и выражения, самостоятельно составить 10-20 предложений по образцу «Техники речи 1».",
+      hint: {
+        ru: "В каждой строке нужна трехмерная отработка: утверждение, вопрос, отрицание. AI-коуч подскажет, где подумать, но не даст готовый ответ сразу.",
+        en: "Each line needs the three-part pattern: positive, question, negative. The AI coach will guide you without giving the finished answer immediately."
+      },
+      targetText: "I often drink coffee. Do I often drink coffee? I don't often drink coffee.",
+      acceptedAnswers: [],
+      notes: {
+        ru: [
+          "Это пункт 3 алгоритма книги: ты уже не переводишь готовые фразы, а сам собираешь речь из новой лексики.",
+          "Цель - научиться самому производить фразы по ПЛФ, а не узнавать правильный ответ."
+        ],
+        en: [
+          "This is step 3 of the book algorithm: you no longer translate ready-made sentences; you build speech from new vocabulary.",
+          "The goal is to produce sentences by the speech pattern yourself, not just recognize the right answer."
+        ]
+      },
+      composition: {
+        minSentences: 10,
+        maxSentences: 20,
+        model: {
+          ru: "I often drink coffee. Do I often drink coffee? I don't often drink coffee.",
+          en: "I often drink coffee. Do I often drink coffee? I don't often drink coffee."
+        },
+        requirements: {
+          ru: [
+            "10-20 строк.",
+            "Каждая строка: утверждение, вопрос, отрицание.",
+            "Используй лексику и идиомы урока.",
+            "Проверь do/does и окончание -s у he/she/it.",
+            "Не копируй один и тот же шаблон механически."
+          ],
+          en: [
+            "10-20 lines.",
+            "Each line: positive, question, negative.",
+            "Use the lesson vocabulary and idioms.",
+            "Check do/does and the -s ending with he/she/it.",
+            "Do not copy the same pattern mechanically."
+          ]
+        }
+      }
+    },
     ...techniqueTwo.map(makeTechniqueTwoStep),
     ...techniqueTwo.map(makeTechniqueTwoSpeakingStep)
   ] satisfies TrainingStep[]
@@ -591,6 +650,13 @@ export const uiCopy = {
     theoryExamplesTitle: "Как формула работает в живой фразе",
     understood: "Понял, продолжить",
     answerPlaceholder: "Напиши ответ на английском...",
+    compositionPlaceholder: "Строка",
+    compositionCheck: "Проверить мои фразы",
+    compositionLoading: "AI-коуч проверяет фразы по сократовскому методу...",
+    compositionTitle: "Своя речь",
+    compositionTheory: "Короткая теория перед исправлением",
+    compositionQuestions: "Что исправить самому",
+    compositionEnough: "Заполни минимум 10 строк.",
     check: "Проверить",
     retry: "Сбросить",
     next: "Дальше",
@@ -658,6 +724,7 @@ export const uiCopy = {
     stepTypes: {
       theory: "Теория",
       vocabulary: "Лексика",
+      composition: "Своя речь",
       translate: "Перевод",
       drill: "Техника речи",
       speaking: "Говорение"
@@ -689,6 +756,13 @@ export const uiCopy = {
     theoryExamplesTitle: "How the pattern works in a real sentence",
     understood: "Got it, continue",
     answerPlaceholder: "Write the English answer...",
+    compositionPlaceholder: "Line",
+    compositionCheck: "Check my sentences",
+    compositionLoading: "The AI coach is checking the sentences Socratically...",
+    compositionTitle: "Own speech",
+    compositionTheory: "Short theory before correction",
+    compositionQuestions: "What to fix yourself",
+    compositionEnough: "Fill in at least 10 lines.",
     check: "Check",
     retry: "Reset",
     next: "Next",
@@ -756,6 +830,7 @@ export const uiCopy = {
     stepTypes: {
       theory: "Theory",
       vocabulary: "Vocabulary",
+      composition: "Own speech",
       translate: "Translation",
       drill: "Speech drill",
       speaking: "Speaking"

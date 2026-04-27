@@ -760,6 +760,148 @@ h1 {
   gap: 12px;
 }
 
+.composition-panel {
+  gap: 16px;
+}
+
+.composition-brief {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.72fr);
+  gap: 18px;
+  padding: 18px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #f5faf6, #eef7f1);
+  border: 1px solid #d7e6da;
+}
+
+.composition-brief span {
+  color: var(--primary-dark);
+  font-size: 0.78rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.composition-brief h3 {
+  margin-top: 8px;
+  font-size: clamp(1.25rem, 2vw, 1.7rem);
+  line-height: 1.18;
+}
+
+.composition-brief ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+  font-weight: 720;
+  line-height: 1.45;
+}
+
+.composition-editor {
+  display: grid;
+  gap: 8px;
+}
+
+.composition-line {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.composition-line span {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #eef4ef;
+  color: var(--primary-dark);
+  font-weight: 900;
+}
+
+.composition-line input {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: #fff;
+  padding: 0 14px;
+  color: var(--ink);
+  outline: 0;
+}
+
+.composition-line input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(25, 166, 107, 0.1);
+}
+
+.composition-actions {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.composition-actions span {
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.composition-feedback {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 20px;
+  background: #fff9e8;
+  border: 1px solid #f1d88d;
+}
+
+.composition-feedback.ready {
+  background: #effaf2;
+  border-color: #94d3a8;
+}
+
+.socratic-list {
+  display: grid;
+  gap: 10px;
+}
+
+.socratic-list h3 {
+  font-size: 1rem;
+}
+
+.socratic-list article {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 12px;
+  padding: 13px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.socratic-list article > span {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #132017;
+  color: #fff;
+  font-weight: 900;
+}
+
+.socratic-list p,
+.socratic-list small {
+  display: block;
+  margin: 4px 0 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.socratic-list strong {
+  color: var(--ink);
+}
+
 .vocab-row span span,
 .vocab-row strong,
 .vocab-row small {
