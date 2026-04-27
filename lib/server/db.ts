@@ -4,12 +4,14 @@ let client: postgres.Sql | null = null;
 let schemaReady = false;
 
 export function getSql() {
-  if (!process.env.DATABASE_URL) {
-    throw new Error("DATABASE_URL is not configured.");
+  const databaseUrl = process.env.DATABASE_URL ?? process.env.STORAGE_URL;
+
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL or STORAGE_URL is not configured.");
   }
 
   if (!client) {
-    client = postgres(process.env.DATABASE_URL, {
+    client = postgres(databaseUrl, {
       prepare: false,
       ssl: "require"
     });
