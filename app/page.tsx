@@ -507,6 +507,39 @@ export default function Home() {
     }
   }
 
+  async function playVocabularyAudio(text: string) {
+    try {
+      const response = await fetch("/api/tts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ text, mode: "normal" })
+      });
+      const result = (await response.json()) as {
+        audioUrl?: string;
+        error?: string;
+      };
+
+      if (!response.ok || !result.audioUrl) {
+        throw new Error(result.error || copy.nativeAudioFailed);
+      }
+
+      nativeAudioRef.current?.pause();
+      const audio = new Audio(result.audioUrl);
+      nativeAudioRef.current = audio;
+      await audio.play();
+    } catch (error) {
+      setNativeAudioMode("normal", {
+        status: "error",
+        message: error instanceof Error ? error.message : copy.nativeAudioFailed,
+        audioUrl: "",
+        voiceName: "",
+        cached: false
+      });
+    }
+  }
+
   async function playAudioUrl(audioUrl: string, mode: NativeAudioMode) {
     nativeAudioRef.current?.pause();
     const audio = new Audio(audioUrl);
@@ -680,7 +713,7 @@ export default function Home() {
                 step={current}
                 locale={locale}
                 onComplete={() => markComplete(2)}
-                onSpeak={(text) => playNativeSample(text, "normal")}
+                onSpeak={(text) => playVocabularyAudio(text)}
               />
             ) : null}
 
