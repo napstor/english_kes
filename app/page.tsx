@@ -46,10 +46,12 @@ type CoachFeedback = {
   score: number;
   bestAnswer: string;
   shortRu: string;
+  grammarMiniLessonRu?: string;
   issues: Array<{
     fragment: string;
     correction: string;
     reasonRu: string;
+    grammarRu?: string;
     category: string;
   }>;
   drillRu: string;
@@ -1060,6 +1062,12 @@ function CoachFeedbackPanel({ feedback, copy }: { feedback: CoachFeedback; copy:
         <span>{feedback.score}/100</span>
       </div>
       <p>{feedback.shortRu}</p>
+      {feedback.grammarMiniLessonRu ? (
+        <div className="grammar-brief">
+          <span>{copy.grammarBrief}</span>
+          <p>{feedback.grammarMiniLessonRu}</p>
+        </div>
+      ) : null}
       <div className="best-answer">
         <span>{copy.bestAnswer}</span>
         <strong>{feedback.bestAnswer}</strong>
@@ -1074,6 +1082,7 @@ function CoachFeedbackPanel({ feedback, copy }: { feedback: CoachFeedback; copy:
                 <span className="good-fragment">{issue.correction}</span>
               </div>
               <p>{issue.reasonRu}</p>
+              {issue.grammarRu ? <p className="grammar-line">{issue.grammarRu}</p> : null}
             </div>
           ))}
         </div>

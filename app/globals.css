@@ -596,6 +596,25 @@ textarea:focus {
   background: rgba(255, 255, 255, 0.72);
 }
 
+.grammar-brief {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #eef6ff;
+  border: 1px solid #c6dcff;
+}
+
+.grammar-brief span {
+  color: #215ca8;
+  font-weight: 900;
+}
+
+.grammar-brief p {
+  margin: 0;
+  line-height: 1.45;
+}
+
 .best-answer span {
   color: var(--muted);
   font-weight: 800;
@@ -617,6 +636,11 @@ textarea:focus {
 .issue-card p {
   margin: 0;
   color: var(--muted);
+}
+
+.issue-card .grammar-line {
+  color: var(--ink);
+  font-weight: 750;
 }
 
 .bad-fragment,

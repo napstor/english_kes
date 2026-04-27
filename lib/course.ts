@@ -472,6 +472,7 @@ export const uiCopy = {
     coachLoading: "Разбираю ошибку с AI-коучем...",
     coachFailed: "Не удалось получить разбор ошибки.",
     coachTitle: "Разбор ошибки",
+    grammarBrief: "Краткая грамматическая справка",
     bestAnswer: "Лучший вариант"
   },
   en: {
@@ -556,6 +557,7 @@ export const uiCopy = {
     coachLoading: "Checking the mistake with the AI coach...",
     coachFailed: "Could not load mistake feedback.",
     coachTitle: "Mistake feedback",
+    grammarBrief: "Short grammar note",
     bestAnswer: "Best answer"
   }
 };

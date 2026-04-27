@@ -7,6 +7,7 @@ type CoachIssue = {
   fragment: string;
   correction: string;
   reasonRu: string;
+  grammarRu: string;
   category: "grammar" | "word_order" | "vocabulary" | "meaning" | "spelling" | "punctuation";
 };
 
@@ -39,7 +40,7 @@ export async function POST(request: Request) {
         {
           role: "system",
           content:
-            "Ты строгий, но ясный коуч-учитель английского для взрослых русскоязычных учеников, которые осваивают английский с нуля и мыслят русской грамматической логикой. Объясняй по-русски максимально понятно, без длинной теории. Фокус: смысл, Present Simple, do/does, порядок слов, частотные наречия, окончание -s, отсутствие двойного отрицания. Не придирайся к допустимым британским/американским вариантам, если смысл и грамматика корректны. Верни только JSON."
+            "Ты коуч-учитель английского для взрослых русскоязычных учеников, которые осваивают английский с нуля и мыслят русской грамматической логикой. Твоя цель не просто исправить, а дать ученику короткое понимание грамматики. Объясняй по-русски ясно, спокойно и очень кратко. Для каждой существенной ошибки дай: 1) что именно неверно, 2) короткое правило, 3) почему русская логика здесь сбивает, 4) как это сказать по-английски. Не пиши длинную лекцию. Одна ошибка = 1-3 коротких предложения. Фокус урока: Present Simple, do/does, he/she/it + -s, порядок слов в вопросе, место частотных наречий, отсутствие двойного отрицания, устойчивые идиомы. Не придирайся к допустимым британским/американским вариантам, артиклям или пунктуации, если они не меняют смысл текущей ПЛФ. Верни только JSON."
         },
         {
           role: "user",
@@ -52,16 +53,18 @@ export async function POST(request: Request) {
               verdict: "correct | almost | incorrect",
               score: "number 0-100",
               bestAnswer: "best corrected English answer",
-              shortRu: "one concise Russian explanation",
+              shortRu: "one sentence: the main grammar idea the learner should understand",
+              grammarMiniLessonRu: "2-4 short Russian sentences explaining the core rule behind the main mistake",
               issues: [
                 {
                   fragment: "wrong fragment from user answer",
                   correction: "correct fragment",
-                  reasonRu: "simple Russian reason",
+                  reasonRu: "what is wrong in plain Russian",
+                  grammarRu: "mini grammar reference: rule + why Russian logic misleads + correct English pattern",
                   category: "grammar | word_order | vocabulary | meaning | spelling | punctuation"
                 }
               ],
-              drillRu: "one short instruction for what to repeat next"
+              drillRu: "one short micro-drill instruction, e.g. repeat He watches / Does he watch / He doesn't watch"
             }
           })
         }
@@ -78,6 +81,7 @@ export async function POST(request: Request) {
       score?: number;
       bestAnswer?: string;
       shortRu?: string;
+      grammarMiniLessonRu?: string;
       issues?: CoachIssue[];
       drillRu?: string;
     };
@@ -87,6 +91,9 @@ export async function POST(request: Request) {
       score: parsed.score ?? 0,
       bestAnswer: parsed.bestAnswer ?? acceptedAnswers[0],
       shortRu: parsed.shortRu ?? "Проверь форму времени, порядок слов и вспомогательные глаголы.",
+      grammarMiniLessonRu:
+        parsed.grammarMiniLessonRu ??
+        "В английском вопрос и отрицание в Present Simple обычно строятся через do/does. После does смысловой глагол идет без окончания -s.",
       issues: parsed.issues ?? [],
       drillRu: parsed.drillRu ?? "Повтори правильный вариант медленно вслух."
     });
