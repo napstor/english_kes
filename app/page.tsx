@@ -4,7 +4,6 @@ import {
   BookOpen,
   Check,
   ChevronRight,
-  CircleAlert,
   Eye,
   EyeOff,
   Languages,
@@ -13,15 +12,13 @@ import {
   Play,
   RotateCcw,
   Shield,
-  Sparkles,
   Target,
   LogOut,
-  UserRoundPlus,
   Users,
   Volume2
 } from "lucide-react";
 import type { FormEvent } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { lessonOne, uiCopy, type Locale, type TrainingStep } from "@/lib/course";
 import { compareAnswer, detectGrammarHint, tokenize, type GrammarHint } from "@/lib/scoring";
 
@@ -300,14 +297,6 @@ export default function Home() {
 
   const completedCount = progress.completedSteps.length;
   const completion = Math.round((completedCount / lessonOne.steps.length) * 100);
-  const weakSteps = useMemo(
-    () =>
-      lessonOne.steps
-        .filter((step) => (progress.attempts[step.id] ?? 0) > 1)
-        .slice(0, 4),
-    [progress.attempts]
-  );
-
   async function loadSession() {
     setAuthLoading(true);
     setAuthError("");
@@ -790,46 +779,16 @@ export default function Home() {
             <button className="icon-button" type="button" onClick={logout} aria-label={copy.logout}>
               <LogOut size={18} />
             </button>
-            <details className="utility-menu">
-              <summary className="icon-button" aria-label={copy.more}>
-                <Users size={18} />
-              </summary>
-              <div className="utility-popover">
-                {authUser.role === "admin" ? <AdminPanel copy={copy} /> : null}
-
-                <section className="coach-card">
-                  <UserRoundPlus size={20} />
-                  <div>
-                    <h3>{copy.localProfilesTitle}</h3>
-                    <p>{copy.localProfilesBody}</p>
-                  </div>
-                </section>
-
-                <section className="coach-card">
-                  <Sparkles size={20} />
-                  <div>
-                    <h3>{copy.methodTitle}</h3>
-                    <p>{copy.methodBody}</p>
-                  </div>
-                </section>
-
-                <section className="coach-card" id="review">
-                  <CircleAlert size={20} />
-                  <div>
-                    <h3>{copy.reviewTitle}</h3>
-                    {weakSteps.length ? (
-                      <ul className="weak-list">
-                        {weakSteps.map((step) => (
-                          <li key={step.id}>{step.label[locale]}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p>{copy.noWeakSteps}</p>
-                    )}
-                  </div>
-                </section>
-              </div>
-            </details>
+            {authUser.role === "admin" ? (
+              <details className="utility-menu">
+                <summary className="icon-button" aria-label={copy.more}>
+                  <Users size={18} />
+                </summary>
+                <div className="utility-popover">
+                  <AdminPanel copy={copy} />
+                </div>
+              </details>
+            ) : null}
           </div>
         </header>
 
@@ -1075,32 +1034,40 @@ function AdminPanel({ copy }: { copy: (typeof uiCopy)[Locale] }) {
   }
 
   return (
-    <section className="coach-card admin-card">
-      <Users size={20} />
-      <div>
-        <h3>{copy.adminTitle}</h3>
-        <form className="admin-form" onSubmit={createStudent}>
-          <input value={username} onChange={(event) => setUsername(event.target.value)} placeholder={copy.username} />
-          <input
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder={copy.password}
-            type="password"
-          />
-          <button className="primary-button wide" type="submit" disabled={loading || !username.trim() || password.length < 8}>
-            {copy.createUser}
-          </button>
-        </form>
-        {message ? <p className="admin-message">{message}</p> : null}
-        <ul className="admin-users">
-          {users.slice(0, 6).map((user) => (
-            <li key={user.id}>
-              <span>{user.username}</span>
-              <small>{user.role}</small>
-            </li>
-          ))}
-        </ul>
+    <section className="admin-panel">
+      <div className="admin-panel-head">
+        <div className="admin-panel-icon">
+          <Users size={18} />
+        </div>
+        <div>
+          <h3>{copy.adminTitle}</h3>
+          <p>{copy.adminSubtitle}</p>
+        </div>
       </div>
+
+      <form className="admin-form" onSubmit={createStudent}>
+        <input value={username} onChange={(event) => setUsername(event.target.value)} placeholder={copy.username} />
+        <input
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          placeholder={copy.password}
+          type="password"
+        />
+        <button className="primary-button wide" type="submit" disabled={loading || !username.trim() || password.length < 8}>
+          {copy.createUser}
+        </button>
+      </form>
+
+      {message ? <p className="admin-message">{message}</p> : null}
+
+      <ul className="admin-users">
+        {users.slice(0, 8).map((user) => (
+          <li key={user.id}>
+            <span>{user.username}</span>
+            <small>{user.role}</small>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
