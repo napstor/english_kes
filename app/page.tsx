@@ -10,11 +10,15 @@ import {
   Pause,
   Play,
   RotateCcw,
+  Shield,
   Sparkles,
   Target,
+  LogOut,
   UserRoundPlus,
+  Users,
   Volume2
 } from "lucide-react";
+import type { FormEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { lessonOne, uiCopy, type Locale, type TrainingStep } from "@/lib/course";
 import { compareAnswer, tokenize } from "@/lib/scoring";
@@ -47,6 +51,12 @@ type NativeAudioState = {
   cached: boolean;
 };
 
+type AuthUser = {
+  id: number;
+  username: string;
+  role: "admin" | "student";
+};
+
 const profilesKey = "english-kes-profiles-v1";
 const activeProfileKey = "english-kes-active-profile-v1";
 const defaultProfile: LocalProfile = {
@@ -77,6 +87,9 @@ function createNativeAudioState(): NativeAudioState {
 
 export default function Home() {
   const [locale, setLocale] = useState<Locale>("ru");
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
+  const [authError, setAuthError] = useState("");
   const [profiles, setProfiles] = useState<LocalProfile[]>([defaultProfile]);
   const [activeProfileId, setActiveProfileId] = useState(defaultProfile.id);
   const [progress, setProgress] = useState<ProgressState>(initialProgress);
@@ -117,6 +130,9 @@ export default function Home() {
     if (saved) {
       setProgress(JSON.parse(saved) as ProgressState);
     }
+
+    void loadSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -154,6 +170,68 @@ export default function Home() {
         .slice(0, 4),
     [progress.attempts]
   );
+
+  async function loadSession() {
+    setAuthLoading(true);
+    setAuthError("");
+
+    try {
+      const response = await fetch("/api/auth/me");
+      const result = (await response.json()) as { user?: AuthUser | null; error?: string };
+
+      if (!response.ok) {
+        throw new Error(result.error || "Could not load session.");
+      }
+
+      setAuthUser(result.user ?? null);
+      if (result.user) {
+        activateUserProfile(result.user);
+      }
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : "Could not load session.");
+      setAuthUser(null);
+    } finally {
+      setAuthLoading(false);
+    }
+  }
+
+  async function login(username: string, password: string) {
+    setAuthError("");
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ username, password })
+    });
+    const result = (await response.json()) as { user?: AuthUser; error?: string };
+
+    if (!response.ok || !result.user) {
+      throw new Error(result.error || "Login failed.");
+    }
+
+    setAuthUser(result.user);
+    activateUserProfile(result.user);
+  }
+
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    setAuthUser(null);
+  }
+
+  function activateUserProfile(user: AuthUser) {
+    const profile = {
+      id: `user-${user.id}`,
+      name: user.username
+    };
+    const saved = window.localStorage.getItem(progressKey(profile.id));
+    setProfiles((prev) => {
+      if (prev.some((item) => item.id === profile.id)) return prev;
+      return [profile, ...prev.filter((item) => item.id !== defaultProfile.id)];
+    });
+    setActiveProfileId(profile.id);
+    setProgress(saved ? (JSON.parse(saved) as ProgressState) : initialProgress);
+  }
 
   function markComplete(extraScore = 1) {
     setProgress((prev) => {
@@ -404,6 +482,21 @@ export default function Home() {
     setProgress(initialProgress);
   }
 
+  if (authLoading) {
+    return (
+      <main className="auth-shell">
+        <section className="auth-card">
+          <div className="brand-mark">K</div>
+          <h1>{copy.loadingSession}</h1>
+        </section>
+      </main>
+    );
+  }
+
+  if (!authUser) {
+    return <LoginScreen copy={copy} error={authError} onLogin={login} />;
+  }
+
   return (
     <main className="app-shell">
       <aside className="sidebar">
@@ -443,19 +536,11 @@ export default function Home() {
             <h1>{lessonOne.title[locale]}</h1>
           </div>
           <div className="top-actions">
-            <label className="profile-picker">
-              <span>{copy.activeProfile}</span>
-              <select value={activeProfile.id} onChange={(event) => switchProfile(event.target.value)}>
-                {profiles.map((profile) => (
-                  <option key={profile.id} value={profile.id}>
-                    {profile.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button className="icon-button" type="button" onClick={addProfile} aria-label={copy.addProfile}>
-              <UserRoundPlus size={18} />
-            </button>
+            <div className="user-pill">
+              <Shield size={17} />
+              <span>{authUser.username}</span>
+              <small>{authUser.role}</small>
+            </div>
             <button
               className="segmented"
               type="button"
@@ -464,6 +549,9 @@ export default function Home() {
             >
               <Languages size={17} />
               {locale.toUpperCase()}
+            </button>
+            <button className="icon-button" type="button" onClick={logout} aria-label={copy.logout}>
+              <LogOut size={18} />
             </button>
           </div>
         </header>
@@ -556,6 +644,8 @@ export default function Home() {
           </article>
 
           <aside className="coach-panel">
+            {authUser.role === "admin" ? <AdminPanel copy={copy} /> : null}
+
             <section className="coach-card">
               <UserRoundPlus size={20} />
               <div>
@@ -608,6 +698,152 @@ function parseJsonResponse(value: string): {
   } catch {
     return null;
   }
+}
+
+function LoginScreen({
+  copy,
+  error,
+  onLogin
+}: {
+  copy: (typeof uiCopy)[Locale];
+  error: string;
+  onLogin: (username: string, password: string) => Promise<void>;
+}) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [loginError, setLoginError] = useState(error);
+
+  useEffect(() => {
+    setLoginError(error);
+  }, [error]);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubmitting(true);
+    setLoginError("");
+
+    try {
+      await onLogin(username, password);
+    } catch (loginError) {
+      setLoginError(loginError instanceof Error ? loginError.message : copy.loginFailed);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <main className="auth-shell">
+      <form className="auth-card" onSubmit={submit}>
+        <div className="brand">
+          <div className="brand-mark">K</div>
+          <div>
+            <p>English KES</p>
+            <span>{copy.productRole}</span>
+          </div>
+        </div>
+        <div>
+          <p className="eyebrow">{copy.authLabel}</p>
+          <h1>{copy.loginTitle}</h1>
+        </div>
+        <label className="field-label">
+          <span>{copy.username}</span>
+          <input value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" />
+        </label>
+        <label className="field-label">
+          <span>{copy.password}</span>
+          <input
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            type="password"
+            autoComplete="current-password"
+          />
+        </label>
+        {loginError ? <div className="auth-error">{loginError}</div> : null}
+        <button className="primary-button wide" type="submit" disabled={submitting || !username.trim() || !password}>
+          {submitting ? copy.signingIn : copy.signIn}
+        </button>
+      </form>
+    </main>
+  );
+}
+
+function AdminPanel({ copy }: { copy: (typeof uiCopy)[Locale] }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [users, setUsers] = useState<AuthUser[]>([]);
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    void loadUsers();
+  }, []);
+
+  async function loadUsers() {
+    const response = await fetch("/api/admin/users");
+    const result = (await response.json()) as { users?: AuthUser[]; error?: string };
+    if (response.ok) setUsers(result.users ?? []);
+  }
+
+  async function createStudent(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password, role: "student" })
+      });
+      const result = (await response.json()) as { user?: AuthUser; error?: string };
+
+      if (!response.ok || !result.user) {
+        throw new Error(result.error || copy.userCreateFailed);
+      }
+
+      setUsername("");
+      setPassword("");
+      setMessage(copy.userCreated);
+      await loadUsers();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : copy.userCreateFailed);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <section className="coach-card admin-card">
+      <Users size={20} />
+      <div>
+        <h3>{copy.adminTitle}</h3>
+        <form className="admin-form" onSubmit={createStudent}>
+          <input value={username} onChange={(event) => setUsername(event.target.value)} placeholder={copy.username} />
+          <input
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder={copy.password}
+            type="password"
+          />
+          <button className="primary-button wide" type="submit" disabled={loading || !username.trim() || password.length < 8}>
+            {copy.createUser}
+          </button>
+        </form>
+        {message ? <p className="admin-message">{message}</p> : null}
+        <ul className="admin-users">
+          {users.slice(0, 6).map((user) => (
+            <li key={user.id}>
+              <span>{user.username}</span>
+              <small>{user.role}</small>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
 }
 
 function TheoryStep({
