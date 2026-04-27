@@ -269,6 +269,10 @@ h1 {
 .step-list {
   display: grid;
   gap: 10px;
+  max-height: calc(100vh - 210px);
+  overflow: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
 }
 
 .step-node {
@@ -660,6 +664,12 @@ textarea:focus {
 
   .lesson-map {
     order: 2;
+  }
+
+  .step-list {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
   }
 
   .exercise-card {
