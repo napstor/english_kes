@@ -8,6 +8,25 @@ export type VocabularyItem = {
   note?: string;
 };
 
+export type TheoryCard = {
+  title: Record<Locale, string>;
+  body: Record<Locale, string>;
+  formula?: string;
+  example?: Record<Locale, string>;
+};
+
+export type TheoryContent = {
+  lead: Record<Locale, string>;
+  cards: TheoryCard[];
+  examples: Array<{
+    ru: string;
+    en: string;
+    note: Record<Locale, string>;
+  }>;
+  pitfalls: TheoryCard[];
+  method: Record<Locale, string[]>;
+};
+
 export type TrainingStep = {
   id: string;
   type: StepType;
@@ -18,6 +37,7 @@ export type TrainingStep = {
   targetText: string;
   acceptedAnswers: string[];
   notes: Record<Locale, string[]>;
+  theory?: TheoryContent;
   vocabulary?: VocabularyItem[];
 };
 
@@ -381,6 +401,124 @@ export const lessonOne = {
           "Frequency words usually, often, seldom, always, never usually go before the main verb.",
           "Lesson method: understand the pattern, build the phrases in writing, then say the same structures aloud until automatic."
         ]
+      },
+      theory: {
+        lead: {
+          ru: "Present Simple в этом уроке нужен не для “простого настоящего”, а для привычек, расписаний и повторяющихся действий. Главная задача - научиться мгновенно собирать три формы: утверждение, вопрос и отрицание.",
+          en: "In this lesson Present Simple is not about a generic present moment. It is for habits, routines and repeated actions. The core task is to build positive, question and negative forms automatically."
+        },
+        cards: [
+          {
+            title: { ru: "Дух времени", en: "Time sense" },
+            body: {
+              ru: "Действие происходит обычно, регулярно, иногда, часто, редко, всегда или никогда. Это не “сейчас”, а повторяемость.",
+              en: "The action happens usually, regularly, sometimes, often, seldom, always or never. It is not happening right now; it is repeated."
+            },
+            formula: "usually / often / never / every day / on Sundays"
+          },
+          {
+            title: { ru: "Утверждение", en: "Positive" },
+            body: {
+              ru: "Для I/you/we/they берем базовый глагол. Для he/she/it добавляем -s или -es.",
+              en: "Use the base verb with I/you/we/they. Add -s or -es with he/she/it."
+            },
+            formula: "I/you/we/they + V · he/she/it + V-s",
+            example: {
+              ru: "Я часто читаю. Он часто читает.",
+              en: "I often read. He often reads."
+            }
+          },
+          {
+            title: { ru: "Вопрос", en: "Question" },
+            body: {
+              ru: "Вопрос строится через do/does. После do/does смысловой глагол всегда возвращается в базовую форму.",
+              en: "Build questions with do/does. After do/does the main verb always returns to its base form."
+            },
+            formula: "do/does + subject + V",
+            example: {
+              ru: "Он часто читает? - Does he often read?",
+              en: "Does he often read?"
+            }
+          },
+          {
+            title: { ru: "Отрицание", en: "Negative" },
+            body: {
+              ru: "Отрицание тоже держится на do/does: don't или doesn't. После них снова базовый глагол без -s.",
+              en: "Negatives also use do/does: don't or doesn't. After them the verb is again in the base form without -s."
+            },
+            formula: "do not / does not + V",
+            example: {
+              ru: "Он не читает. - He doesn't read.",
+              en: "He doesn't read."
+            }
+          }
+        ],
+        examples: [
+          {
+            ru: "Я часто пью кофе.",
+            en: "I often drink coffee. Do I often drink coffee? I don't often drink coffee.",
+            note: {
+              ru: "Трехмерная отработка: утверждение, вопрос, отрицание.",
+              en: "Three-part drilling: positive, question, negative."
+            }
+          },
+          {
+            ru: "Зимой рано темнеет?",
+            en: "Does it get dark early in winter?",
+            note: {
+              ru: "В вопросе does уже забирает -s, поэтому get без окончания.",
+              en: "In a question does carries the -s, so get has no ending."
+            }
+          },
+          {
+            ru: "Мы никогда не играем в теннис.",
+            en: "We never play tennis.",
+            note: {
+              ru: "В английском здесь одно отрицание: never. Не добавляем don't.",
+              en: "English uses one negative here: never. Do not add don't."
+            }
+          }
+        ],
+        pitfalls: [
+          {
+            title: { ru: "Русская логика сбивает", en: "Russian logic trap" },
+            body: {
+              ru: "В русском вопрос часто меняется только интонацией. В английском вопросу нужен вспомогательный глагол: do или does.",
+              en: "Russian can form questions mostly with intonation. English needs an auxiliary: do or does."
+            },
+            formula: "Ты играешь? -> Do you play?"
+          },
+          {
+            title: { ru: "Не удваивай -s", en: "Do not double the -s" },
+            body: {
+              ru: "Если есть does или doesn't, окончание -s уже “использовано”. Нельзя говорить Does he plays?",
+              en: "If you use does or doesn't, the -s is already used. Do not say Does he plays?"
+            },
+            formula: "Does he play? · He doesn't play."
+          },
+          {
+            title: { ru: "Частотные слова", en: "Frequency words" },
+            body: {
+              ru: "Usually, often, seldom, always, never обычно стоят перед смысловым глаголом, но very often / quite often часто уходят в конец.",
+              en: "Usually, often, seldom, always and never usually go before the main verb, while very often / quite often often go at the end."
+            },
+            formula: "I often read. · I read very often."
+          }
+        ],
+        method: {
+          ru: [
+            "Пойми ситуацию: это привычка или повторяемое действие.",
+            "Собери письменный вариант и проверь формулу.",
+            "Проговори вслух: утверждение -> вопрос -> отрицание.",
+            "Повтори фразы ТР2 уже в потоке: русская фраза внутри, английская фраза вслух."
+          ],
+          en: [
+            "Understand the situation: it is a habit or repeated action.",
+            "Build the written version and check the formula.",
+            "Say it aloud: positive -> question -> negative.",
+            "Repeat Speech Drill 2 in flow: Russian inside, English aloud."
+          ]
+        }
       }
     },
     {
@@ -448,6 +586,9 @@ export const uiCopy = {
     trainingPath: "Маршрут урока",
     task: "Задание",
     sourcePhrase: "Русская фраза",
+    theoryCore: "Главная идея",
+    theoryExamples: "Примеры",
+    theoryExamplesTitle: "Как формула работает в живой фразе",
     understood: "Понял, продолжить",
     answerPlaceholder: "Напиши ответ на английском...",
     check: "Проверить",
@@ -538,6 +679,9 @@ export const uiCopy = {
     trainingPath: "Lesson path",
     task: "Task",
     sourcePhrase: "Russian sentence",
+    theoryCore: "Core idea",
+    theoryExamples: "Examples",
+    theoryExamplesTitle: "How the pattern works in a real sentence",
     understood: "Got it, continue",
     answerPlaceholder: "Write the English answer...",
     check: "Check",

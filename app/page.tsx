@@ -1029,6 +1029,65 @@ function TheoryStep({
   onComplete: () => void;
   onSpeak: (text: string) => void;
 }) {
+  if (step.theory) {
+    return (
+      <div className="content-panel theory-panel">
+        <section className="theory-lead">
+          <span>{uiCopy[locale].theoryCore}</span>
+          <p>{step.theory.lead[locale]}</p>
+        </section>
+
+        <section className="theory-card-grid">
+          {step.theory.cards.map((card) => (
+            <article className="theory-card" key={card.title[locale]}>
+              <h3>{card.title[locale]}</h3>
+              <p>{card.body[locale]}</p>
+              {card.formula ? <code>{card.formula}</code> : null}
+              {card.example ? <small>{card.example[locale]}</small> : null}
+            </article>
+          ))}
+        </section>
+
+        <section className="theory-examples">
+          <div>
+            <span>{uiCopy[locale].theoryExamples}</span>
+            <h3>{uiCopy[locale].theoryExamplesTitle}</h3>
+          </div>
+          {step.theory.examples.map((example) => (
+            <article className="example-row" key={example.ru}>
+              <p>{example.ru}</p>
+              <strong>{example.en}</strong>
+              <small>{example.note[locale]}</small>
+            </article>
+          ))}
+        </section>
+
+        <section className="theory-pitfalls">
+          {step.theory.pitfalls.map((pitfall) => (
+            <article key={pitfall.title[locale]}>
+              <span>{pitfall.title[locale]}</span>
+              <p>{pitfall.body[locale]}</p>
+              {pitfall.formula ? <code>{pitfall.formula}</code> : null}
+            </article>
+          ))}
+        </section>
+
+        <section className="method-strip">
+          <span>{uiCopy[locale].methodTitle}</span>
+          <ol>
+            {step.theory.method[locale].map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ol>
+        </section>
+
+        <button className="primary-button wide" type="button" onClick={onComplete}>
+          <Check size={18} /> {uiCopy[locale].understood}
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="content-panel">
       <ul className="lesson-notes">
