@@ -469,6 +469,19 @@ textarea:focus {
   font-weight: 850;
 }
 
+.mini-status {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #f1f6f1;
+  color: var(--muted);
+  font-weight: 750;
+}
+
+.mini-status.error {
+  background: #fff0ef;
+  color: #9d231d;
+}
+
 .speaking-panel {
   text-align: center;
 }
