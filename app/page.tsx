@@ -59,7 +59,12 @@ export default function Home() {
   const [recording, setRecording] = useState(false);
   const [recorded, setRecorded] = useState(false);
   const [elapsed, setElapsed] = useState(0);
+  const [recordingStatus, setRecordingStatus] = useState<"idle" | "uploading" | "uploaded" | "error">("idle");
+  const [recordingMessage, setRecordingMessage] = useState("");
   const timerRef = useRef<number | null>(null);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const chunksRef = useRef<BlobPart[]>([]);
   const current = lessonOne.steps[progress.activeStep];
   const copy = uiCopy[locale];
   const activeProfile = profiles.find((profile) => profile.id === activeProfileId) ?? profiles[0] ?? defaultProfile;
@@ -97,6 +102,8 @@ export default function Home() {
     setRecording(false);
     setRecorded(false);
     setElapsed(0);
+    setRecordingStatus("idle");
+    setRecordingMessage("");
     if (timerRef.current) window.clearInterval(timerRef.current);
   }, [progress.activeStep]);
 
@@ -145,20 +152,86 @@ export default function Home() {
     }
   }
 
-  function startRecording() {
-    setRecording(true);
-    setRecorded(false);
-    setElapsed(0);
-    timerRef.current = window.setInterval(() => {
-      setElapsed((value) => value + 1);
-    }, 1000);
+  async function startRecording() {
+    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
+      setRecordingStatus("error");
+      setRecordingMessage(copy.microphoneUnsupported);
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      streamRef.current = stream;
+      recorderRef.current = recorder;
+      chunksRef.current = [];
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) chunksRef.current.push(event.data);
+      };
+
+      recorder.onstop = () => {
+        void uploadRecording(current.id, activeProfile.id);
+      };
+
+      recorder.start();
+      setRecording(true);
+      setRecorded(false);
+      setRecordingStatus("idle");
+      setRecordingMessage("");
+      setElapsed(0);
+      timerRef.current = window.setInterval(() => {
+        setElapsed((value) => value + 1);
+      }, 1000);
+    } catch {
+      setRecordingStatus("error");
+      setRecordingMessage(copy.microphoneDenied);
+    }
   }
 
   function stopRecording() {
     setRecording(false);
-    setRecorded(true);
     if (timerRef.current) window.clearInterval(timerRef.current);
-    markComplete(3);
+    recorderRef.current?.stop();
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+  }
+
+  async function uploadRecording(stepId: string, profileId: string) {
+    const type = recorderRef.current?.mimeType || "audio/webm";
+    const audioBlob = new Blob(chunksRef.current, { type });
+    if (!audioBlob.size) {
+      setRecordingStatus("error");
+      setRecordingMessage(copy.recordingEmpty);
+      return;
+    }
+
+    setRecorded(true);
+    setRecordingStatus("uploading");
+    setRecordingMessage(copy.uploadingRecording);
+
+    const formData = new FormData();
+    formData.append("audio", audioBlob, `recording-${stepId}.webm`);
+    formData.append("stepId", stepId);
+    formData.append("profileId", profileId);
+
+    try {
+      const response = await fetch("/api/audio/upload", {
+        method: "POST",
+        body: formData
+      });
+      const result = (await response.json()) as { url?: string; error?: string };
+
+      if (!response.ok) {
+        throw new Error(result.error || copy.uploadFailed);
+      }
+
+      setRecordingStatus("uploaded");
+      setRecordingMessage(copy.uploadedRecording);
+      markComplete(3);
+    } catch (error) {
+      setRecordingStatus("error");
+      setRecordingMessage(error instanceof Error ? error.message : copy.uploadFailed);
+    }
   }
 
   function speak(text: string) {
@@ -317,6 +390,8 @@ export default function Home() {
                 copy={copy}
                 elapsed={elapsed}
                 recorded={recorded}
+                recordingMessage={recordingMessage}
+                recordingStatus={recordingStatus}
                 recording={recording}
                 step={current}
                 onStart={startRecording}
@@ -447,6 +522,8 @@ function SpeakingStep({
   copy,
   elapsed,
   recorded,
+  recordingMessage,
+  recordingStatus,
   recording,
   step,
   onStart,
@@ -455,6 +532,8 @@ function SpeakingStep({
   copy: (typeof uiCopy)[Locale];
   elapsed: number;
   recorded: boolean;
+  recordingMessage: string;
+  recordingStatus: "idle" | "uploading" | "uploaded" | "error";
   recording: boolean;
   step: TrainingStep;
   onStart: () => void;
@@ -469,16 +548,27 @@ function SpeakingStep({
         ))}
       </div>
       <div className="record-row">
-        <button className={recording ? "danger-button" : "record-button"} type="button" onClick={recording ? onStop : onStart}>
+        <button
+          className={recording ? "danger-button" : "record-button"}
+          type="button"
+          onClick={recording ? onStop : onStart}
+          disabled={recordingStatus === "uploading"}
+        >
           {recording ? <Pause size={18} /> : <Mic size={18} />}
           {recording ? copy.stopRecording : copy.startRecording}
         </button>
         <span>{elapsed}s</span>
       </div>
       {recorded ? (
-        <div className="feedback partial">
+        <div className={`feedback ${recordingStatus === "error" ? "wrong" : recordingStatus === "uploaded" ? "exact" : "partial"}`}>
           <strong>{copy.recordingSaved}</strong>
-          <p>{copy.recordingMvp}</p>
+          <p>{recordingMessage || copy.recordingMvp}</p>
+        </div>
+      ) : null}
+      {recordingStatus === "error" && !recorded ? (
+        <div className="feedback wrong">
+          <strong>{copy.recordingProblem}</strong>
+          <p>{recordingMessage}</p>
         </div>
       ) : null}
       <button className="secondary-button wide" type="button">
