@@ -790,6 +790,12 @@ export default function Home() {
             <div className="prompt-block">
               <p className="eyebrow">{copy.task}</p>
               <h2>{current.prompt[locale]}</h2>
+              {current.sourceText ? (
+                <div className="source-text" lang="ru">
+                  <span>{copy.sourcePhrase}</span>
+                  <p>{current.sourceText}</p>
+                </div>
+              ) : null}
               {current.hint[locale] ? <p className="hint">{current.hint[locale]}</p> : null}
             </div>
 

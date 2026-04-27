@@ -13,6 +13,7 @@ export type TrainingStep = {
   type: StepType;
   label: Record<Locale, string>;
   prompt: Record<Locale, string>;
+  sourceText?: string;
   hint: Record<Locale, string>;
   targetText: string;
   acceptedAnswers: string[];
@@ -230,9 +231,10 @@ function makeTechniqueOneStep(item: LessonOneItem, index: number): TrainingStep 
       en: `Speech drill 1.${index + 1}`
     },
     prompt: {
-      ru: `Дай утверждение, вопрос и отрицание: ${item.ru}`,
-      en: `Give positive, question and negative: ${item.ru}`
+      ru: "Дай утверждение, вопрос и отрицание.",
+      en: "Give positive, question and negative."
     },
+    sourceText: item.ru,
     hint: item.hint ?? {
       ru: "Пиши три предложения подряд: утверждение, вопрос, отрицание.",
       en: "Write three sentences in order: positive, question, negative."
@@ -255,9 +257,10 @@ function makeTechniqueTwoStep(item: LessonOneItem, index: number): TrainingStep 
       en: `Speech drill 2.${index + 1}`
     },
     prompt: {
-      ru: `Переведи: ${item.ru}`,
-      en: `Translate: ${item.ru}`
+      ru: "Переведи на английский.",
+      en: "Translate into English."
     },
+    sourceText: item.ru,
     hint: item.hint ?? {
       ru: "Сначала проверь ПЛФ, затем лексику и порядок слов.",
       en: "Check the speech pattern first, then vocabulary and word order."
@@ -280,9 +283,10 @@ function makeTechniqueOneSpeakingStep(item: LessonOneItem, index: number): Train
       en: `Speech drill 1.${index + 1} aloud`
     },
     prompt: {
-      ru: `Прочитай по-русски про себя и вслух произнеси трехмерный вариант: ${item.ru}`,
-      en: `Read the Russian silently and say the three-part English pattern aloud: ${item.ru}`
+      ru: "Прочитай русскую фразу про себя и вслух произнеси трехмерный английский вариант.",
+      en: "Read the Russian sentence silently and say the three-part English pattern aloud."
     },
+    sourceText: item.ru,
     hint: {
       ru: "Последовательность книги: утверждение, вопрос, отрицание. Сначала медленно, потом повтори в обычном темпе.",
       en: "Book sequence: positive, question, negative. Start slowly, then repeat at normal speed."
@@ -313,9 +317,10 @@ function makeTechniqueTwoSpeakingStep(item: LessonOneItem, index: number): Train
       en: `Speech drill 2.${index + 1} aloud`
     },
     prompt: {
-      ru: `Прочитай русскую фразу про себя и сразу произнеси английский вариант: ${item.ru}`,
-      en: `Read the Russian silently and immediately say the English version: ${item.ru}`
+      ru: "Прочитай русскую фразу про себя и сразу произнеси английский вариант.",
+      en: "Read the Russian sentence silently and immediately say the English version."
     },
+    sourceText: item.ru,
     hint: {
       ru: "Методика ТР2: сначала тихо и медленно, сверка, затем два раза громко - обычным голосом и с другой высотой голоса.",
       en: "Speech drill 2 method: first quietly and slowly, check, then twice aloud with varied pitch."
@@ -442,6 +447,7 @@ export const uiCopy = {
     bookProgress: "Прогресс книги",
     trainingPath: "Маршрут урока",
     task: "Задание",
+    sourcePhrase: "Русская фраза",
     understood: "Понял, продолжить",
     answerPlaceholder: "Напиши ответ на английском...",
     check: "Проверить",
@@ -531,6 +537,7 @@ export const uiCopy = {
     bookProgress: "Book progress",
     trainingPath: "Lesson path",
     task: "Task",
+    sourcePhrase: "Russian sentence",
     understood: "Got it, continue",
     answerPlaceholder: "Write the English answer...",
     check: "Check",
