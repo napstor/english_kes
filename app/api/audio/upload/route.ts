@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     const pathname = `recordings/${safeProfileId}/${safeStepId}/${Date.now()}.${extension}`;
 
     const blob = await put(pathname, audio, {
-      access: "public",
+      access: "private",
       addRandomSuffix: true,
       contentType: audio.type
     });
