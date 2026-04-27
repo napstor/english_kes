@@ -706,6 +706,46 @@ export default function Home() {
             <button className="icon-button" type="button" onClick={logout} aria-label={copy.logout}>
               <LogOut size={18} />
             </button>
+            <details className="utility-menu">
+              <summary className="icon-button" aria-label={copy.more}>
+                <Users size={18} />
+              </summary>
+              <div className="utility-popover">
+                {authUser.role === "admin" ? <AdminPanel copy={copy} /> : null}
+
+                <section className="coach-card">
+                  <UserRoundPlus size={20} />
+                  <div>
+                    <h3>{copy.localProfilesTitle}</h3>
+                    <p>{copy.localProfilesBody}</p>
+                  </div>
+                </section>
+
+                <section className="coach-card">
+                  <Sparkles size={20} />
+                  <div>
+                    <h3>{copy.methodTitle}</h3>
+                    <p>{copy.methodBody}</p>
+                  </div>
+                </section>
+
+                <section className="coach-card" id="review">
+                  <CircleAlert size={20} />
+                  <div>
+                    <h3>{copy.reviewTitle}</h3>
+                    {weakSteps.length ? (
+                      <ul className="weak-list">
+                        {weakSteps.map((step) => (
+                          <li key={step.id}>{step.label[locale]}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>{copy.noWeakSteps}</p>
+                    )}
+                  </div>
+                </section>
+              </div>
+            </details>
           </div>
         </header>
 
@@ -804,41 +844,6 @@ export default function Home() {
             </div>
           </article>
 
-          <aside className="coach-panel">
-            {authUser.role === "admin" ? <AdminPanel copy={copy} /> : null}
-
-            <section className="coach-card">
-              <UserRoundPlus size={20} />
-              <div>
-                <h3>{copy.localProfilesTitle}</h3>
-                <p>{copy.localProfilesBody}</p>
-              </div>
-            </section>
-
-            <section className="coach-card">
-              <Sparkles size={20} />
-              <div>
-                <h3>{copy.methodTitle}</h3>
-                <p>{copy.methodBody}</p>
-              </div>
-            </section>
-
-            <section className="coach-card" id="review">
-              <CircleAlert size={20} />
-              <div>
-                <h3>{copy.reviewTitle}</h3>
-                {weakSteps.length ? (
-                  <ul className="weak-list">
-                    {weakSteps.map((step) => (
-                      <li key={step.id}>{step.label[locale]}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>{copy.noWeakSteps}</p>
-                )}
-              </div>
-            </section>
-          </aside>
         </section>
       </section>
     </main>
