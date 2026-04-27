@@ -173,8 +173,8 @@ export const lessonOne = {
         en: "Say the phrase slowly, then repeat it faster."
       },
       hint: {
-        ru: "В MVP запись пока имитирует pipeline. Позже подключим микрофон, STT и подсветку ошибок.",
-        en: "The MVP simulates the pipeline. We will connect microphone, STT and error highlighting next."
+        ru: "Запись уже сохраняется в Blob. Следующий шаг - STT и подсветка ошибок.",
+        en: "The recording is now saved to Blob. Next step: STT and error highlighting."
       },
       targetText: "Why do you never wash the dishes after lunch?",
       acceptedAnswers: ["Why do you never wash the dishes after lunch?"],

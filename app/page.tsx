@@ -219,10 +219,11 @@ export default function Home() {
         method: "POST",
         body: formData
       });
-      const result = (await response.json()) as { url?: string; error?: string };
+      const responseText = await response.text();
+      const result = parseJsonResponse(responseText);
 
       if (!response.ok) {
-        throw new Error(result.error || copy.uploadFailed);
+        throw new Error(result?.error || `${copy.uploadFailed} HTTP ${response.status}`);
       }
 
       setRecordingStatus("uploaded");
@@ -447,6 +448,15 @@ export default function Home() {
       </section>
     </main>
   );
+}
+
+function parseJsonResponse(value: string): { url?: string; error?: string } | null {
+  if (!value.trim()) return null;
+  try {
+    return JSON.parse(value) as { url?: string; error?: string };
+  } catch {
+    return null;
+  }
 }
 
 function TheoryStep({
