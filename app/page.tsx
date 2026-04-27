@@ -5,6 +5,8 @@ import {
   Check,
   ChevronRight,
   CircleAlert,
+  Eye,
+  EyeOff,
   Languages,
   Mic,
   Pause,
@@ -1162,10 +1164,25 @@ function SpeakingStep({
 }) {
   const slowAudio = nativeAudio.slow;
   const normalAudio = nativeAudio.normal;
+  const [referenceVisible, setReferenceVisible] = useState(false);
+
+  useEffect(() => {
+    setReferenceVisible(false);
+  }, [step.id]);
 
   return (
     <div className="content-panel speaking-panel">
-      <div className="speech-target">{step.targetText}</div>
+      <div className={referenceVisible ? "speech-target revealed" : "speech-target hidden"}>
+        {referenceVisible ? (
+          <p>{step.targetText}</p>
+        ) : (
+          <p>{copy.referenceHidden}</p>
+        )}
+        <button className="reference-toggle" type="button" onClick={() => setReferenceVisible((visible) => !visible)}>
+          {referenceVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+          {referenceVisible ? copy.hideReference : copy.showReference}
+        </button>
+      </div>
       <div className={recording ? "wave active" : "wave"}>
         {Array.from({ length: 18 }).map((_, index) => (
           <span key={index} />

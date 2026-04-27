@@ -750,6 +750,39 @@ textarea:focus {
   font-weight: 850;
 }
 
+.speech-target.hidden {
+  border: 1px dashed #c9d7ce;
+  background: #f7faf7;
+  color: var(--muted);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-weight: 750;
+}
+
+.speech-target p {
+  margin: 0;
+}
+
+.reference-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #e8f1eb;
+  color: var(--ink);
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 0.98rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.reference-toggle:hover {
+  background: #dceae1;
+}
+
 .wave {
   height: 72px;
   display: flex;
