@@ -104,6 +104,7 @@ export default function Home() {
   const [authLoading, setAuthLoading] = useState(true);
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
   const [authError, setAuthError] = useState("");
+  const [remoteProgressReady, setRemoteProgressReady] = useState(false);
   const [profiles, setProfiles] = useState<LocalProfile[]>([defaultProfile]);
   const [activeProfileId, setActiveProfileId] = useState(defaultProfile.id);
   const [progress, setProgress] = useState<ProgressState>(initialProgress);
@@ -159,7 +160,10 @@ export default function Home() {
   useEffect(() => {
     window.localStorage.setItem(activeProfileKey, activeProfileId);
     window.localStorage.setItem(progressKey(activeProfileId), JSON.stringify(progress));
-  }, [activeProfileId, progress]);
+    if (authUser && remoteProgressReady) {
+      void saveRemoteProgress(progress);
+    }
+  }, [activeProfileId, authUser, progress, remoteProgressReady]);
 
   useEffect(() => {
     setAnswer("");
@@ -205,7 +209,7 @@ export default function Home() {
 
       setAuthUser(result.user ?? null);
       if (result.user) {
-        activateUserProfile(result.user);
+        await activateUserProfile(result.user);
       }
     } catch (error) {
       setAuthError(error instanceof Error ? error.message : "Could not load session.");
@@ -231,7 +235,7 @@ export default function Home() {
     }
 
     setAuthUser(result.user);
-    activateUserProfile(result.user);
+    await activateUserProfile(result.user);
   }
 
   async function logout() {
@@ -239,18 +243,42 @@ export default function Home() {
     setAuthUser(null);
   }
 
-  function activateUserProfile(user: AuthUser) {
+  async function activateUserProfile(user: AuthUser) {
     const profile = {
       id: `user-${user.id}`,
       name: user.username
     };
+    setRemoteProgressReady(false);
     const saved = window.localStorage.getItem(progressKey(profile.id));
     setProfiles((prev) => {
       if (prev.some((item) => item.id === profile.id)) return prev;
       return [profile, ...prev.filter((item) => item.id !== defaultProfile.id)];
     });
     setActiveProfileId(profile.id);
-    setProgress(saved ? (JSON.parse(saved) as ProgressState) : initialProgress);
+    const remoteProgress = await loadRemoteProgress();
+    setProgress(remoteProgress ?? (saved ? (JSON.parse(saved) as ProgressState) : initialProgress));
+    setRemoteProgressReady(true);
+  }
+
+  async function loadRemoteProgress() {
+    const response = await fetch(`/api/progress?lessonId=${encodeURIComponent(lessonOne.id)}`);
+    if (!response.ok) return null;
+
+    const result = (await response.json()) as { progress?: ProgressState | null };
+    return result.progress ?? null;
+  }
+
+  async function saveRemoteProgress(nextProgress: ProgressState) {
+    await fetch("/api/progress", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        lessonId: lessonOne.id,
+        ...nextProgress
+      })
+    });
   }
 
   function markComplete(extraScore = 1) {
