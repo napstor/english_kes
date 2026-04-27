@@ -37,6 +37,16 @@ type SpeechReview = {
   error: string;
 };
 
+type NativeAudioMode = "slow" | "normal";
+
+type NativeAudioState = {
+  status: "idle" | "loading" | "playing" | "ready" | "error";
+  message: string;
+  audioUrl: string;
+  voiceName: string;
+  cached: boolean;
+};
+
 const profilesKey = "english-kes-profiles-v1";
 const activeProfileKey = "english-kes-active-profile-v1";
 const defaultProfile: LocalProfile = {
@@ -55,6 +65,16 @@ const initialProgress: ProgressState = {
   score: 0
 };
 
+function createNativeAudioState(): NativeAudioState {
+  return {
+    status: "idle",
+    message: "",
+    audioUrl: "",
+    voiceName: "",
+    cached: false
+  };
+}
+
 export default function Home() {
   const [locale, setLocale] = useState<Locale>("ru");
   const [profiles, setProfiles] = useState<LocalProfile[]>([defaultProfile]);
@@ -68,8 +88,10 @@ export default function Home() {
   const [recordingStatus, setRecordingStatus] = useState<"idle" | "uploading" | "uploaded" | "error">("idle");
   const [recordingMessage, setRecordingMessage] = useState("");
   const [speechReview, setSpeechReview] = useState<SpeechReview | null>(null);
-  const [nativeAudioStatus, setNativeAudioStatus] = useState<"idle" | "loading" | "playing" | "error">("idle");
-  const [nativeAudioMessage, setNativeAudioMessage] = useState("");
+  const [nativeAudio, setNativeAudio] = useState<Record<NativeAudioMode, NativeAudioState>>({
+    slow: createNativeAudioState(),
+    normal: createNativeAudioState()
+  });
   const timerRef = useRef<number | null>(null);
   const nativeAudioRef = useRef<HTMLAudioElement | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -115,8 +137,10 @@ export default function Home() {
     setRecordingStatus("idle");
     setRecordingMessage("");
     setSpeechReview(null);
-    setNativeAudioStatus("idle");
-    setNativeAudioMessage("");
+    setNativeAudio({
+      slow: createNativeAudioState(),
+      normal: createNativeAudioState()
+    });
     nativeAudioRef.current?.pause();
     if (timerRef.current) window.clearInterval(timerRef.current);
   }, [progress.activeStep]);
@@ -276,9 +300,21 @@ export default function Home() {
     window.speechSynthesis.speak(utterance);
   }
 
-  async function playNativeSample(text: string) {
-    setNativeAudioStatus("loading");
-    setNativeAudioMessage(copy.nativeAudioLoading);
+  async function playNativeSample(text: string, mode: NativeAudioMode) {
+    const existing = nativeAudio[mode];
+
+    if (existing.audioUrl) {
+      await playAudioUrl(existing.audioUrl, mode);
+      return;
+    }
+
+    setNativeAudioMode(mode, {
+      status: "loading",
+      message: copy.nativeAudioLoading,
+      audioUrl: "",
+      voiceName: "",
+      cached: false
+    });
 
     try {
       const response = await fetch("/api/tts", {
@@ -286,11 +322,12 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ text })
+        body: JSON.stringify({ text, mode })
       });
       const result = (await response.json()) as {
         audioUrl?: string;
         voiceName?: string;
+        cached?: boolean;
         error?: string;
       };
 
@@ -298,21 +335,54 @@ export default function Home() {
         throw new Error(result.error || copy.nativeAudioFailed);
       }
 
-      nativeAudioRef.current?.pause();
-      const audio = new Audio(result.audioUrl);
-      nativeAudioRef.current = audio;
-      audio.onended = () => setNativeAudioStatus("idle");
-      audio.onerror = () => {
-        setNativeAudioStatus("error");
-        setNativeAudioMessage(copy.nativeAudioFailed);
-      };
-      setNativeAudioMessage(result.voiceName ? `${copy.nativeAudioVoice}: ${result.voiceName}` : "");
-      setNativeAudioStatus("playing");
-      await audio.play();
+      setNativeAudioMode(mode, {
+        status: "ready",
+        message: result.voiceName ? `${copy.nativeAudioVoice}: ${result.voiceName}` : copy.nativeAudioReady,
+        audioUrl: result.audioUrl,
+        voiceName: result.voiceName ?? "",
+        cached: Boolean(result.cached)
+      });
+      await playAudioUrl(result.audioUrl, mode);
     } catch (error) {
-      setNativeAudioStatus("error");
-      setNativeAudioMessage(error instanceof Error ? error.message : copy.nativeAudioFailed);
+      setNativeAudioMode(mode, {
+        status: "error",
+        message: error instanceof Error ? error.message : copy.nativeAudioFailed,
+        audioUrl: "",
+        voiceName: "",
+        cached: false
+      });
     }
+  }
+
+  async function playAudioUrl(audioUrl: string, mode: NativeAudioMode) {
+    nativeAudioRef.current?.pause();
+    const audio = new Audio(audioUrl);
+    nativeAudioRef.current = audio;
+    audio.onended = () => {
+      patchNativeAudioMode(mode, { status: "ready" });
+    };
+    audio.onerror = () => {
+      patchNativeAudioMode(mode, { status: "error", message: copy.nativeAudioFailed });
+    };
+    patchNativeAudioMode(mode, { status: "playing" });
+    await audio.play();
+  }
+
+  function setNativeAudioMode(mode: NativeAudioMode, state: NativeAudioState) {
+    setNativeAudio((prev) => ({
+      ...prev,
+      [mode]: state
+    }));
+  }
+
+  function patchNativeAudioMode(mode: NativeAudioMode, state: Partial<NativeAudioState>) {
+    setNativeAudio((prev) => ({
+      ...prev,
+      [mode]: {
+        ...prev[mode],
+        ...state
+      }
+    }));
   }
 
   function switchProfile(profileId: string) {
@@ -466,12 +536,11 @@ export default function Home() {
                 recordingStatus={recordingStatus}
                 recording={recording}
                 speechReview={speechReview}
-                nativeAudioMessage={nativeAudioMessage}
-                nativeAudioStatus={nativeAudioStatus}
+                nativeAudio={nativeAudio}
                 step={current}
                 onStart={startRecording}
                 onStop={stopRecording}
-                onPlayNative={() => playNativeSample(current.targetText)}
+                onPlayNative={(mode) => playNativeSample(current.targetText, mode)}
               />
             ) : null}
 
@@ -618,8 +687,7 @@ function SpeakingStep({
   recordingStatus,
   recording,
   speechReview,
-  nativeAudioMessage,
-  nativeAudioStatus,
+  nativeAudio,
   step,
   onStart,
   onStop,
@@ -632,13 +700,15 @@ function SpeakingStep({
   recordingStatus: "idle" | "uploading" | "uploaded" | "error";
   recording: boolean;
   speechReview: SpeechReview | null;
-  nativeAudioMessage: string;
-  nativeAudioStatus: "idle" | "loading" | "playing" | "error";
+  nativeAudio: Record<NativeAudioMode, NativeAudioState>;
   step: TrainingStep;
   onStart: () => void;
   onStop: () => void;
-  onPlayNative: () => void;
+  onPlayNative: (mode: NativeAudioMode) => void;
 }) {
+  const slowAudio = nativeAudio.slow;
+  const normalAudio = nativeAudio.normal;
+
   return (
     <div className="content-panel speaking-panel">
       <div className="speech-target">{step.targetText}</div>
@@ -695,12 +765,40 @@ function SpeakingStep({
           <p>{speechReview.error}</p>
         </div>
       ) : null}
-      {nativeAudioMessage ? (
-        <div className={`mini-status ${nativeAudioStatus === "error" ? "error" : ""}`}>{nativeAudioMessage}</div>
+      {slowAudio.message || normalAudio.message ? (
+        <div className="native-status-grid">
+          {slowAudio.message ? (
+            <div className={`mini-status ${slowAudio.status === "error" ? "error" : ""}`}>
+              <strong>{copy.nativeAudioSlow}</strong>
+              <span>{slowAudio.message}</span>
+            </div>
+          ) : null}
+          {normalAudio.message ? (
+            <div className={`mini-status ${normalAudio.status === "error" ? "error" : ""}`}>
+              <strong>{copy.nativeAudioNormal}</strong>
+              <span>{normalAudio.message}</span>
+            </div>
+          ) : null}
+        </div>
       ) : null}
-      <button className="secondary-button wide" type="button" onClick={onPlayNative} disabled={nativeAudioStatus === "loading"}>
-        <Play size={18} /> {nativeAudioStatus === "loading" ? copy.nativeAudioLoadingShort : copy.playNative}
-      </button>
+      <div className="native-actions">
+        <button className="secondary-button wide" type="button" onClick={() => onPlayNative("slow")} disabled={slowAudio.status === "loading"}>
+          <Play size={18} />
+          {slowAudio.status === "loading"
+            ? copy.nativeAudioLoadingShort
+            : slowAudio.audioUrl
+              ? copy.playNativeAgainSlow
+              : copy.playNativeSlow}
+        </button>
+        <button className="secondary-button wide" type="button" onClick={() => onPlayNative("normal")} disabled={normalAudio.status === "loading"}>
+          <Play size={18} />
+          {normalAudio.status === "loading"
+            ? copy.nativeAudioLoadingShort
+            : normalAudio.audioUrl
+              ? copy.playNativeAgainNormal
+              : copy.playNativeNormal}
+        </button>
+      </div>
     </div>
   );
 }

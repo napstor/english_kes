@@ -477,9 +477,33 @@ textarea:focus {
   font-weight: 750;
 }
 
+.mini-status strong,
+.mini-status span {
+  display: block;
+}
+
+.mini-status strong {
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
 .mini-status.error {
   background: #fff0ef;
   color: #9d231d;
+}
+
+.native-status-grid,
+.native-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 560px) {
+  .native-status-grid,
+  .native-actions {
+    grid-template-columns: 1fr;
+  }
 }
 
 .speaking-panel {

@@ -21,6 +21,12 @@ type VoicesResponse = {
 
 const elevenModelId = "eleven_v3";
 const outputFormat = "mp3_44100_128";
+const speedByMode = {
+  slow: 0.72,
+  normal: 0.92
+} as const;
+
+type TtsMode = keyof typeof speedByMode;
 
 export async function POST(request: Request) {
   try {
@@ -32,8 +38,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "BLOB_READ_WRITE_TOKEN is not configured." }, { status: 500 });
     }
 
-    const body = (await request.json()) as { text?: string };
+    const body = (await request.json()) as { text?: string; mode?: TtsMode };
     const text = body.text?.trim();
+    const mode: TtsMode = body.mode === "slow" ? "slow" : "normal";
 
     if (!text) {
       return NextResponse.json({ error: "text is required." }, { status: 400 });
@@ -44,8 +51,8 @@ export async function POST(request: Request) {
     }
 
     const voice = await chooseBritishVoice(text);
-    const textHash = createHash("sha256").update(`${elevenModelId}:${voice.voice_id}:${text}`).digest("hex").slice(0, 24);
-    const pathname = `tts/${elevenModelId}/${voice.voice_id}/${textHash}.mp3`;
+    const textHash = createHash("sha256").update(`${elevenModelId}:${voice.voice_id}:${mode}:${text}`).digest("hex").slice(0, 24);
+    const pathname = `tts/${elevenModelId}/${voice.voice_id}/${mode}/${textHash}.mp3`;
 
     const cached = await findCachedAudio(pathname);
     if (cached) {
@@ -54,7 +61,8 @@ export async function POST(request: Request) {
         pathname,
         voiceId: voice.voice_id,
         voiceName: voice.name,
-        cached: true
+        cached: true,
+        mode
       });
     }
 
@@ -75,7 +83,7 @@ export async function POST(request: Request) {
             similarity_boost: 0.78,
             style: 0.18,
             use_speaker_boost: true,
-            speed: 0.92
+            speed: speedByMode[mode]
           }
         })
       }
@@ -101,7 +109,8 @@ export async function POST(request: Request) {
       pathname,
       voiceId: voice.voice_id,
       voiceName: voice.name,
-      cached: false
+      cached: false,
+      mode
     });
   } catch (error) {
     return NextResponse.json(
