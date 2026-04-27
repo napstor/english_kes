@@ -1275,117 +1275,132 @@ function SpeakingStep({
 
   return (
     <div className="content-panel speaking-panel">
-      <div className={referenceVisible ? "speech-target revealed" : "speech-target hidden"}>
-        {referenceVisible ? (
-          <p>{step.targetText}</p>
-        ) : (
-          <p>{copy.referenceHidden}</p>
-        )}
-        <button className="reference-toggle" type="button" onClick={() => setReferenceVisible((visible) => !visible)}>
-          {referenceVisible ? <EyeOff size={18} /> : <Eye size={18} />}
-          {referenceVisible ? copy.hideReference : copy.showReference}
-        </button>
-      </div>
-      <div className={recording ? "wave active" : "wave"}>
-        {Array.from({ length: 18 }).map((_, index) => (
-          <span key={index} />
-        ))}
-      </div>
-      <div className="record-row">
-        <button
-          className={recording ? "danger-button" : "record-button"}
-          type="button"
-          onClick={recording ? onStop : onStart}
-          disabled={recordingStatus === "uploading"}
-        >
-          {recording ? <Pause size={18} /> : <Mic size={18} />}
-          {recording ? copy.stopRecording : copy.startRecording}
-        </button>
-        <span>{elapsed}s</span>
-      </div>
-      {recorded ? (
-        <div className={`feedback ${recordingStatus === "error" ? "wrong" : recordingStatus === "uploaded" ? "exact" : "partial"}`}>
-          <strong>{copy.recordingSaved}</strong>
-          <p>{recordingMessage || copy.recordingMvp}</p>
-        </div>
-      ) : null}
-      {recordingStatus === "error" && !recorded ? (
-        <div className="feedback wrong">
-          <strong>{copy.recordingProblem}</strong>
-          <p>{recordingMessage}</p>
-        </div>
-      ) : null}
-      {speechReview?.audioUrl ? (
-        <div className="self-review-card">
-          <div>
-            <span>{copy.selfRecordingTitle}</span>
-            <p>{copy.selfRecordingBody}</p>
+      <section className="speaking-workbench">
+        <div className="speaking-reference">
+          <div className={referenceVisible ? "speech-target revealed" : "speech-target hidden"}>
+            {referenceVisible ? <p>{step.targetText}</p> : <p>{copy.referenceHidden}</p>}
+            <button className="reference-toggle" type="button" onClick={() => setReferenceVisible((visible) => !visible)}>
+              {referenceVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+              {referenceVisible ? copy.hideReference : copy.showReference}
+            </button>
           </div>
-          <button className="secondary-button" type="button" onClick={() => onPlayRecording(speechReview.audioUrl)}>
-            <Play size={18} />
-            {copy.playSelfRecording}
-          </button>
         </div>
-      ) : null}
-      {speechReview?.transcript ? (
-        <div className={`feedback ${speechReview.result?.status ?? "partial"}`}>
-          <strong>{copy.transcriptTitle}</strong>
-          <p className="transcript-text">{speechReview.transcript}</p>
-          {speechReview.result ? (
-            <>
-              <p>{speechReview.result.message}</p>
-              <div className="token-row">
-                {tokenize(speechReview.transcript).map((token, index) => (
-                  <span key={`${token}-${index}`} className={speechReview.result?.badTokens.includes(token) ? "bad" : "good"}>
-                    {token}
-                  </span>
-                ))}
-              </div>
-            </>
-          ) : null}
-        </div>
-      ) : null}
-      {speechReview?.error ? (
-        <div className="feedback partial">
-          <strong>{copy.transcriptProblem}</strong>
-          <p>{speechReview.error}</p>
-        </div>
-      ) : null}
-      {speechReview?.pronunciation ? <PronunciationPanel review={speechReview.pronunciation} copy={copy} /> : null}
-      {slowAudio.message || normalAudio.message ? (
-        <div className="native-status-grid">
-          {slowAudio.message ? (
-            <div className={`mini-status ${slowAudio.status === "error" ? "error" : ""}`}>
-              <strong>{copy.nativeAudioSlow}</strong>
-              <span>{slowAudio.message}</span>
+
+        <div className="recording-console">
+          <div className={recording ? "wave active" : "wave"}>
+            {Array.from({ length: 18 }).map((_, index) => (
+              <span key={index} />
+            ))}
+          </div>
+          <div className="record-row">
+            <button
+              className={recording ? "danger-button" : "record-button"}
+              type="button"
+              onClick={recording ? onStop : onStart}
+              disabled={recordingStatus === "uploading"}
+            >
+              {recording ? <Pause size={18} /> : <Mic size={18} />}
+              {recording ? copy.stopRecording : copy.startRecording}
+            </button>
+            <span>{elapsed}s</span>
+          </div>
+          {recorded ? (
+            <div
+              className={`feedback compact ${recordingStatus === "error" ? "wrong" : recordingStatus === "uploaded" ? "exact" : "partial"}`}
+            >
+              <strong>{copy.recordingSaved}</strong>
+              <p>{recordingMessage || copy.recordingMvp}</p>
             </div>
           ) : null}
-          {normalAudio.message ? (
-            <div className={`mini-status ${normalAudio.status === "error" ? "error" : ""}`}>
-              <strong>{copy.nativeAudioNormal}</strong>
-              <span>{normalAudio.message}</span>
+          {recordingStatus === "error" && !recorded ? (
+            <div className="feedback compact wrong">
+              <strong>{copy.recordingProblem}</strong>
+              <p>{recordingMessage}</p>
             </div>
           ) : null}
         </div>
-      ) : null}
-      <div className="native-actions">
-        <button className="secondary-button wide" type="button" onClick={() => onPlayNative("slow")} disabled={slowAudio.status === "loading"}>
-          <Play size={18} />
-          {slowAudio.status === "loading"
-            ? copy.nativeAudioLoadingShort
-            : slowAudio.audioUrl
-              ? copy.playNativeAgainSlow
-              : copy.playNativeSlow}
-        </button>
-        <button className="secondary-button wide" type="button" onClick={() => onPlayNative("normal")} disabled={normalAudio.status === "loading"}>
-          <Play size={18} />
-          {normalAudio.status === "loading"
-            ? copy.nativeAudioLoadingShort
-            : normalAudio.audioUrl
-              ? copy.playNativeAgainNormal
-              : copy.playNativeNormal}
-        </button>
-      </div>
+
+        <div className="speaking-compare-grid">
+          <section className="compare-card">
+            <div>
+              <span>{copy.selfRecordingTitle}</span>
+              <p>{copy.selfRecordingBody}</p>
+            </div>
+            <button
+              className="secondary-button wide"
+              type="button"
+              onClick={() => speechReview?.audioUrl && onPlayRecording(speechReview.audioUrl)}
+              disabled={!speechReview?.audioUrl}
+            >
+              <Play size={18} />
+              {copy.playSelfRecording}
+            </button>
+          </section>
+
+          <section className="compare-card">
+            <div>
+              <span>{copy.nativeAudioSlow}</span>
+              <p>{slowAudio.message || copy.nativeAudioReady}</p>
+            </div>
+            <button className="secondary-button wide" type="button" onClick={() => onPlayNative("slow")} disabled={slowAudio.status === "loading"}>
+              <Play size={18} />
+              {slowAudio.status === "loading"
+                ? copy.nativeAudioLoadingShort
+                : slowAudio.audioUrl
+                  ? copy.playNativeAgainSlow
+                  : copy.playNativeSlow}
+            </button>
+          </section>
+
+          <section className="compare-card">
+            <div>
+              <span>{copy.nativeAudioNormal}</span>
+              <p>{normalAudio.message || copy.nativeAudioReady}</p>
+            </div>
+            <button
+              className="secondary-button wide"
+              type="button"
+              onClick={() => onPlayNative("normal")}
+              disabled={normalAudio.status === "loading"}
+            >
+              <Play size={18} />
+              {normalAudio.status === "loading"
+                ? copy.nativeAudioLoadingShort
+                : normalAudio.audioUrl
+                  ? copy.playNativeAgainNormal
+                  : copy.playNativeNormal}
+            </button>
+          </section>
+        </div>
+      </section>
+
+      <section className="speaking-results">
+        {speechReview?.transcript ? (
+          <div className={`feedback ${speechReview.result?.status ?? "partial"}`}>
+            <strong>{copy.transcriptTitle}</strong>
+            <p className="transcript-text">{speechReview.transcript}</p>
+            {speechReview.result ? (
+              <>
+                <p>{speechReview.result.message}</p>
+                <div className="token-row">
+                  {tokenize(speechReview.transcript).map((token, index) => (
+                    <span key={`${token}-${index}`} className={speechReview.result?.badTokens.includes(token) ? "bad" : "good"}>
+                      {token}
+                    </span>
+                  ))}
+                </div>
+              </>
+            ) : null}
+          </div>
+        ) : null}
+        {speechReview?.error ? (
+          <div className="feedback partial">
+            <strong>{copy.transcriptProblem}</strong>
+            <p>{speechReview.error}</p>
+          </div>
+        ) : null}
+        {speechReview?.pronunciation ? <PronunciationPanel review={speechReview.pronunciation} copy={copy} /> : null}
+      </section>
     </div>
   );
 }
