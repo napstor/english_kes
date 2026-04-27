@@ -31,6 +31,12 @@ type LocalProfile = {
   name: string;
 };
 
+type SpeechReview = {
+  transcript: string;
+  result: ReturnType<typeof compareAnswer> | null;
+  error: string;
+};
+
 const profilesKey = "english-kes-profiles-v1";
 const activeProfileKey = "english-kes-active-profile-v1";
 const defaultProfile: LocalProfile = {
@@ -61,6 +67,7 @@ export default function Home() {
   const [elapsed, setElapsed] = useState(0);
   const [recordingStatus, setRecordingStatus] = useState<"idle" | "uploading" | "uploaded" | "error">("idle");
   const [recordingMessage, setRecordingMessage] = useState("");
+  const [speechReview, setSpeechReview] = useState<SpeechReview | null>(null);
   const timerRef = useRef<number | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -104,6 +111,7 @@ export default function Home() {
     setElapsed(0);
     setRecordingStatus("idle");
     setRecordingMessage("");
+    setSpeechReview(null);
     if (timerRef.current) window.clearInterval(timerRef.current);
   }, [progress.activeStep]);
 
@@ -213,6 +221,7 @@ export default function Home() {
     formData.append("audio", audioBlob, `recording-${stepId}.webm`);
     formData.append("stepId", stepId);
     formData.append("profileId", profileId);
+    formData.append("expectedText", current.targetText);
 
     try {
       const response = await fetch("/api/audio/upload", {
@@ -226,8 +235,25 @@ export default function Home() {
         throw new Error(result?.error || `${copy.uploadFailed} HTTP ${response.status}`);
       }
 
+      const transcript = result?.transcription?.text?.trim() ?? "";
+      const transcriptionError = result?.transcription?.error ?? "";
+
+      if (transcript) {
+        setSpeechReview({
+          transcript,
+          result: compareAnswer(transcript, [current.targetText]),
+          error: ""
+        });
+      } else if (transcriptionError) {
+        setSpeechReview({
+          transcript: "",
+          result: null,
+          error: transcriptionError
+        });
+      }
+
       setRecordingStatus("uploaded");
-      setRecordingMessage(copy.uploadedRecording);
+      setRecordingMessage(transcript ? copy.transcriptionReady : copy.uploadedRecording);
       markComplete(3);
     } catch (error) {
       setRecordingStatus("error");
@@ -394,6 +420,7 @@ export default function Home() {
                 recordingMessage={recordingMessage}
                 recordingStatus={recordingStatus}
                 recording={recording}
+                speechReview={speechReview}
                 step={current}
                 onStart={startRecording}
                 onStop={stopRecording}
@@ -450,7 +477,14 @@ export default function Home() {
   );
 }
 
-function parseJsonResponse(value: string): { url?: string; error?: string } | null {
+function parseJsonResponse(value: string): {
+  url?: string;
+  error?: string;
+  transcription?: {
+    text?: string;
+    error?: string;
+  };
+} | null {
   if (!value.trim()) return null;
   try {
     return JSON.parse(value) as { url?: string; error?: string };
@@ -535,6 +569,7 @@ function SpeakingStep({
   recordingMessage,
   recordingStatus,
   recording,
+  speechReview,
   step,
   onStart,
   onStop
@@ -545,6 +580,7 @@ function SpeakingStep({
   recordingMessage: string;
   recordingStatus: "idle" | "uploading" | "uploaded" | "error";
   recording: boolean;
+  speechReview: SpeechReview | null;
   step: TrainingStep;
   onStart: () => void;
   onStop: () => void;
@@ -579,6 +615,30 @@ function SpeakingStep({
         <div className="feedback wrong">
           <strong>{copy.recordingProblem}</strong>
           <p>{recordingMessage}</p>
+        </div>
+      ) : null}
+      {speechReview?.transcript ? (
+        <div className={`feedback ${speechReview.result?.status ?? "partial"}`}>
+          <strong>{copy.transcriptTitle}</strong>
+          <p className="transcript-text">{speechReview.transcript}</p>
+          {speechReview.result ? (
+            <>
+              <p>{speechReview.result.message}</p>
+              <div className="token-row">
+                {tokenize(speechReview.transcript).map((token, index) => (
+                  <span key={`${token}-${index}`} className={speechReview.result?.badTokens.includes(token) ? "bad" : "good"}>
+                    {token}
+                  </span>
+                ))}
+              </div>
+            </>
+          ) : null}
+        </div>
+      ) : null}
+      {speechReview?.error ? (
+        <div className="feedback partial">
+          <strong>{copy.transcriptProblem}</strong>
+          <p>{speechReview.error}</p>
         </div>
       ) : null}
       <button className="secondary-button wide" type="button">

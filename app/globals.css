@@ -464,6 +464,11 @@ textarea:focus {
   font-weight: 850;
 }
 
+.transcript-text {
+  font-size: 1.15rem;
+  font-weight: 850;
+}
+
 .speaking-panel {
   text-align: center;
 }

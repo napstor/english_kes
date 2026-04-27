@@ -1,5 +1,6 @@
 import { put } from "@vercel/blob";
 import { NextResponse } from "next/server";
+import OpenAI from "openai";
 
 export const runtime = "nodejs";
 
@@ -20,6 +21,7 @@ export async function POST(request: Request) {
     const audio = formData.get("audio");
     const profileId = String(formData.get("profileId") ?? "local-profile");
     const stepId = String(formData.get("stepId") ?? "unknown-step");
+    const expectedText = String(formData.get("expectedText") ?? "");
 
     if (!(audio instanceof File)) {
       return NextResponse.json({ error: "Audio file is required." }, { status: 400 });
@@ -44,11 +46,14 @@ export async function POST(request: Request) {
       contentType: audio.type
     });
 
+    const transcription = await transcribeAudio(audio, expectedText);
+
     return NextResponse.json({
       url: blob.url,
       pathname: blob.pathname,
       contentType: audio.type,
-      size: audio.size
+      size: audio.size,
+      transcription
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown upload error.";
@@ -58,5 +63,37 @@ export async function POST(request: Request) {
       },
       { status: 500 }
     );
+  }
+}
+
+async function transcribeAudio(audio: File, expectedText: string) {
+  if (!process.env.OPENAI_API_KEY) {
+    return {
+      text: "",
+      error: "OPENAI_API_KEY is not configured."
+    };
+  }
+
+  try {
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
+    });
+
+    const transcription = await openai.audio.transcriptions.create({
+      file: audio,
+      model: "gpt-4o-mini-transcribe",
+      language: "en",
+      prompt: expectedText || undefined
+    });
+
+    return {
+      text: transcription.text ?? "",
+      error: ""
+    };
+  } catch (error) {
+    return {
+      text: "",
+      error: error instanceof Error ? error.message : "Transcription failed."
+    };
   }
 }
