@@ -21,7 +21,7 @@ import {
 import type { FormEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { lessonOne, uiCopy, type Locale, type TrainingStep } from "@/lib/course";
-import { compareAnswer, tokenize } from "@/lib/scoring";
+import { compareAnswer, detectGrammarHint, tokenize, type GrammarHint } from "@/lib/scoring";
 
 type ProgressState = {
   activeStep: number;
@@ -56,6 +56,45 @@ type CoachFeedback = {
   }>;
   drillRu: string;
 };
+
+function mergeCoachFeedbackWithHint(feedback: CoachFeedback, hint: GrammarHint | null): CoachFeedback {
+  if (!hint) {
+    return feedback;
+  }
+
+  const alreadyExplained = feedback.issues.some(
+    (issue) => issue.fragment.toLowerCase() === hint.fragment.toLowerCase() && issue.category === hint.category
+  );
+
+  return {
+    ...feedback,
+    shortRu: hint.shortRu,
+    grammarMiniLessonRu: hint.grammarRu,
+    issues: alreadyExplained
+      ? feedback.issues.map((issue, index) =>
+          index === 0
+            ? {
+                ...issue,
+                reasonRu: hint.shortRu,
+                grammarRu: hint.grammarRu,
+                category: hint.category
+              }
+            : issue
+        )
+      : [
+          {
+            fragment: hint.fragment,
+            correction: hint.correction,
+            reasonRu: hint.shortRu,
+            grammarRu: hint.grammarRu,
+            category: hint.category
+          },
+          ...feedback.issues
+        ],
+    drillRu:
+      feedback.drillRu || `Повтори вслух: ${hint.correction}. Затем всю фразу целиком без окончания -s/-es после do/does.`
+  };
+}
 
 type NativeAudioMode = "slow" | "normal";
 
@@ -305,6 +344,7 @@ export default function Home() {
 
   async function checkAnswer(step: TrainingStep) {
     const result = compareAnswer(answer, step.acceptedAnswers);
+    const grammarHint = detectGrammarHint(answer, step.acceptedAnswers);
     setChecked(result);
     setCoachFeedback(null);
     setCoachError("");
@@ -320,11 +360,11 @@ export default function Home() {
     }
 
     if (result.status !== "exact") {
-      await loadCoachFeedback(step);
+      await loadCoachFeedback(step, grammarHint);
     }
   }
 
-  async function loadCoachFeedback(step: TrainingStep) {
+  async function loadCoachFeedback(step: TrainingStep, grammarHint: GrammarHint | null) {
     setCoachLoading(true);
 
     try {
@@ -337,7 +377,8 @@ export default function Home() {
           promptRu: step.prompt.ru,
           userAnswer: answer,
           acceptedAnswers: step.acceptedAnswers,
-          lessonTitle: lessonOne.title.ru
+          lessonTitle: lessonOne.title.ru,
+          localHint: grammarHint
         })
       });
       const result = (await response.json()) as CoachFeedback & { error?: string };
@@ -346,7 +387,7 @@ export default function Home() {
         throw new Error(result.error || copy.coachFailed);
       }
 
-      setCoachFeedback(result);
+      setCoachFeedback(mergeCoachFeedbackWithHint(result, grammarHint));
     } catch (error) {
       setCoachError(error instanceof Error ? error.message : copy.coachFailed);
     } finally {
