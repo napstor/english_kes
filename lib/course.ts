@@ -2,6 +2,12 @@ export type Locale = "ru" | "en";
 
 export type StepType = "theory" | "vocabulary" | "translate" | "drill" | "speaking";
 
+export type VocabularyItem = {
+  ru: string;
+  en: string;
+  note?: string;
+};
+
 export type TrainingStep = {
   id: string;
   type: StepType;
@@ -11,6 +17,7 @@ export type TrainingStep = {
   targetText: string;
   acceptedAnswers: string[];
   notes: Record<Locale, string[]>;
+  vocabulary?: VocabularyItem[];
 };
 
 type LessonOneItem = {
@@ -20,20 +27,69 @@ type LessonOneItem = {
   hint?: Record<Locale, string>;
 };
 
-const lessonOneVocabulary = [
-  "валять дурака - to play the fool",
-  "видеть выход из положения - to see daylight",
-  "выходить из себя - to lose one's temper",
-  "встать не с той ноги - to get out of bed on the wrong side",
-  "гнуть спину / напрягаться на работе - to break one's back at work",
-  "просыпаться - to wake up",
-  "мыть посуду - to wash the dishes",
-  "принимать душ - to take a shower",
-  "завтракать - to have breakfast",
-  "обедать - to have lunch",
-  "ужинать - to have supper",
-  "ходить на работу - to go to work"
+const lessonOneVocabularyItems: VocabularyItem[] = [
+  { ru: "вкусно", en: "tasty" },
+  { ru: "время", en: "time" },
+  { ru: "встать", en: "to get up" },
+  { ru: "встать с постели", en: "to get out of bed" },
+  { ru: "газета", en: "a newspaper" },
+  { ru: "готовить", en: "to cook" },
+  { ru: "готовить завтрак", en: "to make breakfast" },
+  { ru: "для всей семьи", en: "for the whole family" },
+  { ru: "довольно", en: "quite; rather" },
+  { ru: "идти о дожде", en: "to rain" },
+  { ru: "завтракать", en: "to have breakfast" },
+  { ru: "играть", en: "to play" },
+  { ru: "кино", en: "cinema" },
+  { ru: "кофе", en: "coffee" },
+  { ru: "мешать, беспокоить", en: "to bother; to disturb" },
+  { ru: "муж", en: "a husband" },
+  { ru: "навести макияж", en: "to make up; to beautify oneself" },
+  { ru: "обедать", en: "to have lunch" },
+  { ru: "одеться", en: "to get dressed; to dress" },
+  { ru: "перекусить", en: "to have a snack" },
+  { ru: "переодеться", en: "to change; to get changed" },
+  { ru: "петь", en: "to sing" },
+  { ru: "пить", en: "to drink" },
+  { ru: "по будням", en: "on weekdays" },
+  { ru: "помогать", en: "to help" },
+  { ru: "помыть посуду", en: "to wash the dishes" },
+  { ru: "приготовить завтрак", en: "to make breakfast" },
+  { ru: "принимать ванну", en: "to take a bath; to have a bath" },
+  { ru: "принимать душ", en: "to take a shower; to have a shower" },
+  { ru: "приходить", en: "to come" },
+  { ru: "приходить вовремя", en: "to come on time" },
+  { ru: "приходить в последнюю минуту", en: "to come in time" },
+  { ru: "причесаться", en: "to do one's hair" },
+  { ru: "проголодаться", en: "to get hungry" },
+  { ru: "просыпаться", en: "to wake up" },
+  { ru: "работа", en: "work; a job" },
+  { ru: "рано", en: "early" },
+  { ru: "ресторан", en: "a restaurant" },
+  { ru: "семья", en: "a family" },
+  { ru: "смотреть телевизор", en: "to watch TV" },
+  { ru: "спать", en: "to sleep" },
+  { ru: "стелить постель", en: "to make the bed" },
+  { ru: "темнеть", en: "to get dark" },
+  { ru: "теннис", en: "tennis" },
+  { ru: "убрать комнату", en: "to do the room; to clean the room" },
+  { ru: "ужинать", en: "to have supper" },
+  { ru: "умываться", en: "to wash" },
+  { ru: "читать", en: "to read" }
 ];
+
+const lessonOneIdioms: VocabularyItem[] = [
+  { ru: "валять дурака", en: "to play the fool" },
+  { ru: "видеть выход из положения", en: "to see daylight" },
+  { ru: "выходить из себя, терять терпение", en: "to lose one's temper" },
+  { ru: "встать не с той ноги", en: "to get out of bed on the wrong side" },
+  { ru: "гнуть спину", en: "to break one's back" },
+  { ru: "напрягаться на работе", en: "to break one's back at work" }
+];
+
+function vocabularyNotes(items: VocabularyItem[]) {
+  return items.map((item) => `${item.ru} - ${item.en}`);
+}
 
 const techniqueOne: LessonOneItem[] = [
   {
@@ -296,23 +352,36 @@ export const lessonOne = {
         ru: "Нажми динамик вверху, чтобы услышать пример системной озвучки браузера.",
         en: "Use the speaker button above to hear a browser voice preview."
       },
-      targetText: "to play the fool, to lose one's temper, to wake up, to wash the dishes",
+      targetText: lessonOneIdioms.map((item) => item.en).join(", "),
       acceptedAnswers: [],
       notes: {
-        ru: lessonOneVocabulary,
-        en: [
-          "to play the fool - валять дурака",
-          "to see daylight - видеть выход из положения",
-          "to lose one's temper - выходить из себя",
-          "to get out of bed on the wrong side - встать не с той ноги",
-          "to break one's back at work - напрягаться на работе",
-          "to wake up - просыпаться",
-          "to wash the dishes - мыть посуду",
-          "to take a shower - принимать душ",
-          "to have breakfast / lunch / supper - завтракать / обедать / ужинать",
-          "to go to work - ходить на работу"
-        ]
-      }
+        ru: vocabularyNotes(lessonOneIdioms),
+        en: lessonOneIdioms.map((item) => `${item.en} - ${item.ru}`)
+      },
+      vocabulary: lessonOneIdioms
+    },
+    {
+      id: "l1-vocabulary-minimum",
+      type: "vocabulary",
+      label: {
+        ru: "Лексический минимум",
+        en: "Core vocabulary"
+      },
+      prompt: {
+        ru: "Прослушай и проговори лексический минимум урока.",
+        en: "Listen to and say the lesson core vocabulary."
+      },
+      hint: {
+        ru: "Сначала слушай английский, затем повторяй вслух. Эти слова будут встречаться в упражнениях.",
+        en: "Listen to the English first, then repeat aloud. These words appear in the exercises."
+      },
+      targetText: lessonOneVocabularyItems.map((item) => item.en).join(", "),
+      acceptedAnswers: [],
+      notes: {
+        ru: vocabularyNotes(lessonOneVocabularyItems),
+        en: lessonOneVocabularyItems.map((item) => `${item.en} - ${item.ru}`)
+      },
+      vocabulary: lessonOneVocabularyItems
     },
     ...techniqueOne.map(makeTechniqueOneStep),
     ...techniqueTwo.map(makeTechniqueTwoStep),
@@ -399,7 +468,11 @@ export const uiCopy = {
       exact: "Точно",
       partial: "Можно принять",
       wrong: "Нужно исправить"
-    }
+    },
+    coachLoading: "Разбираю ошибку с AI-коучем...",
+    coachFailed: "Не удалось получить разбор ошибки.",
+    coachTitle: "Разбор ошибки",
+    bestAnswer: "Лучший вариант"
   },
   en: {
     productRole: "speech trainer",
@@ -479,6 +552,10 @@ export const uiCopy = {
       exact: "Exact",
       partial: "Accepted",
       wrong: "Needs correction"
-    }
+    },
+    coachLoading: "Checking the mistake with the AI coach...",
+    coachFailed: "Could not load mistake feedback.",
+    coachTitle: "Mistake feedback",
+    bestAnswer: "Best answer"
   }
 };

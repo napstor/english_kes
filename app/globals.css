@@ -458,6 +458,28 @@ h1 {
   border: 1px solid var(--line);
 }
 
+.lesson-notes li.vocab-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.vocab-row span span,
+.vocab-row strong,
+.vocab-row small {
+  display: block;
+}
+
+.vocab-row strong {
+  font-size: 1.05rem;
+}
+
+.vocab-row small {
+  color: var(--muted);
+  margin-top: 3px;
+}
+
 textarea {
   width: 100%;
   resize: vertical;
@@ -520,6 +542,112 @@ textarea:focus {
 .feedback.wrong {
   border-color: #efaaa6;
   background: #fff0ef;
+}
+
+.coach-feedback {
+  display: grid;
+  gap: 12px;
+  border-radius: 18px;
+  padding: 16px;
+  border: 1px solid #b9d6ff;
+  background: #f3f8ff;
+  text-align: left;
+}
+
+.coach-feedback.loading {
+  color: var(--muted);
+  font-weight: 850;
+}
+
+.coach-feedback.error,
+.coach-feedback.incorrect {
+  border-color: #efaaa6;
+  background: #fff0ef;
+}
+
+.coach-feedback.almost {
+  border-color: #f2d27a;
+  background: #fff9e8;
+}
+
+.coach-feedback.correct {
+  border-color: #9bd8ae;
+  background: #effbf2;
+}
+
+.coach-feedback-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.coach-feedback-head strong,
+.coach-feedback-head span {
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.best-answer {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.best-answer span {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.issue-list {
+  display: grid;
+  gap: 10px;
+}
+
+.issue-card {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.issue-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.bad-fragment,
+.good-fragment {
+  display: inline-block;
+  padding: 5px 8px;
+  border-radius: 9px;
+  font-weight: 850;
+}
+
+.bad-fragment {
+  background: #ffe0de;
+  color: #9d231d;
+}
+
+.good-fragment {
+  background: #eaf7ee;
+  color: var(--primary-dark);
+}
+
+.arrow {
+  margin: 0 8px;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.drill-note {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(19, 32, 23, 0.06);
+  font-weight: 850;
 }
 
 .token-row {

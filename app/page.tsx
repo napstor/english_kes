@@ -41,6 +41,20 @@ type SpeechReview = {
   error: string;
 };
 
+type CoachFeedback = {
+  verdict: "correct" | "almost" | "incorrect";
+  score: number;
+  bestAnswer: string;
+  shortRu: string;
+  issues: Array<{
+    fragment: string;
+    correction: string;
+    reasonRu: string;
+    category: string;
+  }>;
+  drillRu: string;
+};
+
 type NativeAudioMode = "slow" | "normal";
 
 type NativeAudioState = {
@@ -95,6 +109,9 @@ export default function Home() {
   const [progress, setProgress] = useState<ProgressState>(initialProgress);
   const [answer, setAnswer] = useState("");
   const [checked, setChecked] = useState<ReturnType<typeof compareAnswer> | null>(null);
+  const [coachFeedback, setCoachFeedback] = useState<CoachFeedback | null>(null);
+  const [coachLoading, setCoachLoading] = useState(false);
+  const [coachError, setCoachError] = useState("");
   const [recording, setRecording] = useState(false);
   const [recorded, setRecorded] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -147,6 +164,9 @@ export default function Home() {
   useEffect(() => {
     setAnswer("");
     setChecked(null);
+    setCoachFeedback(null);
+    setCoachLoading(false);
+    setCoachError("");
     setRecording(false);
     setRecorded(false);
     setElapsed(0);
@@ -253,9 +273,11 @@ export default function Home() {
     }));
   }
 
-  function checkAnswer(step: TrainingStep) {
+  async function checkAnswer(step: TrainingStep) {
     const result = compareAnswer(answer, step.acceptedAnswers);
     setChecked(result);
+    setCoachFeedback(null);
+    setCoachError("");
     setProgress((prev) => ({
       ...prev,
       attempts: {
@@ -265,6 +287,40 @@ export default function Home() {
     }));
     if (result.status !== "wrong") {
       markComplete(result.status === "exact" ? 4 : 2);
+    }
+
+    if (result.status !== "exact") {
+      await loadCoachFeedback(step);
+    }
+  }
+
+  async function loadCoachFeedback(step: TrainingStep) {
+    setCoachLoading(true);
+
+    try {
+      const response = await fetch("/api/coach/check-answer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          promptRu: step.prompt.ru,
+          userAnswer: answer,
+          acceptedAnswers: step.acceptedAnswers,
+          lessonTitle: lessonOne.title.ru
+        })
+      });
+      const result = (await response.json()) as CoachFeedback & { error?: string };
+
+      if (!response.ok) {
+        throw new Error(result.error || copy.coachFailed);
+      }
+
+      setCoachFeedback(result);
+    } catch (error) {
+      setCoachError(error instanceof Error ? error.message : copy.coachFailed);
+    } finally {
+      setCoachLoading(false);
     }
   }
 
@@ -367,15 +423,6 @@ export default function Home() {
       setRecordingStatus("error");
       setRecordingMessage(error instanceof Error ? error.message : copy.uploadFailed);
     }
-  }
-
-  function speak(text: string) {
-    if (!("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-US";
-    utterance.rate = 0.88;
-    window.speechSynthesis.speak(utterance);
   }
 
   async function playNativeSample(text: string, mode: NativeAudioMode) {
@@ -589,7 +636,7 @@ export default function Home() {
           <article className="exercise-card" id="today">
             <div className="exercise-top">
               <span className={`type-pill ${current.type}`}>{copy.stepTypes[current.type]}</span>
-              <button className="icon-button" type="button" onClick={() => speak(current.targetText)}>
+              <button className="icon-button" type="button" onClick={() => playNativeSample(current.targetText, "normal")}>
                 <Volume2 size={18} />
               </button>
             </div>
@@ -601,17 +648,25 @@ export default function Home() {
             </div>
 
             {current.type === "theory" || current.type === "vocabulary" ? (
-              <TheoryStep step={current} locale={locale} onComplete={() => markComplete(2)} />
+              <TheoryStep
+                step={current}
+                locale={locale}
+                onComplete={() => markComplete(2)}
+                onSpeak={(text) => playNativeSample(text, "normal")}
+              />
             ) : null}
 
             {current.type === "translate" || current.type === "drill" ? (
               <WritingStep
                 answer={answer}
                 checked={checked}
+                coachError={coachError}
+                coachFeedback={coachFeedback}
+                coachLoading={coachLoading}
                 copy={copy}
                 step={current}
                 onAnswer={setAnswer}
-                onCheck={() => checkAnswer(current)}
+                onCheck={() => void checkAnswer(current)}
               />
             ) : null}
 
@@ -849,18 +904,30 @@ function AdminPanel({ copy }: { copy: (typeof uiCopy)[Locale] }) {
 function TheoryStep({
   step,
   locale,
-  onComplete
+  onComplete,
+  onSpeak
 }: {
   step: TrainingStep;
   locale: Locale;
   onComplete: () => void;
+  onSpeak: (text: string) => void;
 }) {
   return (
     <div className="content-panel">
       <ul className="lesson-notes">
-        {step.notes[locale].map((note) => (
-          <li key={note}>{note}</li>
-        ))}
+        {step.vocabulary
+          ? step.vocabulary.map((item) => (
+              <li className="vocab-row" key={`${item.ru}-${item.en}`}>
+                <span>
+                  <strong>{item.en}</strong>
+                  <small>{item.ru}</small>
+                </span>
+                <button className="icon-button" type="button" onClick={() => onSpeak(item.en)}>
+                  <Volume2 size={16} />
+                </button>
+              </li>
+            ))
+          : step.notes[locale].map((note) => <li key={note}>{note}</li>)}
       </ul>
       <button className="primary-button wide" type="button" onClick={onComplete}>
         <Check size={18} /> {uiCopy[locale].understood}
@@ -872,6 +939,9 @@ function TheoryStep({
 function WritingStep({
   answer,
   checked,
+  coachError,
+  coachFeedback,
+  coachLoading,
   copy,
   step,
   onAnswer,
@@ -879,6 +949,9 @@ function WritingStep({
 }: {
   answer: string;
   checked: ReturnType<typeof compareAnswer> | null;
+  coachError: string;
+  coachFeedback: CoachFeedback | null;
+  coachLoading: boolean;
   copy: (typeof uiCopy)[Locale];
   step: TrainingStep;
   onAnswer: (value: string) => void;
@@ -911,6 +984,40 @@ function WritingStep({
           <p className="expected">{step.acceptedAnswers[0]}</p>
         </div>
       ) : null}
+      {coachLoading ? <div className="coach-feedback loading">{copy.coachLoading}</div> : null}
+      {coachError ? <div className="coach-feedback error">{coachError}</div> : null}
+      {coachFeedback ? <CoachFeedbackPanel feedback={coachFeedback} copy={copy} /> : null}
+    </div>
+  );
+}
+
+function CoachFeedbackPanel({ feedback, copy }: { feedback: CoachFeedback; copy: (typeof uiCopy)[Locale] }) {
+  return (
+    <div className={`coach-feedback ${feedback.verdict}`}>
+      <div className="coach-feedback-head">
+        <strong>{copy.coachTitle}</strong>
+        <span>{feedback.score}/100</span>
+      </div>
+      <p>{feedback.shortRu}</p>
+      <div className="best-answer">
+        <span>{copy.bestAnswer}</span>
+        <strong>{feedback.bestAnswer}</strong>
+      </div>
+      {feedback.issues.length ? (
+        <div className="issue-list">
+          {feedback.issues.map((issue, index) => (
+            <div className="issue-card" key={`${issue.fragment}-${index}`}>
+              <div>
+                <span className="bad-fragment">{issue.fragment}</span>
+                <span className="arrow">→</span>
+                <span className="good-fragment">{issue.correction}</span>
+              </div>
+              <p>{issue.reasonRu}</p>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      <div className="drill-note">{feedback.drillRu}</div>
     </div>
   );
 }
