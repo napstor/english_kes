@@ -147,6 +147,45 @@ const initialProgress: ProgressState = {
   score: 0
 };
 
+function safeParseJson<T>(value: string | null): T | null {
+  if (!value) return null;
+
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return null;
+  }
+}
+
+function normalizeProgress(value: Partial<ProgressState> | null | undefined): ProgressState {
+  const lastStepIndex = Math.max(lessonOne.steps.length - 1, 0);
+  const activeStep =
+    typeof value?.activeStep === "number" && Number.isFinite(value.activeStep)
+      ? Math.min(Math.max(Math.trunc(value.activeStep), 0), lastStepIndex)
+      : 0;
+  const completedSteps = Array.isArray(value?.completedSteps)
+    ? Array.from(
+        new Set(
+          value.completedSteps
+            .map((step) => (typeof step === "number" && Number.isFinite(step) ? Math.trunc(step) : -1))
+            .filter((step) => step >= 0 && step <= lastStepIndex)
+        )
+      ).sort((a, b) => a - b)
+    : [];
+  const attempts =
+    value?.attempts && typeof value.attempts === "object" && !Array.isArray(value.attempts) ? value.attempts : {};
+  const score = typeof value?.score === "number" && Number.isFinite(value.score)
+    ? Math.min(Math.max(Math.trunc(value.score), 0), 100)
+    : 0;
+
+  return {
+    activeStep,
+    completedSteps,
+    attempts,
+    score
+  };
+}
+
 function createNativeAudioState(): NativeAudioState {
   return {
     status: "idle",
@@ -186,14 +225,18 @@ export default function Home() {
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
-  const current = lessonOne.steps[progress.activeStep];
+  const activeStepIndex = Math.min(Math.max(progress.activeStep, 0), lessonOne.steps.length - 1);
+  const current = lessonOne.steps[activeStepIndex] ?? lessonOne.steps[0];
   const copy = uiCopy[locale];
   const activeProfile = profiles.find((profile) => profile.id === activeProfileId) ?? profiles[0] ?? defaultProfile;
 
   useEffect(() => {
-    const savedProfiles = window.localStorage.getItem(profilesKey);
-    const parsedProfiles = savedProfiles ? (JSON.parse(savedProfiles) as LocalProfile[]) : [defaultProfile];
-    const usableProfiles = parsedProfiles.length ? parsedProfiles : [defaultProfile];
+    const parsedProfiles = safeParseJson<LocalProfile[]>(window.localStorage.getItem(profilesKey));
+    const storedProfiles =
+      Array.isArray(parsedProfiles) && parsedProfiles.length
+        ? parsedProfiles.filter((profile) => profile?.id && profile?.name)
+        : [];
+    const usableProfiles = storedProfiles.length ? storedProfiles : [defaultProfile];
     const savedActiveProfileId = window.localStorage.getItem(activeProfileKey) ?? usableProfiles[0].id;
     const nextActiveProfileId = usableProfiles.some((profile) => profile.id === savedActiveProfileId)
       ? savedActiveProfileId
@@ -204,7 +247,7 @@ export default function Home() {
 
     const saved = window.localStorage.getItem(progressKey(nextActiveProfileId));
     if (saved) {
-      setProgress(JSON.parse(saved) as ProgressState);
+      setProgress(normalizeProgress(safeParseJson<ProgressState>(saved)));
     }
 
     void loadSession();
@@ -217,11 +260,23 @@ export default function Home() {
 
   useEffect(() => {
     window.localStorage.setItem(activeProfileKey, activeProfileId);
-    window.localStorage.setItem(progressKey(activeProfileId), JSON.stringify(progress));
+    const nextProgress = normalizeProgress(progress);
+    window.localStorage.setItem(progressKey(activeProfileId), JSON.stringify(nextProgress));
     if (authUser && remoteProgressReady) {
-      void saveRemoteProgress(progress);
+      void saveRemoteProgress(nextProgress);
     }
   }, [activeProfileId, authUser, progress, remoteProgressReady]);
+
+  useEffect(() => {
+    setProgress((prev) => {
+      const nextProgress = normalizeProgress(prev);
+      return nextProgress.activeStep === prev.activeStep &&
+        nextProgress.score === prev.score &&
+        nextProgress.completedSteps.length === prev.completedSteps.length
+        ? prev
+        : nextProgress;
+    });
+  }, []);
 
   useEffect(() => {
     setAnswer("");
@@ -314,7 +369,7 @@ export default function Home() {
     });
     setActiveProfileId(profile.id);
     const remoteProgress = await loadRemoteProgress();
-    setProgress(remoteProgress ?? (saved ? (JSON.parse(saved) as ProgressState) : initialProgress));
+    setProgress(normalizeProgress(remoteProgress ?? safeParseJson<ProgressState>(saved)));
     setRemoteProgressReady(true);
   }
 
@@ -341,9 +396,10 @@ export default function Home() {
 
   function markComplete(extraScore = 1) {
     setProgress((prev) => {
-      const completedSteps = prev.completedSteps.includes(progress.activeStep)
+      const stepIndex = Math.min(Math.max(prev.activeStep, 0), lessonOne.steps.length - 1);
+      const completedSteps = prev.completedSteps.includes(stepIndex)
         ? prev.completedSteps
-        : [...prev.completedSteps, progress.activeStep];
+        : [...prev.completedSteps, stepIndex];
       return {
         ...prev,
         completedSteps,
@@ -645,10 +701,10 @@ export default function Home() {
   }
 
   function switchProfile(profileId: string) {
-    window.localStorage.setItem(progressKey(activeProfileId), JSON.stringify(progress));
+    window.localStorage.setItem(progressKey(activeProfileId), JSON.stringify(normalizeProgress(progress)));
     const saved = window.localStorage.getItem(progressKey(profileId));
     setActiveProfileId(profileId);
-    setProgress(saved ? (JSON.parse(saved) as ProgressState) : initialProgress);
+    setProgress(normalizeProgress(safeParseJson<ProgressState>(saved)));
   }
 
   function addProfile() {
@@ -791,7 +847,7 @@ export default function Home() {
                   key={step.id}
                   className={[
                     "step-node",
-                    index === progress.activeStep ? "current" : "",
+                    index === activeStepIndex ? "current" : "",
                     progress.completedSteps.includes(index) ? "done" : ""
                   ].join(" ")}
                   type="button"
@@ -873,7 +929,7 @@ export default function Home() {
                 {copy.retry}
               </button>
               <button className="primary-button" type="button" onClick={goNext}>
-                {progress.activeStep === lessonOne.steps.length - 1 ? copy.finish : copy.next}
+                {activeStepIndex === lessonOne.steps.length - 1 ? copy.finish : copy.next}
                 <ChevronRight size={18} />
               </button>
             </div>
