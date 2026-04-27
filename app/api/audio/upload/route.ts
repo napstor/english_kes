@@ -47,13 +47,16 @@ export async function POST(request: Request) {
     });
 
     const transcription = await transcribeAudio(audio, expectedText);
+    const pronunciation = await assessPronunciation(expectedText, transcription.text ?? "", transcription.error ?? "");
 
     return NextResponse.json({
       url: blob.url,
+      audioUrl: `/api/audio/native?pathname=${encodeURIComponent(blob.pathname)}`,
       pathname: blob.pathname,
       contentType: audio.type,
       size: audio.size,
-      transcription
+      transcription,
+      pronunciation
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown upload error.";
@@ -63,6 +66,104 @@ export async function POST(request: Request) {
       },
       { status: 500 }
     );
+  }
+}
+
+async function assessPronunciation(expectedText: string, transcript: string, transcriptionError: string) {
+  if (!process.env.OPENAI_API_KEY) {
+    return {
+      score: 0,
+      nativeImpressionRu: "OPENAI_API_KEY is not configured.",
+      summaryRu: "",
+      issues: [],
+      drillRu: ""
+    };
+  }
+
+  if (!expectedText.trim() || (!transcript.trim() && transcriptionError)) {
+    return {
+      score: 0,
+      nativeImpressionRu: "Пока не удалось оценить произношение: распознавание речи не прошло.",
+      summaryRu: transcriptionError,
+      issues: [],
+      drillRu: "Запиши фразу еще раз в тихом месте, ближе к микрофону."
+    };
+  }
+
+  try {
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
+    });
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      response_format: { type: "json_object" },
+      temperature: 0.2,
+      messages: [
+        {
+          role: "system",
+          content:
+            "Ты тренер по английскому произношению для взрослых русскоязычных. Оценивай понятно и бережно, но прямо. У тебя есть эталонная фраза и результат распознавания речи ученика. Это не полный фонетический анализ аудио, а оценка разборчивости и вероятных грубых проблем по тому, что распознал STT. Не обещай точность фонетической лаборатории. Фокус: понятность для носителя, пропущенные/искаженные слова, окончания, связность, ритм фразы, частые русские проблемы: th, w/v, r, короткие/долгие гласные, окончания -s/-ed, редукция служебных слов. Верни только JSON."
+        },
+        {
+          role: "user",
+          content: JSON.stringify({
+            expectedText,
+            recognizedSpeech: transcript,
+            expectedJsonShape: {
+              score: "number 0-100",
+              nativeImpressionRu: "1 sentence: how this likely sounds to a native speaker",
+              summaryRu: "1-2 short sentences with the main pronunciation takeaway",
+              issues: [
+                {
+                  titleRu: "short issue title",
+                  evidenceRu: "what in the recognized speech suggests this",
+                  fixRu: "specific pronunciation fix in Russian",
+                  drillRu: "short repeat drill"
+                }
+              ],
+              drillRu: "one focused drill for the next recording"
+            }
+          })
+        }
+      ]
+    });
+
+    const content = response.choices[0]?.message.content;
+    if (!content) throw new Error("Pronunciation coach returned an empty response.");
+    const parsed = JSON.parse(content) as {
+      score?: number;
+      nativeImpressionRu?: string;
+      summaryRu?: string;
+      issues?: Array<{
+        titleRu?: string;
+        evidenceRu?: string;
+        fixRu?: string;
+        drillRu?: string;
+      }>;
+      drillRu?: string;
+    };
+
+    return {
+      score: Math.max(0, Math.min(100, Math.round(parsed.score ?? 0))),
+      nativeImpressionRu: parsed.nativeImpressionRu ?? "Речь в целом можно оценить по совпадению с распознанным текстом.",
+      summaryRu: parsed.summaryRu ?? "",
+      issues: (parsed.issues ?? []).slice(0, 3).map((issue) => ({
+        titleRu: issue.titleRu ?? "Что поправить",
+        evidenceRu: issue.evidenceRu ?? "",
+        fixRu: issue.fixRu ?? "",
+        drillRu: issue.drillRu ?? ""
+      })),
+      drillRu: parsed.drillRu ?? "Повтори фразу медленно, затем в обычном темпе."
+    };
+  } catch (error) {
+    return {
+      score: 0,
+      nativeImpressionRu: "Произносительный разбор сейчас не прошел.",
+      summaryRu: error instanceof Error ? error.message : "Pronunciation assessment failed.",
+      issues: [],
+      drillRu: "Сравни свою запись с эталоном и повтори фразу еще раз."
+    };
   }
 }
 

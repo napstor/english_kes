@@ -41,6 +41,21 @@ type SpeechReview = {
   transcript: string;
   result: ReturnType<typeof compareAnswer> | null;
   error: string;
+  audioUrl: string;
+  pronunciation: PronunciationReview | null;
+};
+
+type PronunciationReview = {
+  score: number;
+  nativeImpressionRu: string;
+  summaryRu: string;
+  issues: Array<{
+    titleRu: string;
+    evidenceRu: string;
+    fixRu: string;
+    drillRu: string;
+  }>;
+  drillRu: string;
 };
 
 type CoachFeedback = {
@@ -474,18 +489,24 @@ export default function Home() {
 
       const transcript = result?.transcription?.text?.trim() ?? "";
       const transcriptionError = result?.transcription?.error ?? "";
+      const audioUrl = result?.audioUrl ?? "";
+      const pronunciation = result?.pronunciation ?? null;
 
       if (transcript) {
         setSpeechReview({
           transcript,
           result: compareAnswer(transcript, [current.targetText]),
-          error: ""
+          error: "",
+          audioUrl,
+          pronunciation
         });
       } else if (transcriptionError) {
         setSpeechReview({
           transcript: "",
           result: null,
-          error: transcriptionError
+          error: transcriptionError,
+          audioUrl,
+          pronunciation
         });
       }
 
@@ -583,6 +604,13 @@ export default function Home() {
         cached: false
       });
     }
+  }
+
+  async function playUserRecording(audioUrl: string) {
+    nativeAudioRef.current?.pause();
+    const audio = new Audio(audioUrl);
+    nativeAudioRef.current = audio;
+    await audio.play();
   }
 
   async function playAudioUrl(audioUrl: string, mode: NativeAudioMode) {
@@ -836,6 +864,7 @@ export default function Home() {
                 onStart={startRecording}
                 onStop={stopRecording}
                 onPlayNative={(mode) => playNativeSample(current.targetText, mode)}
+                onPlayRecording={(audioUrl) => void playUserRecording(audioUrl)}
               />
             ) : null}
 
@@ -858,11 +887,13 @@ export default function Home() {
 
 function parseJsonResponse(value: string): {
   url?: string;
+  audioUrl?: string;
   error?: string;
   transcription?: {
     text?: string;
     error?: string;
   };
+  pronunciation?: PronunciationReview;
 } | null {
   if (!value.trim()) return null;
   try {
@@ -1217,7 +1248,8 @@ function SpeakingStep({
   step,
   onStart,
   onStop,
-  onPlayNative
+  onPlayNative,
+  onPlayRecording
 }: {
   copy: (typeof uiCopy)[Locale];
   elapsed: number;
@@ -1231,6 +1263,7 @@ function SpeakingStep({
   onStart: () => void;
   onStop: () => void;
   onPlayNative: (mode: NativeAudioMode) => void;
+  onPlayRecording: (audioUrl: string) => void;
 }) {
   const slowAudio = nativeAudio.slow;
   const normalAudio = nativeAudio.normal;
@@ -1282,6 +1315,18 @@ function SpeakingStep({
           <p>{recordingMessage}</p>
         </div>
       ) : null}
+      {speechReview?.audioUrl ? (
+        <div className="self-review-card">
+          <div>
+            <span>{copy.selfRecordingTitle}</span>
+            <p>{copy.selfRecordingBody}</p>
+          </div>
+          <button className="secondary-button" type="button" onClick={() => onPlayRecording(speechReview.audioUrl)}>
+            <Play size={18} />
+            {copy.playSelfRecording}
+          </button>
+        </div>
+      ) : null}
       {speechReview?.transcript ? (
         <div className={`feedback ${speechReview.result?.status ?? "partial"}`}>
           <strong>{copy.transcriptTitle}</strong>
@@ -1306,6 +1351,7 @@ function SpeakingStep({
           <p>{speechReview.error}</p>
         </div>
       ) : null}
+      {speechReview?.pronunciation ? <PronunciationPanel review={speechReview.pronunciation} copy={copy} /> : null}
       {slowAudio.message || normalAudio.message ? (
         <div className="native-status-grid">
           {slowAudio.message ? (
@@ -1341,5 +1387,39 @@ function SpeakingStep({
         </button>
       </div>
     </div>
+  );
+}
+
+function PronunciationPanel({
+  review,
+  copy
+}: {
+  review: PronunciationReview;
+  copy: (typeof uiCopy)[Locale];
+}) {
+  return (
+    <section className="pronunciation-panel">
+      <div className="pronunciation-head">
+        <div>
+          <span>{copy.pronunciationTitle}</span>
+          <h3>{review.nativeImpressionRu}</h3>
+        </div>
+        <strong>{review.score}/100</strong>
+      </div>
+      {review.summaryRu ? <p>{review.summaryRu}</p> : null}
+      {review.issues.length ? (
+        <div className="pronunciation-issues">
+          {review.issues.map((issue) => (
+            <article key={`${issue.titleRu}-${issue.fixRu}`}>
+              <h4>{issue.titleRu}</h4>
+              {issue.evidenceRu ? <p>{issue.evidenceRu}</p> : null}
+              {issue.fixRu ? <strong>{issue.fixRu}</strong> : null}
+              {issue.drillRu ? <small>{issue.drillRu}</small> : null}
+            </article>
+          ))}
+        </div>
+      ) : null}
+      {review.drillRu ? <div className="drill-note">{review.drillRu}</div> : null}
+    </section>
   );
 }
