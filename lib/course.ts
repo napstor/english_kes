@@ -271,27 +271,66 @@ function makeTechniqueTwoStep(item: LessonOneItem, index: number): TrainingStep 
   };
 }
 
-function makeSpeakingStep(item: LessonOneItem, index: number): TrainingStep {
+function makeTechniqueOneSpeakingStep(item: LessonOneItem, index: number): TrainingStep {
   return {
-    id: `l1-speaking-${String(index + 1).padStart(2, "0")}`,
+    id: `l1-tp1-speak-${String(index + 1).padStart(2, "0")}`,
     type: "speaking",
     label: {
-      ru: `Говорение ${index + 1}`,
-      en: `Speaking ${index + 1}`
+      ru: `Техника речи 1.${index + 1} вслух`,
+      en: `Speech drill 1.${index + 1} aloud`
     },
     prompt: {
-      ru: "Произнеси фразу: сначала медленно с эталоном, затем обычным темпом.",
-      en: "Say the phrase: first slowly with the model, then at normal speed."
+      ru: `Прочитай по-русски про себя и вслух произнеси трехмерный вариант: ${item.ru}`,
+      en: `Read the Russian silently and say the three-part English pattern aloud: ${item.ru}`
     },
     hint: {
-      ru: "Это артикуляционная проверка: добейся совпадения с текстовым эталоном.",
-      en: "This is articulation practice: aim to match the text target."
+      ru: "Последовательность книги: утверждение, вопрос, отрицание. Сначала медленно, потом повтори в обычном темпе.",
+      en: "Book sequence: positive, question, negative. Start slowly, then repeat at normal speed."
     },
     targetText: item.answer,
     acceptedAnswers: [item.answer, ...(item.alternatives ?? [])],
     notes: {
-      ru: [],
-      en: []
+      ru: [
+        "Говори громко и отчетливо.",
+        "Копируй интонацию эталона.",
+        "Если STT не совпал, повтори именно проблемный кусок."
+      ],
+      en: [
+        "Speak loudly and clearly.",
+        "Copy the reference intonation.",
+        "If STT does not match, repeat the problem fragment."
+      ]
+    }
+  };
+}
+
+function makeTechniqueTwoSpeakingStep(item: LessonOneItem, index: number): TrainingStep {
+  return {
+    id: `l1-tp2-speak-${String(index + 1).padStart(2, "0")}`,
+    type: "speaking",
+    label: {
+      ru: `Техника речи 2.${index + 1} вслух`,
+      en: `Speech drill 2.${index + 1} aloud`
+    },
+    prompt: {
+      ru: `Прочитай русскую фразу про себя и сразу произнеси английский вариант: ${item.ru}`,
+      en: `Read the Russian silently and immediately say the English version: ${item.ru}`
+    },
+    hint: {
+      ru: "Методика ТР2: сначала тихо и медленно, сверка, затем два раза громко - обычным голосом и с другой высотой голоса.",
+      en: "Speech drill 2 method: first quietly and slowly, check, then twice aloud with varied pitch."
+    },
+    targetText: item.answer,
+    acceptedAnswers: [item.answer, ...(item.alternatives ?? [])],
+    notes: {
+      ru: [
+        "Это основной навык урока: быстро выбирать нужную ПЛФ в потоке речи.",
+        "После правильной записи повтори фразу еще два раза: выше обычного голоса и ниже обычного голоса."
+      ],
+      en: [
+        "This is the core lesson skill: choosing the right speech pattern in speech flow.",
+        "After a correct recording, repeat the phrase twice more: above and below your normal pitch."
+      ]
     }
   };
 }
@@ -326,14 +365,16 @@ export const lessonOne = {
           "Утверждение: I/you/we/they + V, he/she/it + Vs.",
           "Вопрос: do/does + subject + V.",
           "Отрицание: do not / does not + V.",
-          "Слова частоты usually, often, seldom, always, never обычно стоят перед смысловым глаголом."
+          "Слова частоты usually, often, seldom, always, never обычно стоят перед смысловым глаголом.",
+          "Методика урока: понять ПЛФ, письменно собрать фразы, затем громко проговорить те же конструкции до автоматизма."
         ],
         en: [
           "Time sense: repeated and habitual actions.",
           "Positive: I/you/we/they + V, he/she/it + Vs.",
           "Question: do/does + subject + V.",
           "Negative: do not / does not + V.",
-          "Frequency words usually, often, seldom, always, never usually go before the main verb."
+          "Frequency words usually, often, seldom, always, never usually go before the main verb.",
+          "Lesson method: understand the pattern, build the phrases in writing, then say the same structures aloud until automatic."
         ]
       }
     },
@@ -384,8 +425,9 @@ export const lessonOne = {
       vocabulary: lessonOneVocabularyItems
     },
     ...techniqueOne.map(makeTechniqueOneStep),
+    ...techniqueOne.map(makeTechniqueOneSpeakingStep),
     ...techniqueTwo.map(makeTechniqueTwoStep),
-    ...[techniqueTwo[3], techniqueTwo[10], techniqueTwo[17], techniqueTwo[21], techniqueTwo[24]].map(makeSpeakingStep)
+    ...techniqueTwo.map(makeTechniqueTwoSpeakingStep)
   ] satisfies TrainingStep[]
 };
 
