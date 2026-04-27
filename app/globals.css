@@ -1012,6 +1012,109 @@ textarea:focus {
   line-height: 1.5;
 }
 
+.intonation-guide {
+  display: grid;
+  gap: 12px;
+  padding: 15px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(206, 184, 112, 0.46);
+}
+
+.intonation-guide-head {
+  display: grid;
+  gap: 4px;
+}
+
+.intonation-guide-head span {
+  color: #8b6400;
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.intonation-guide-head p,
+.intonation-phrase p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.intonation-phrases {
+  display: grid;
+  gap: 10px;
+}
+
+.intonation-phrase {
+  display: grid;
+  gap: 9px;
+  padding: 13px;
+  border-radius: 15px;
+  background: #fffdf5;
+  border: 1px solid rgba(222, 201, 137, 0.42);
+}
+
+.intonation-line {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 7px;
+  font-size: clamp(1.1rem, 2vw, 1.45rem);
+  line-height: 1.15;
+}
+
+.intonation-token {
+  position: relative;
+  padding: 3px 2px 8px;
+  color: #314239;
+}
+
+.intonation-token.weak {
+  color: #819087;
+  font-weight: 650;
+}
+
+.intonation-token.strong {
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.intonation-token.focus::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 1px;
+  height: 4px;
+  border-radius: 999px;
+  background: #19a66b;
+}
+
+.intonation-arrow {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  margin-left: 2px;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.intonation-arrow.rise {
+  background: #2f6fe8;
+}
+
+.intonation-arrow.fall {
+  background: #159763;
+}
+
+.intonation-arrow.hold {
+  background: #b77900;
+}
+
 .pronunciation-head {
   display: flex;
   align-items: flex-start;

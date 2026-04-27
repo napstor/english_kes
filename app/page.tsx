@@ -1455,7 +1455,9 @@ function SpeakingStep({
             <p>{speechReview.error}</p>
           </div>
         ) : null}
-        {speechReview?.pronunciation ? <PronunciationPanel review={speechReview.pronunciation} copy={copy} /> : null}
+        {speechReview?.pronunciation ? (
+          <PronunciationPanel review={speechReview.pronunciation} copy={copy} expectedText={step.targetText} />
+        ) : null}
       </section>
     </div>
   );
@@ -1463,10 +1465,12 @@ function SpeakingStep({
 
 function PronunciationPanel({
   review,
-  copy
+  copy,
+  expectedText
 }: {
   review: PronunciationReview;
   copy: (typeof uiCopy)[Locale];
+  expectedText: string;
 }) {
   return (
     <section className="pronunciation-panel">
@@ -1478,6 +1482,7 @@ function PronunciationPanel({
         <strong>{review.score}/100</strong>
       </div>
       {review.summaryRu ? <p>{review.summaryRu}</p> : null}
+      <IntonationGuide text={expectedText} />
       {review.issues.length ? (
         <div className="pronunciation-issues">
           {review.issues.map((issue) => (
@@ -1493,4 +1498,112 @@ function PronunciationPanel({
       {review.drillRu ? <div className="drill-note">{review.drillRu}</div> : null}
     </section>
   );
+}
+
+function IntonationGuide({ text }: { text: string }) {
+  const phrases = buildIntonationPhrases(text);
+
+  if (!phrases.length) return null;
+
+  return (
+    <section className="intonation-guide" aria-label="Интонационная схема">
+      <div className="intonation-guide-head">
+        <span>Интонация</span>
+        <p>Смотри на стрелку в конце части: туда должен идти голос. Жирные слова несут смысловой удар.</p>
+      </div>
+      <div className="intonation-phrases">
+        {phrases.map((phrase, index) => (
+          <article className="intonation-phrase" key={`${phrase.raw}-${index}`}>
+            <div className="intonation-line">
+              {phrase.tokens.map((token, tokenIndex) => (
+                <span
+                  className={[
+                    "intonation-token",
+                    token.strong ? "strong" : "weak",
+                    tokenIndex === phrase.focusIndex ? "focus" : ""
+                  ].join(" ")}
+                  key={`${token.text}-${tokenIndex}`}
+                >
+                  {token.text}
+                </span>
+              ))}
+              <strong className={`intonation-arrow ${phrase.direction}`}>{phrase.arrow}</strong>
+            </div>
+            <p>{phrase.tip}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function buildIntonationPhrases(text: string) {
+  const functionWords = new Set([
+    "a",
+    "an",
+    "the",
+    "to",
+    "do",
+    "does",
+    "don't",
+    "doesn't",
+    "i",
+    "you",
+    "we",
+    "they",
+    "he",
+    "she",
+    "it",
+    "in",
+    "on",
+    "at",
+    "of",
+    "for",
+    "with",
+    "and",
+    "but",
+    "or"
+  ]);
+
+  return text
+    .match(/[^.!?]+[.!?]?/g)
+    ?.map((rawPhrase) => {
+      const raw = rawPhrase.trim();
+      const words = raw.match(/[A-Za-z']+|[.,!?;]/g) ?? [];
+      const wordIndexes = words
+        .map((word, index) => ({ word, index }))
+        .filter(({ word }) => /[A-Za-z']/.test(word));
+      const focusIndex =
+        [...wordIndexes]
+          .reverse()
+          .find(({ word }) => !functionWords.has(word.toLowerCase().replace(/[^\w']/g, "")))?.index ??
+        wordIndexes[wordIndexes.length - 1]?.index ??
+        -1;
+      const isQuestion = raw.endsWith("?");
+      const isListPause = raw.endsWith(",");
+      const direction = isQuestion ? "rise" : isListPause ? "hold" : "fall";
+
+      return {
+        raw,
+        arrow: direction === "rise" ? "↗" : direction === "hold" ? "→" : "↘",
+        direction,
+        focusIndex,
+        tip:
+          direction === "rise"
+            ? "Вопрос через do/does: держи голос живым и чуть подними на последнем смысловом слове."
+            : direction === "hold"
+              ? "Это не конец мысли: не роняй голос полностью, оставь фразу открытой."
+              : "Утверждение или отрицание: поставь ударение на смысловое слово и мягко опусти голос в конце.",
+        tokens: words.map((word, index) => {
+          const normalized = word.toLowerCase().replace(/[^\w']/g, "");
+          const isWord = /[A-Za-z']/.test(word);
+          return {
+            text: word,
+            strong: isWord && !functionWords.has(normalized),
+            focus: index === focusIndex
+          };
+        })
+      };
+    })
+    .filter((phrase) => phrase.raw.length) ?? [];
 }
