@@ -2,13 +2,7 @@
 
 import {
   BookOpen,
-  ChevronRight,
-  Eye,
-  EyeOff,
   Languages,
-  Mic,
-  Pause,
-  Play,
   Shield,
   LogOut,
   Users,
@@ -22,12 +16,14 @@ import { CourseDrawer, StepRail, type NavigationStep } from "@/components/naviga
 import {
   CompositionStep as CompositionStepView,
   DrillStep as DrillStepView,
+  SpeakingStep as SpeakingStepView,
   TheoryStep as TheoryStepView,
+  TranslateStep as TranslateStepView,
   VocabularyStep as VocabularyStepView
 } from "@/components/steps";
 import { IconButton } from "@/components/ui";
 import { lessonOne, uiCopy, type Locale, type TrainingStep } from "@/lib/course";
-import { compareAnswer, detectGrammarHint, tokenize, type GrammarHint } from "@/lib/scoring";
+import { compareAnswer, detectGrammarHint, type GrammarHint } from "@/lib/scoring";
 
 type ProgressState = {
   activeStep: number;
@@ -905,16 +901,20 @@ export default function Home() {
           ) : null}
 
           {current.type === "translate" ? (
-            <WritingStep
+            <TranslateStepView
+              step={current}
               answer={answer}
               checked={checked}
               coachError={coachError}
               coachFeedback={coachFeedback}
               coachLoading={coachLoading}
-              copy={copy}
-              step={current}
+              attemptCount={progress.attempts[current.id] ?? 0}
               onAnswer={setAnswer}
               onCheck={() => void checkAnswer(current)}
+              onComplete={() => {
+                markComplete(2);
+                goNext();
+              }}
             />
           ) : null}
 
@@ -954,8 +954,8 @@ export default function Home() {
           ) : null}
 
           {current.type === "speaking" ? (
-            <SpeakingStep
-              copy={copy}
+            <SpeakingStepView
+              step={current}
               elapsed={elapsed}
               recorded={recorded}
               recordingMessage={recordingMessage}
@@ -963,24 +963,15 @@ export default function Home() {
               recording={recording}
               speechReview={speechReview}
               nativeAudio={nativeAudio}
-              step={current}
               onStart={startRecording}
               onStop={stopRecording}
               onPlayNative={(mode) => playNativeSample(current.targetText, mode)}
               onPlayRecording={(audioUrl) => void playUserRecording(audioUrl)}
+              onComplete={() => {
+                markComplete(3);
+                goNext();
+              }}
             />
-          ) : null}
-
-          {current.type === "translate" || current.type === "speaking" ? (
-            <div className="footer-actions">
-              <button className="secondary-button" type="button" onClick={() => setChecked(null)}>
-                {copy.retry}
-              </button>
-              <button className="primary-button" type="button" onClick={goNext}>
-                {activeStepIndex === lessonOne.steps.length - 1 ? copy.finish : copy.next}
-                <ChevronRight size={18} />
-              </button>
-            </div>
           ) : null}
         </article>
         <StepRail steps={nearbySteps} currentStepId={current.id} onStepClick={navigateToStep} onCourseClick={() => setDrawerOpen(true)} />
@@ -1109,422 +1100,4 @@ function AdminPanel({ copy }: { copy: (typeof uiCopy)[Locale] }) {
       </ul>
     </section>
   );
-}
-
-function WritingStep({
-  answer,
-  checked,
-  coachError,
-  coachFeedback,
-  coachLoading,
-  copy,
-  step,
-  onAnswer,
-  onCheck
-}: {
-  answer: string;
-  checked: ReturnType<typeof compareAnswer> | null;
-  coachError: string;
-  coachFeedback: CoachFeedback | null;
-  coachLoading: boolean;
-  copy: (typeof uiCopy)[Locale];
-  step: TrainingStep;
-  onAnswer: (value: string) => void;
-  onCheck: () => void;
-}) {
-  const answerTokens = tokenize(answer);
-  return (
-    <div className="content-panel">
-      <textarea
-        value={answer}
-        onChange={(event) => onAnswer(event.target.value)}
-        placeholder={copy.answerPlaceholder}
-        rows={4}
-      />
-      <button className="primary-button wide" type="button" onClick={onCheck} disabled={!answer.trim()}>
-        {copy.check}
-      </button>
-
-      {checked ? (
-        <div className={`feedback ${checked.status}`}>
-          <div className="feedback-headline">
-            <strong>{copy.feedback[checked.status]}</strong>
-            <p>{checked.message}</p>
-          </div>
-          <div className="answer-sentence-card">
-            <span>{checked.status === "exact" ? copy.yourAnswer : copy.bestAnswer}</span>
-            <p>{checked.status === "exact" ? answer : step.acceptedAnswers[0]}</p>
-          </div>
-          {checked.status !== "exact" ? <p className="expected">{step.acceptedAnswers[0]}</p> : null}
-          <details className="token-details" open={checked.status !== "exact"}>
-            <summary>{copy.wordMarkup}</summary>
-            <div className="token-row">
-              {answerTokens.map((token, index) => (
-                <span key={`${token}-${index}`} className={checked.badTokens.includes(token) ? "bad" : "good"}>
-                  {token}
-                </span>
-              ))}
-            </div>
-          </details>
-        </div>
-      ) : null}
-      {coachLoading ? <div className="coach-feedback loading">{copy.coachLoading}</div> : null}
-      {coachError ? <div className="coach-feedback error">{coachError}</div> : null}
-      {coachFeedback ? <CoachFeedbackPanel feedback={coachFeedback} copy={copy} /> : null}
-    </div>
-  );
-}
-
-function CoachFeedbackPanel({ feedback, copy }: { feedback: CoachFeedback; copy: (typeof uiCopy)[Locale] }) {
-  return (
-    <div className={`coach-feedback ${feedback.verdict}`}>
-      <div className="coach-feedback-head">
-        <strong>{copy.coachTitle}</strong>
-        <span>{feedback.score}/100</span>
-      </div>
-      <p>{feedback.shortRu}</p>
-      {feedback.grammarMiniLessonRu ? (
-        <div className="grammar-brief">
-          <span>{copy.grammarBrief}</span>
-          <p>{feedback.grammarMiniLessonRu}</p>
-        </div>
-      ) : null}
-      <div className="best-answer">
-        <span>{copy.bestAnswer}</span>
-        <strong>{feedback.bestAnswer}</strong>
-      </div>
-      {feedback.issues.length ? (
-        <div className="issue-list">
-          {feedback.issues.map((issue, index) => (
-            <div className="issue-card" key={`${issue.fragment}-${index}`}>
-              <div>
-                <span className="bad-fragment">{issue.fragment}</span>
-                <span className="arrow">→</span>
-                <span className="good-fragment">{issue.correction}</span>
-              </div>
-              <p>{issue.reasonRu}</p>
-              {issue.grammarRu ? <p className="grammar-line">{issue.grammarRu}</p> : null}
-            </div>
-          ))}
-        </div>
-      ) : null}
-      <div className="drill-note">{feedback.drillRu}</div>
-    </div>
-  );
-}
-
-function SpeakingStep({
-  copy,
-  elapsed,
-  recorded,
-  recordingMessage,
-  recordingStatus,
-  recording,
-  speechReview,
-  nativeAudio,
-  step,
-  onStart,
-  onStop,
-  onPlayNative,
-  onPlayRecording
-}: {
-  copy: (typeof uiCopy)[Locale];
-  elapsed: number;
-  recorded: boolean;
-  recordingMessage: string;
-  recordingStatus: "idle" | "uploading" | "uploaded" | "error";
-  recording: boolean;
-  speechReview: SpeechReview | null;
-  nativeAudio: Record<NativeAudioMode, NativeAudioState>;
-  step: TrainingStep;
-  onStart: () => void;
-  onStop: () => void;
-  onPlayNative: (mode: NativeAudioMode) => void;
-  onPlayRecording: (audioUrl: string) => void;
-}) {
-  const slowAudio = nativeAudio.slow;
-  const normalAudio = nativeAudio.normal;
-  const [referenceVisible, setReferenceVisible] = useState(false);
-
-  useEffect(() => {
-    setReferenceVisible(false);
-  }, [step.id]);
-
-  return (
-    <div className="content-panel speaking-panel">
-      <section className="speaking-workbench">
-        <div className="speaking-reference">
-          <div className={referenceVisible ? "speech-target revealed" : "speech-target hidden"}>
-            {referenceVisible ? <p>{step.targetText}</p> : <p>{copy.referenceHidden}</p>}
-            <button className="reference-toggle" type="button" onClick={() => setReferenceVisible((visible) => !visible)}>
-              {referenceVisible ? <EyeOff size={18} /> : <Eye size={18} />}
-              {referenceVisible ? copy.hideReference : copy.showReference}
-            </button>
-          </div>
-        </div>
-
-        <div className="recording-console">
-          <div className={recording ? "wave active" : "wave"}>
-            {Array.from({ length: 18 }).map((_, index) => (
-              <span key={index} />
-            ))}
-          </div>
-          <div className="record-row">
-            <button
-              className={recording ? "danger-button" : "record-button"}
-              type="button"
-              onClick={recording ? onStop : onStart}
-              disabled={recordingStatus === "uploading"}
-            >
-              {recording ? <Pause size={18} /> : <Mic size={18} />}
-              {recording ? copy.stopRecording : copy.startRecording}
-            </button>
-            <span>{elapsed}s</span>
-          </div>
-          {recorded ? (
-            <div
-              className={`feedback compact ${recordingStatus === "error" ? "wrong" : recordingStatus === "uploaded" ? "exact" : "partial"}`}
-            >
-              <strong>{copy.recordingSaved}</strong>
-              <p>{recordingMessage || copy.recordingMvp}</p>
-            </div>
-          ) : null}
-          {recordingStatus === "error" && !recorded ? (
-            <div className="feedback compact wrong">
-              <strong>{copy.recordingProblem}</strong>
-              <p>{recordingMessage}</p>
-            </div>
-          ) : null}
-        </div>
-
-        <div className="speaking-compare-grid">
-          <section className="compare-card">
-            <div>
-              <span>{copy.selfRecordingTitle}</span>
-              <p>{copy.selfRecordingBody}</p>
-            </div>
-            <button
-              className="secondary-button wide"
-              type="button"
-              onClick={() => speechReview?.audioUrl && onPlayRecording(speechReview.audioUrl)}
-              disabled={!speechReview?.audioUrl}
-            >
-              <Play size={18} />
-              {copy.playSelfRecording}
-            </button>
-          </section>
-
-          <section className="compare-card">
-            <div>
-              <span>{copy.nativeAudioSlow}</span>
-              <p>{slowAudio.message || copy.nativeAudioReady}</p>
-            </div>
-            <button className="secondary-button wide" type="button" onClick={() => onPlayNative("slow")} disabled={slowAudio.status === "loading"}>
-              <Play size={18} />
-              {slowAudio.status === "loading"
-                ? copy.nativeAudioLoadingShort
-                : slowAudio.audioUrl
-                  ? copy.playNativeAgainSlow
-                  : copy.playNativeSlow}
-            </button>
-          </section>
-
-          <section className="compare-card">
-            <div>
-              <span>{copy.nativeAudioNormal}</span>
-              <p>{normalAudio.message || copy.nativeAudioReady}</p>
-            </div>
-            <button
-              className="secondary-button wide"
-              type="button"
-              onClick={() => onPlayNative("normal")}
-              disabled={normalAudio.status === "loading"}
-            >
-              <Play size={18} />
-              {normalAudio.status === "loading"
-                ? copy.nativeAudioLoadingShort
-                : normalAudio.audioUrl
-                  ? copy.playNativeAgainNormal
-                  : copy.playNativeNormal}
-            </button>
-          </section>
-        </div>
-      </section>
-
-      <section className="speaking-results">
-        {speechReview?.transcript ? (
-          <div className={`feedback ${speechReview.result?.status ?? "partial"}`}>
-            <strong>{copy.transcriptTitle}</strong>
-            <p className="transcript-text">{speechReview.transcript}</p>
-            {speechReview.result ? (
-              <>
-                <p>{speechReview.result.message}</p>
-                <div className="token-row">
-                  {tokenize(speechReview.transcript).map((token, index) => (
-                    <span key={`${token}-${index}`} className={speechReview.result?.badTokens.includes(token) ? "bad" : "good"}>
-                      {token}
-                    </span>
-                  ))}
-                </div>
-              </>
-            ) : null}
-          </div>
-        ) : null}
-        {speechReview?.error ? (
-          <div className="feedback partial">
-            <strong>{copy.transcriptProblem}</strong>
-            <p>{speechReview.error}</p>
-          </div>
-        ) : null}
-        {speechReview?.pronunciation ? (
-          <PronunciationPanel review={speechReview.pronunciation} copy={copy} expectedText={step.targetText} />
-        ) : null}
-      </section>
-    </div>
-  );
-}
-
-function PronunciationPanel({
-  review,
-  copy,
-  expectedText
-}: {
-  review: PronunciationReview;
-  copy: (typeof uiCopy)[Locale];
-  expectedText: string;
-}) {
-  return (
-    <section className="pronunciation-panel">
-      <div className="pronunciation-head">
-        <div>
-          <span>{copy.pronunciationTitle}</span>
-          <h3>{review.nativeImpressionRu}</h3>
-        </div>
-        <strong>{review.score}/100</strong>
-      </div>
-      {review.summaryRu ? <p>{review.summaryRu}</p> : null}
-      <IntonationGuide text={expectedText} />
-      {review.issues.length ? (
-        <div className="pronunciation-issues">
-          {review.issues.map((issue) => (
-            <article key={`${issue.titleRu}-${issue.fixRu}`}>
-              <h4>{issue.titleRu}</h4>
-              {issue.evidenceRu ? <p>{issue.evidenceRu}</p> : null}
-              {issue.fixRu ? <strong>{issue.fixRu}</strong> : null}
-              {issue.drillRu ? <small>{issue.drillRu}</small> : null}
-            </article>
-          ))}
-        </div>
-      ) : null}
-      {review.drillRu ? <div className="drill-note">{review.drillRu}</div> : null}
-    </section>
-  );
-}
-
-function IntonationGuide({ text }: { text: string }) {
-  const phrases = buildIntonationPhrases(text);
-
-  if (!phrases.length) return null;
-
-  return (
-    <section className="intonation-guide" aria-label="Интонационная схема">
-      <div className="intonation-guide-head">
-        <span>Интонация</span>
-        <p>Смотри на стрелку в конце части: туда должен идти голос. Жирные слова несут смысловой удар.</p>
-      </div>
-      <div className="intonation-phrases">
-        {phrases.map((phrase, index) => (
-          <article className="intonation-phrase" key={`${phrase.raw}-${index}`}>
-            <div className="intonation-line">
-              {phrase.tokens.map((token, tokenIndex) => (
-                <span
-                  className={[
-                    "intonation-token",
-                    token.strong ? "strong" : "weak",
-                    tokenIndex === phrase.focusIndex ? "focus" : ""
-                  ].join(" ")}
-                  key={`${token.text}-${tokenIndex}`}
-                >
-                  {token.text}
-                </span>
-              ))}
-              <strong className={`intonation-arrow ${phrase.direction}`}>{phrase.arrow}</strong>
-            </div>
-            <p>{phrase.tip}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function buildIntonationPhrases(text: string) {
-  const functionWords = new Set([
-    "a",
-    "an",
-    "the",
-    "to",
-    "do",
-    "does",
-    "don't",
-    "doesn't",
-    "i",
-    "you",
-    "we",
-    "they",
-    "he",
-    "she",
-    "it",
-    "in",
-    "on",
-    "at",
-    "of",
-    "for",
-    "with",
-    "and",
-    "but",
-    "or"
-  ]);
-
-  return text
-    .match(/[^.!?]+[.!?]?/g)
-    ?.map((rawPhrase) => {
-      const raw = rawPhrase.trim();
-      const words = raw.match(/[A-Za-z']+|[.,!?;]/g) ?? [];
-      const wordIndexes = words
-        .map((word, index) => ({ word, index }))
-        .filter(({ word }) => /[A-Za-z']/.test(word));
-      const focusIndex =
-        [...wordIndexes]
-          .reverse()
-          .find(({ word }) => !functionWords.has(word.toLowerCase().replace(/[^\w']/g, "")))?.index ??
-        wordIndexes[wordIndexes.length - 1]?.index ??
-        -1;
-      const isQuestion = raw.endsWith("?");
-      const isListPause = raw.endsWith(",");
-      const direction = isQuestion ? "rise" : isListPause ? "hold" : "fall";
-
-      return {
-        raw,
-        arrow: direction === "rise" ? "↗" : direction === "hold" ? "→" : "↘",
-        direction,
-        focusIndex,
-        tip:
-          direction === "rise"
-            ? "Вопрос через do/does: держи голос живым и чуть подними на последнем смысловом слове."
-            : direction === "hold"
-              ? "Это не конец мысли: не роняй голос полностью, оставь фразу открытой."
-              : "Утверждение или отрицание: поставь ударение на смысловое слово и мягко опусти голос в конце.",
-        tokens: words.map((word, index) => {
-          const normalized = word.toLowerCase().replace(/[^\w']/g, "");
-          const isWord = /[A-Za-z']/.test(word);
-          return {
-            text: word,
-            strong: isWord && !functionWords.has(normalized),
-            focus: index === focusIndex
-          };
-        })
-      };
-    })
-    .filter((phrase) => phrase.raw.length) ?? [];
 }
