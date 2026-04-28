@@ -1409,16 +1409,25 @@ function WritingStep({
 
       {checked ? (
         <div className={`feedback ${checked.status}`}>
-          <strong>{copy.feedback[checked.status]}</strong>
-          <p>{checked.message}</p>
-          <div className="token-row">
-            {answerTokens.map((token, index) => (
-              <span key={`${token}-${index}`} className={checked.badTokens.includes(token) ? "bad" : "good"}>
-                {token}
-              </span>
-            ))}
+          <div className="feedback-headline">
+            <strong>{copy.feedback[checked.status]}</strong>
+            <p>{checked.message}</p>
           </div>
-          <p className="expected">{step.acceptedAnswers[0]}</p>
+          <div className="answer-sentence-card">
+            <span>{checked.status === "exact" ? copy.yourAnswer : copy.bestAnswer}</span>
+            <p>{checked.status === "exact" ? answer : step.acceptedAnswers[0]}</p>
+          </div>
+          {checked.status !== "exact" ? <p className="expected">{step.acceptedAnswers[0]}</p> : null}
+          <details className="token-details" open={checked.status !== "exact"}>
+            <summary>{copy.wordMarkup}</summary>
+            <div className="token-row">
+              {answerTokens.map((token, index) => (
+                <span key={`${token}-${index}`} className={checked.badTokens.includes(token) ? "bad" : "good"}>
+                  {token}
+                </span>
+              ))}
+            </div>
+          </details>
         </div>
       ) : null}
       {coachLoading ? <div className="coach-feedback loading">{copy.coachLoading}</div> : null}

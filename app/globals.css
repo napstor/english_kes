@@ -1014,14 +1014,67 @@ textarea:focus {
 }
 
 .feedback {
+  display: grid;
+  gap: 14px;
   border-radius: 18px;
-  padding: 16px;
+  padding: 18px;
   border: 1px solid;
 }
 
 .feedback p {
-  margin: 8px 0 0;
+  margin: 0;
   line-height: 1.45;
+}
+
+.feedback-headline {
+  display: grid;
+  gap: 5px;
+}
+
+.feedback-headline strong {
+  font-size: 1.05rem;
+}
+
+.answer-sentence-card {
+  display: grid;
+  gap: 7px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(19, 32, 23, 0.08);
+}
+
+.answer-sentence-card span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.answer-sentence-card p {
+  color: var(--ink);
+  font-size: clamp(1.05rem, 1.6vw, 1.28rem);
+  font-weight: 760;
+  line-height: 1.45;
+}
+
+.token-details {
+  display: grid;
+  gap: 8px;
+}
+
+.token-details summary {
+  width: fit-content;
+  list-style: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 850;
+}
+
+.token-details summary::-webkit-details-marker {
+  display: none;
 }
 
 .feedback.exact {
@@ -1173,7 +1226,7 @@ textarea:focus {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 14px;
+  margin-top: 2px;
 }
 
 .token-row span {
