@@ -3,6 +3,7 @@
 import {
   BookOpen,
   Languages,
+  MessageCircle,
   Shield,
   LogOut,
   Users,
@@ -10,7 +11,8 @@ import {
 } from "lucide-react";
 import type { FormEvent } from "react";
 import { useEffect, useRef, useState } from "react";
-import { AuthShell } from "@/components/auth";
+import { AuthLoadingScreen, AuthShell } from "@/components/auth";
+import { CourseMap, ReviewDashboard, TodayDashboard, TutorChat } from "@/components/dashboard";
 import { AppShell, BottomTabs, Sidebar, TopBar } from "@/components/layout";
 import { CourseDrawer, StepRail, type NavigationStep } from "@/components/navigation";
 import {
@@ -23,7 +25,10 @@ import {
 } from "@/components/steps";
 import { IconButton } from "@/components/ui";
 import { lessonOne, uiCopy, type Locale, type TrainingStep } from "@/lib/course";
+import { mockConsistencyWeeks, mockCourseLessons, mockReviewPatterns, mockStreakDays } from "@/lib/mockData";
 import { compareAnswer, detectGrammarHint, type GrammarHint } from "@/lib/scoring";
+
+type AppView = "today" | "course" | "review" | "lesson";
 
 type ProgressState = {
   activeStep: number;
@@ -240,6 +245,8 @@ export default function Home() {
     normal: createNativeAudioState()
   });
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [tutorOpen, setTutorOpen] = useState(false);
+  const [currentView, setCurrentView] = useState<AppView>("today");
   const timerRef = useRef<number | null>(null);
   const nativeAudioRef = useRef<HTMLAudioElement | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -443,7 +450,19 @@ export default function Home() {
   function navigateToStep(stepId: string) {
     const stepIndex = lessonOne.steps.findIndex((step) => step.id === stepId);
     if (stepIndex < 0) return;
+    setCurrentView("lesson");
     setProgress((prev) => ({ ...prev, activeStep: stepIndex }));
+  }
+
+  function navigateToLesson(lessonId: string) {
+    if (lessonId === lessonOne.id) {
+      setCurrentView("lesson");
+    }
+  }
+
+  function navigateToView(view: "today" | "course" | "review" | "profile") {
+    if (view === "profile") return;
+    setCurrentView(view);
   }
 
   async function checkAnswer(step: TrainingStep) {
@@ -795,14 +814,7 @@ export default function Home() {
   }
 
   if (authLoading) {
-    return (
-      <main className="auth-shell">
-        <section className="auth-card">
-          <div className="brand-mark">K</div>
-          <h1>{copy.loadingSession}</h1>
-        </section>
-      </main>
-    );
+    return <AuthLoadingScreen />;
   }
 
   if (!authUser) {
@@ -819,10 +831,10 @@ export default function Home() {
             actions={
               <>
                 <IconButton ariaLabel={copy.book} icon={BookOpen} onClick={() => setDrawerOpen(true)} />
+                <IconButton ariaLabel="AI Tutor" icon={MessageCircle} onClick={() => setTutorOpen(true)} />
                 <div className="user-pill">
                   <Shield size={17} />
                   <span>{authUser.username}</span>
-                  <small>{authUser.role}</small>
                 </div>
                 <button
                   className="segmented"
@@ -850,131 +862,158 @@ export default function Home() {
             }
           />
         }
-        sidebar={<Sidebar activeKey="course" />}
-        bottomTabs={<BottomTabs activeKey="course" />}
+        sidebar={<Sidebar activeKey={currentView === "lesson" ? "course" : currentView} onItemClick={navigateToView} />}
+        bottomTabs={<BottomTabs activeKey={currentView === "lesson" ? "course" : currentView} onTabClick={navigateToView} />}
       >
-        <article className="exercise-card" id="today">
-          {current.type === "translate" || current.type === "speaking" ? (
-            <>
-              <div className="exercise-top">
-                <span className={`type-pill ${current.type}`}>{copy.stepTypes[current.type]}</span>
-                <button className="icon-button" type="button" onClick={() => playNativeSample(current.targetText, "normal")}>
-                  <Volume2 size={18} />
-                </button>
-              </div>
+        {currentView === "today" ? (
+          <TodayDashboard
+            userName={authUser.username}
+            progress={progress}
+            streakDays={mockStreakDays}
+            consistencyWeeks={mockConsistencyWeeks}
+            onContinue={() => setCurrentView("lesson")}
+            onReview={() => setCurrentView("review")}
+          />
+        ) : null}
 
-              <div className="prompt-block">
-                <p className="eyebrow">{copy.task}</p>
-                <h2>{current.prompt[locale]}</h2>
-                {current.sourceText ? (
-                  <div className="source-text" lang="ru">
-                    <span>{copy.sourcePhrase}</span>
-                    <p>{current.sourceText}</p>
+        {currentView === "course" ? (
+          <CourseMap
+            steps={lessonSteps}
+            lessons={mockCourseLessons}
+            progress={progress}
+            onLessonClick={navigateToLesson}
+            onStepClick={navigateToStep}
+          />
+        ) : null}
+
+        {currentView === "review" ? <ReviewDashboard patterns={mockReviewPatterns} onPlay={(text) => playVocabularyAudio(text)} /> : null}
+
+        {currentView === "lesson" ? (
+          <>
+            <article className="exercise-card" id="today">
+              {current.type === "translate" || current.type === "speaking" ? (
+                <>
+                  <div className="exercise-top">
+                    <span className={`type-pill ${current.type}`}>{copy.stepTypes[current.type]}</span>
+                    <button className="icon-button" type="button" onClick={() => playNativeSample(current.targetText, "normal")}>
+                      <Volume2 size={18} />
+                    </button>
                   </div>
-                ) : null}
-                {current.hint[locale] ? <p className="hint">{current.hint[locale]}</p> : null}
-              </div>
-            </>
-          ) : null}
 
-          {current.type === "theory" ? (
-            <TheoryStepView
-              step={current}
-              locale={locale}
-              onComplete={() => {
-                markComplete(2);
-                goNext();
-              }}
-            />
-          ) : null}
+                  <div className="prompt-block">
+                    <p className="eyebrow">{copy.task}</p>
+                    <h2>{current.prompt[locale]}</h2>
+                    {current.sourceText ? (
+                      <div className="source-text" lang="ru">
+                        <span>{copy.sourcePhrase}</span>
+                        <p>{current.sourceText}</p>
+                      </div>
+                    ) : null}
+                    {current.hint[locale] ? <p className="hint">{current.hint[locale]}</p> : null}
+                  </div>
+                </>
+              ) : null}
 
-          {current.type === "vocabulary" ? (
-            <VocabularyStepView
-              step={current}
-              locale={locale}
-              onPlay={(text) => playVocabularyAudio(text)}
-              onComplete={() => {
-                markComplete(2);
-                goNext();
-              }}
-            />
-          ) : null}
+              {current.type === "theory" ? (
+                <TheoryStepView
+                  step={current}
+                  locale={locale}
+                  onComplete={() => {
+                    markComplete(2);
+                    goNext();
+                  }}
+                />
+              ) : null}
 
-          {current.type === "translate" ? (
-            <TranslateStepView
-              step={current}
-              answer={answer}
-              checked={checked}
-              coachError={coachError}
-              coachFeedback={coachFeedback}
-              coachLoading={coachLoading}
-              attemptCount={progress.attempts[current.id] ?? 0}
-              onAnswer={setAnswer}
-              onCheck={() => void checkAnswer(current)}
-              onComplete={() => {
-                markComplete(2);
-                goNext();
-              }}
-            />
-          ) : null}
+              {current.type === "vocabulary" ? (
+                <VocabularyStepView
+                  step={current}
+                  locale={locale}
+                  onPlay={(text) => playVocabularyAudio(text)}
+                  onComplete={() => {
+                    markComplete(2);
+                    goNext();
+                  }}
+                />
+              ) : null}
 
-          {current.type === "drill" ? (
-            <DrillStepView
-              step={current}
-              answer={answer}
-              checked={checked}
-              attemptCount={progress.attempts[current.id] ?? 0}
-              coachError={coachError}
-              coachFeedback={coachFeedback}
-              coachLoading={coachLoading}
-              onAnswer={setAnswer}
-              onCheck={() => void checkAnswer(current)}
-              onComplete={() => {
-                markComplete(2);
-                goNext();
-              }}
-            />
-          ) : null}
+              {current.type === "translate" ? (
+                <TranslateStepView
+                  step={current}
+                  answer={answer}
+                  checked={checked}
+                  coachError={coachError}
+                  coachFeedback={coachFeedback}
+                  coachLoading={coachLoading}
+                  attemptCount={progress.attempts[current.id] ?? 0}
+                  onAnswer={setAnswer}
+                  onCheck={() => void checkAnswer(current)}
+                  onComplete={() => {
+                    markComplete(2);
+                    goNext();
+                  }}
+                />
+              ) : null}
 
-          {current.type === "composition" ? (
-            <CompositionStepView
-              step={current}
-              locale={locale}
-              feedback={compositionFeedback}
-              lines={compositionLines}
-              loading={compositionLoading}
-              error={compositionError}
-              onLinesChange={setCompositionLines}
-              onCheck={() => void checkComposition(current)}
-              onComplete={() => {
-                markComplete(4);
-                goNext();
-              }}
-            />
-          ) : null}
+              {current.type === "drill" ? (
+                <DrillStepView
+                  step={current}
+                  answer={answer}
+                  checked={checked}
+                  attemptCount={progress.attempts[current.id] ?? 0}
+                  coachError={coachError}
+                  coachFeedback={coachFeedback}
+                  coachLoading={coachLoading}
+                  onAnswer={setAnswer}
+                  onCheck={() => void checkAnswer(current)}
+                  onComplete={() => {
+                    markComplete(2);
+                    goNext();
+                  }}
+                />
+              ) : null}
 
-          {current.type === "speaking" ? (
-            <SpeakingStepView
-              step={current}
-              elapsed={elapsed}
-              recorded={recorded}
-              recordingMessage={recordingMessage}
-              recordingStatus={recordingStatus}
-              recording={recording}
-              speechReview={speechReview}
-              nativeAudio={nativeAudio}
-              onStart={startRecording}
-              onStop={stopRecording}
-              onPlayNative={(mode) => playNativeSample(current.targetText, mode)}
-              onPlayRecording={(audioUrl) => void playUserRecording(audioUrl)}
-              onComplete={() => {
-                markComplete(3);
-                goNext();
-              }}
-            />
-          ) : null}
-        </article>
-        <StepRail steps={nearbySteps} currentStepId={current.id} onStepClick={navigateToStep} onCourseClick={() => setDrawerOpen(true)} />
+              {current.type === "composition" ? (
+                <CompositionStepView
+                  step={current}
+                  locale={locale}
+                  feedback={compositionFeedback}
+                  lines={compositionLines}
+                  loading={compositionLoading}
+                  error={compositionError}
+                  onLinesChange={setCompositionLines}
+                  onCheck={() => void checkComposition(current)}
+                  onComplete={() => {
+                    markComplete(4);
+                    goNext();
+                  }}
+                />
+              ) : null}
+
+              {current.type === "speaking" ? (
+                <SpeakingStepView
+                  step={current}
+                  elapsed={elapsed}
+                  recorded={recorded}
+                  recordingMessage={recordingMessage}
+                  recordingStatus={recordingStatus}
+                  recording={recording}
+                  speechReview={speechReview}
+                  nativeAudio={nativeAudio}
+                  onStart={startRecording}
+                  onStop={stopRecording}
+                  onPlayNative={(mode) => playNativeSample(current.targetText, mode)}
+                  onPlayRecording={(audioUrl) => void playUserRecording(audioUrl)}
+                  onComplete={() => {
+                    markComplete(3);
+                    goNext();
+                  }}
+                />
+              ) : null}
+            </article>
+            <StepRail steps={nearbySteps} currentStepId={current.id} onStepClick={navigateToStep} onCourseClick={() => setDrawerOpen(true)} />
+          </>
+        ) : null}
       </AppShell>
       <CourseDrawer
         isOpen={drawerOpen}
@@ -984,6 +1023,7 @@ export default function Home() {
         onStepClick={navigateToStep}
         lessonTitle={`${copy.lessonLabel} 1 / 44`}
       />
+      <TutorChat isOpen={tutorOpen} onClose={() => setTutorOpen(false)} />
     </>
   );
 }
