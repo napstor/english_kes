@@ -64,14 +64,14 @@ const lessonOneVocabularyItems: VocabularyItem[] = [
   { ru: "готовить завтрак", en: "to make breakfast" },
   { ru: "для всей семьи", en: "for the whole family" },
   { ru: "довольно", en: "quite; rather" },
-  { ru: "идти о дожде", en: "to rain" },
+  { ru: "идти (о дожде)", en: "to rain" },
   { ru: "завтракать", en: "to have breakfast" },
   { ru: "играть", en: "to play" },
   { ru: "кино", en: "cinema" },
   { ru: "кофе", en: "coffee" },
   { ru: "мешать, беспокоить", en: "to bother; to disturb" },
   { ru: "муж", en: "a husband" },
-  { ru: "навести макияж", en: "to make up; to beautify oneself" },
+  { ru: "навести макияж", en: "to put on makeup; to do one's makeup" },
   { ru: "обедать", en: "to have lunch" },
   { ru: "одеться", en: "to get dressed; to dress" },
   { ru: "перекусить", en: "to have a snack" },
@@ -79,14 +79,16 @@ const lessonOneVocabularyItems: VocabularyItem[] = [
   { ru: "петь", en: "to sing" },
   { ru: "пить", en: "to drink" },
   { ru: "по будням", en: "on weekdays" },
+  { ru: "по выходным", en: "at weekends; on weekends" },
+  { ru: "по воскресеньям", en: "on Sundays" },
   { ru: "помогать", en: "to help" },
   { ru: "помыть посуду", en: "to wash the dishes" },
   { ru: "приготовить завтрак", en: "to make breakfast" },
   { ru: "принимать ванну", en: "to take a bath; to have a bath" },
   { ru: "принимать душ", en: "to take a shower; to have a shower" },
   { ru: "приходить", en: "to come" },
-  { ru: "приходить вовремя", en: "to come on time" },
-  { ru: "приходить в последнюю минуту", en: "to come in time" },
+  { ru: "приходить вовремя", en: "to arrive on time; to come on time" },
+  { ru: "приходить в последнюю минуту", en: "to come at the last minute" },
   { ru: "причесаться", en: "to do one's hair" },
   { ru: "проголодаться", en: "to get hungry" },
   { ru: "просыпаться", en: "to wake up" },
@@ -99,8 +101,8 @@ const lessonOneVocabularyItems: VocabularyItem[] = [
   { ru: "стелить постель", en: "to make the bed" },
   { ru: "темнеть", en: "to get dark" },
   { ru: "теннис", en: "tennis" },
-  { ru: "убрать комнату", en: "to do the room; to clean the room" },
-  { ru: "ужинать", en: "to have supper" },
+  { ru: "убрать комнату", en: "to clean the room; to tidy the room" },
+  { ru: "ужинать", en: "to have dinner; to have supper" },
   { ru: "умываться", en: "to wash" },
   { ru: "читать", en: "to read" }
 ];
@@ -138,10 +140,7 @@ const techniqueOne: LessonOneItem[] = [
   {
     ru: "Он часто смотрит телевизор по выходным.",
     answer: "He often watches TV at weekends. Does he often watch TV at weekends? He doesn't often watch TV at weekends.",
-    alternatives: [
-      "He often watches TV at week-ends. Does he often watch TV at week-ends? He doesn't often watch TV at week-ends.",
-      "He often watches TV on weekends. Does he often watch TV on weekends? He doesn't often watch TV on weekends."
-    ]
+    alternatives: ["He often watches TV on weekends. Does he often watch TV on weekends? He doesn't often watch TV on weekends."]
   },
   {
     ru: "Она иногда готовит обед.",
@@ -179,9 +178,9 @@ const techniqueOne: LessonOneItem[] = [
     ru: "По выходным он обычно приходит вовремя.",
     answer: "He usually comes on time at weekends. Does he usually come on time at weekends? He doesn't usually come on time at weekends.",
     alternatives: [
-      "He usually comes on time at week-ends. Does he usually come on time at week-ends? He doesn't usually come on time at week-ends.",
       "She usually comes on time at weekends. Does she usually come on time at weekends? She doesn't usually come on time at weekends.",
-      "She usually comes on time at week-ends. Does she usually come on time at week-ends? She doesn't usually come on time at week-ends."
+      "He usually comes on time on weekends. Does he usually come on time on weekends? He doesn't usually come on time on weekends.",
+      "She usually comes on time on weekends. Does she usually come on time on weekends? She doesn't usually come on time on weekends."
     ],
     hint: {
       ru: "В ключах книги здесь есть расхождение он/она, поэтому принимаются оба варианта.",
@@ -219,7 +218,11 @@ const techniqueTwo: LessonOneItem[] = [
   },
   { ru: "Я каждый день просыпаюсь в 7 утра.", answer: "I wake up at 7 o'clock every day." },
   { ru: "В котором часу вы обычно встаете?", answer: "What time do you usually get up?" },
-  { ru: "Они никогда не умываются!", answer: "They never wash themselves." },
+  {
+    ru: "Они никогда не умываются!",
+    answer: "They never wash.",
+    alternatives: ["They never wash their faces.", "They never wash themselves."]
+  },
   { ru: "Он принимает душ каждый день.", answer: "He takes a shower every day." },
   {
     ru: "Я всегда принимаю ванну по вечерам.",
@@ -228,7 +231,11 @@ const techniqueTwo: LessonOneItem[] = [
   },
   { ru: "Мы иногда готовим завтрак по воскресеньям.", answer: "Sometimes we make breakfast on Sundays." },
   { ru: "Когда они завтракают?", answer: "When do they have breakfast?" },
-  { ru: "Она редко обедает и никогда не ужинает.", answer: "She seldom has lunch and never has supper." },
+  {
+    ru: "Она редко обедает и никогда не ужинает.",
+    answer: "She rarely has lunch and never has dinner.",
+    alternatives: ["She seldom has lunch and never has supper.", "She rarely has lunch and never has supper."]
+  },
   { ru: "Я иногда обедаю на работе, но не очень часто.", answer: "Sometimes I have lunch at work, but not very often." },
   { ru: "Он всегда моет посуду после завтрака.", answer: "He always washes the dishes after breakfast." },
   { ru: "Почему ты никогда не моешь посуду после обеда?", answer: "Why do you never wash the dishes after lunch?" },
@@ -240,10 +247,12 @@ const techniqueTwo: LessonOneItem[] = [
   { ru: "Вы всегда валяете дурака на работе?", answer: "Do you always play the fool at work?" },
   {
     ru: "Они не моют посуду по вечерам, потому что довольно часто ужинают в ресторане.",
-    answer: "They never wash the dishes in the evenings, because they have supper at the restaurant quite often.",
+    answer: "They never wash the dishes in the evenings because they have dinner at a restaurant quite often.",
     alternatives: [
-      "They never wash the dishes in the evenings because they have supper at the restaurant quite often.",
-      "They never wash the dishes in the evenings, because they have supper at the restaurant fairly often."
+      "They never wash the dishes in the evenings because they have supper at a restaurant quite often.",
+      "They never wash the dishes in the evenings because they have dinner in a restaurant quite often.",
+      "They never wash the dishes in the evenings, because they have dinner at a restaurant quite often.",
+      "They never wash the dishes in the evenings because they have dinner at a restaurant fairly often."
     ]
   }
 ];

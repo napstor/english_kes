@@ -20,7 +20,6 @@ export function normalizeAnswer(value: string) {
     .replace(/[’']/g, "'")
     .replace(/\bdo not\b/g, "don't")
     .replace(/\bdoes not\b/g, "doesn't")
-    .replace(/\bat week-ends\b/g, "at weekends")
     .replace(/\bon weekends\b/g, "at weekends")
     .replace(/[^a-z0-9?' ]/g, " ")
     .replace(/\s+/g, " ")
