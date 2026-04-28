@@ -22,39 +22,6 @@ export type ReviewPatternMock = {
   phrases: ReviewPhraseMock[];
 };
 
-export const mockStreakDays = [
-  true,
-  true,
-  false,
-  true,
-  true,
-  true,
-  true,
-  false,
-  true,
-  false,
-  true,
-  true,
-  true,
-  false,
-  true,
-  true,
-  false,
-  true,
-  true,
-  true,
-  true,
-  true,
-  false,
-  true,
-  false,
-  true,
-  true,
-  true,
-  true,
-  true
-];
-
 export const mockCourseLessons: CourseLessonMock[] = [
   {
     id: "lesson-01",

@@ -1,23 +1,20 @@
 import { ArrowRight, CheckCircle2, RotateCw, Waves } from "lucide-react";
 import { Button } from "@/components/ui";
-import { StreakDisplay } from "./StreakDisplay";
 import styles from "./TodayDashboard.module.css";
 
 type TodayDashboardProps = {
   userName: string;
-  streakDays: boolean[];
   onContinue: () => void;
   onCourse: () => void;
   onReview: () => void;
 };
 
-export function TodayDashboard({ userName, streakDays, onContinue, onCourse, onReview }: TodayDashboardProps) {
+export function TodayDashboard({ userName, onContinue, onCourse, onReview }: TodayDashboardProps) {
   return (
     <section className={styles.dashboard}>
       <header className={styles.hero}>
         <span className={styles.eyebrow}>Понедельник, 07:48</span>
         <h1>Доброе утро, {userName}.</h1>
-        <StreakDisplay days={streakDays} streak={5} />
       </header>
 
       <p className={styles.statusRow}>

@@ -21,8 +21,13 @@
 }
 
 .canvas {
-  width: min(100%, 608px);
+  width: min(100%, 1080px);
   min-width: 0;
+  margin: 0 auto;
+}
+
+.canvas:has(:global(.exercise-card)) {
+  width: min(100%, 608px);
 }
 
 @media (max-width: 767px) {
