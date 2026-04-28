@@ -37,7 +37,6 @@
   padding: 16px 18px;
 }
 
-.header span,
 .assistant span,
 .user span {
   color: var(--fg-subtle);

@@ -112,7 +112,6 @@ export function TutorChat({ isOpen, onClose }: TutorChatProps) {
       <aside className={styles.sheet} ref={sheetRef} role="dialog" aria-modal="true" aria-labelledby="tutor-title">
         <header className={styles.header}>
           <div>
-            <span>Right sheet</span>
             <h2 id="tutor-title">AI Tutor</h2>
           </div>
           <IconButton ariaLabel="Close AI Tutor" icon={X} onClick={onClose} />
