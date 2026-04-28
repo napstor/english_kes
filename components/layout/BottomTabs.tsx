@@ -15,6 +15,7 @@ type BottomTabsProps = {
   activeKey?: BottomTabKey;
   tabs?: BottomTab[];
   className?: string;
+  onTabClick?: (key: BottomTabKey) => void;
 };
 
 const defaultTabs: BottomTab[] = [
@@ -24,14 +25,24 @@ const defaultTabs: BottomTab[] = [
   { key: "profile", label: "Profile", href: "/profile", icon: User }
 ];
 
-export function BottomTabs({ activeKey = "today", tabs = defaultTabs, className }: BottomTabsProps) {
+export function BottomTabs({ activeKey = "today", tabs = defaultTabs, className, onTabClick }: BottomTabsProps) {
   return (
     <nav className={cn(styles.tabs, className)} aria-label="Mobile navigation">
       {tabs.slice(0, 4).map((tab) => {
         const Icon = tab.icon;
         const active = tab.key === activeKey;
         return (
-          <a className={cn(styles.tab, active && styles.active)} href={tab.href} aria-current={active ? "page" : undefined} key={tab.key}>
+          <a
+            className={cn(styles.tab, active && styles.active)}
+            href={tab.href}
+            onClick={(event) => {
+              if (!onTabClick) return;
+              event.preventDefault();
+              onTabClick(tab.key);
+            }}
+            aria-current={active ? "page" : undefined}
+            key={tab.key}
+          >
             <Icon size={18} aria-hidden="true" />
             <span>{tab.label}</span>
           </a>

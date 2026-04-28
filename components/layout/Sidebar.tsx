@@ -18,6 +18,7 @@ type SidebarProps = {
   activeKey?: SidebarItemKey;
   items?: SidebarItem[];
   className?: string;
+  onItemClick?: (key: SidebarItemKey) => void;
 };
 
 const collapsedKey = "english-kes-sidebar-collapsed-v2";
@@ -29,7 +30,7 @@ const defaultItems: SidebarItem[] = [
   { key: "profile", label: "Profile", href: "/profile", icon: User }
 ];
 
-export function Sidebar({ activeKey = "today", items = defaultItems, className }: SidebarProps) {
+export function Sidebar({ activeKey = "today", items = defaultItems, className, onItemClick }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(true);
 
   useEffect(() => {
@@ -55,6 +56,11 @@ export function Sidebar({ activeKey = "today", items = defaultItems, className }
             <a
               className={cn(styles.item, active && styles.active)}
               href={item.href}
+              onClick={(event) => {
+                if (!onItemClick) return;
+                event.preventDefault();
+                onItemClick(item.key);
+              }}
               aria-current={active ? "page" : undefined}
               title={collapsed ? item.label : undefined}
               key={item.key}
