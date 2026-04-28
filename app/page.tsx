@@ -835,7 +835,6 @@ export default function Home() {
                 <div className="user-pill">
                   <Shield size={17} />
                   <span>{authUser.username}</span>
-                  <small>{authUser.role}</small>
                 </div>
                 <button
                   className="segmented"
