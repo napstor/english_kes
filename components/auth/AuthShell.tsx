@@ -14,17 +14,22 @@ type AuthShellProps = {
 export function AuthShell({ onSubmit, loading = false, error = "" }: AuthShellProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [localError, setLocalError] = useState("");
   const visibleError = localError || error;
+  const busy = loading || submitting;
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setSubmitting(true);
     setLocalError("");
 
     try {
       await onSubmit(username, password);
     } catch (submitError) {
       setLocalError(submitError instanceof Error ? submitError.message : "Не удалось войти.");
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -62,7 +67,7 @@ export function AuthShell({ onSubmit, loading = false, error = "" }: AuthShellPr
               {visibleError}
             </div>
           ) : null}
-          <Button className={styles.button} type="submit" variant="primary" size="lg" loading={loading} disabled={!username.trim() || !password}>
+          <Button className={styles.button} type="submit" variant="primary" size="lg" loading={busy} disabled={!username.trim() || !password}>
             Войти
           </Button>
         </form>
