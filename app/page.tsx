@@ -10,9 +10,7 @@ import {
   Mic,
   Pause,
   Play,
-  RotateCcw,
   Shield,
-  Target,
   LogOut,
   Users,
   Volume2
@@ -20,6 +18,9 @@ import {
 import type { FormEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { AuthShell } from "@/components/auth";
+import { AppShell, BottomTabs, Sidebar, TopBar } from "@/components/layout";
+import { CourseDrawer, StepRail, type NavigationStep } from "@/components/navigation";
+import { IconButton } from "@/components/ui";
 import { lessonOne, uiCopy, type Locale, type TrainingStep } from "@/lib/course";
 import { compareAnswer, detectGrammarHint, tokenize, type GrammarHint } from "@/lib/scoring";
 
@@ -237,6 +238,7 @@ export default function Home() {
     slow: createNativeAudioState(),
     normal: createNativeAudioState()
   });
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const timerRef = useRef<number | null>(null);
   const nativeAudioRef = useRef<HTMLAudioElement | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -320,8 +322,16 @@ export default function Home() {
     if (timerRef.current) window.clearInterval(timerRef.current);
   }, [currentCompositionMin, progress.activeStep]);
 
-  const completedCount = progress.completedSteps.length;
-  const completion = Math.round((completedCount / lessonOne.steps.length) * 100);
+  const lessonSteps: NavigationStep[] = lessonOne.steps.map((step, index) => ({
+    id: step.id,
+    index,
+    type: step.type,
+    title: step.label[locale],
+    typeLabel: copy.stepTypes[step.type],
+    completed: progress.completedSteps.includes(index)
+  }));
+  const nearbySteps = getNearbySteps(lessonSteps, current.id);
+
   async function loadSession() {
     setAuthLoading(true);
     setAuthError("");
@@ -427,6 +437,12 @@ export default function Home() {
       ...prev,
       activeStep: Math.min(prev.activeStep + 1, lessonOne.steps.length - 1)
     }));
+  }
+
+  function navigateToStep(stepId: string) {
+    const stepIndex = lessonOne.steps.findIndex((step) => step.id === stepId);
+    if (stepIndex < 0) return;
+    setProgress((prev) => ({ ...prev, activeStep: stepIndex }));
   }
 
   async function checkAnswer(step: TrainingStep) {
@@ -793,105 +809,50 @@ export default function Home() {
   }
 
   return (
-    <main className="app-shell">
-      <aside className="sidebar">
-        <div className="brand">
-          <div className="brand-mark">K</div>
-          <div>
-            <p>English KES</p>
-            <span>{copy.productRole}</span>
-          </div>
-        </div>
-
-        <nav className="nav-list" aria-label="Primary">
-          <a className="active" href="#today">
-            <Target size={18} /> {copy.today}
-          </a>
-          <a href="#book">
-            <BookOpen size={18} /> {copy.book}
-          </a>
-          <a href="#review">
-            <RotateCcw size={18} /> {copy.review}
-          </a>
-        </nav>
-
-        <section className="stat-card">
-          <span>{copy.bookProgress}</span>
-          <strong>{completion}%</strong>
-          <div className="meter">
-            <div style={{ width: `${completion}%` }} />
-          </div>
-        </section>
-      </aside>
-
-      <section className="workspace">
-        <header className="topbar">
-          <div>
-            <p className="eyebrow">{copy.lessonLabel} 1 / 44</p>
-            <h1>{lessonOne.title[locale]}</h1>
-          </div>
-          <div className="top-actions">
-            <div className="user-pill">
-              <Shield size={17} />
-              <span>{authUser.username}</span>
-              <small>{authUser.role}</small>
-            </div>
-            <button
-              className="segmented"
-              type="button"
-              onClick={() => setLocale(locale === "ru" ? "en" : "ru")}
-              aria-label={copy.switchLanguage}
-            >
-              <Languages size={17} />
-              {locale.toUpperCase()}
-            </button>
-            <button className="icon-button" type="button" onClick={logout} aria-label={copy.logout}>
-              <LogOut size={18} />
-            </button>
-            {authUser.role === "admin" ? (
-              <details className="utility-menu">
-                <summary className="icon-button" aria-label={copy.more}>
-                  <Users size={18} />
-                </summary>
-                <div className="utility-popover">
-                  <AdminPanel copy={copy} />
+    <>
+      <AppShell
+        topBar={
+          <TopBar
+            brandMeta={copy.productRole}
+            breadcrumb={`${copy.lessonLabel} 1 / 44 · ${lessonOne.title[locale]}`}
+            actions={
+              <>
+                <IconButton ariaLabel={copy.book} icon={BookOpen} onClick={() => setDrawerOpen(true)} />
+                <div className="user-pill">
+                  <Shield size={17} />
+                  <span>{authUser.username}</span>
+                  <small>{authUser.role}</small>
                 </div>
-              </details>
-            ) : null}
-          </div>
-        </header>
-
-        <section className="lesson-grid">
-          <div className="lesson-map" id="book">
-            <div className="map-head">
-              <span>{copy.trainingPath}</span>
-              <strong>
-                {completedCount}/{lessonOne.steps.length}
-              </strong>
-            </div>
-            <div className="step-list">
-              {lessonOne.steps.map((step, index) => (
                 <button
-                  key={step.id}
-                  className={[
-                    "step-node",
-                    index === activeStepIndex ? "current" : "",
-                    progress.completedSteps.includes(index) ? "done" : ""
-                  ].join(" ")}
+                  className="segmented"
                   type="button"
-                  onClick={() => setProgress((prev) => ({ ...prev, activeStep: index }))}
+                  onClick={() => setLocale(locale === "ru" ? "en" : "ru")}
+                  aria-label={copy.switchLanguage}
                 >
-                  <span>{progress.completedSteps.includes(index) ? <Check size={16} /> : index + 1}</span>
-                  <div>
-                    <strong>{step.label[locale]}</strong>
-                    <small>{copy.stepTypes[step.type]}</small>
-                  </div>
+                  <Languages size={17} />
+                  {locale.toUpperCase()}
                 </button>
-              ))}
-            </div>
-          </div>
-
-          <article className="exercise-card" id="today">
+                <button className="icon-button" type="button" onClick={logout} aria-label={copy.logout}>
+                  <LogOut size={18} />
+                </button>
+                {authUser.role === "admin" ? (
+                  <details className="utility-menu">
+                    <summary className="icon-button" aria-label={copy.more}>
+                      <Users size={18} />
+                    </summary>
+                    <div className="utility-popover">
+                      <AdminPanel copy={copy} />
+                    </div>
+                  </details>
+                ) : null}
+              </>
+            }
+          />
+        }
+        sidebar={<Sidebar activeKey="course" />}
+        bottomTabs={<BottomTabs activeKey="course" />}
+      >
+        <article className="exercise-card" id="today">
             <div className="exercise-top">
               <span className={`type-pill ${current.type}`}>{copy.stepTypes[current.type]}</span>
               <button className="icon-button" type="button" onClick={() => playNativeSample(current.targetText, "normal")}>
@@ -981,11 +942,18 @@ export default function Home() {
                 <ChevronRight size={18} />
               </button>
             </div>
-          </article>
-
-        </section>
-      </section>
-    </main>
+        </article>
+        <StepRail steps={nearbySteps} currentStepId={current.id} onStepClick={navigateToStep} onCourseClick={() => setDrawerOpen(true)} />
+      </AppShell>
+      <CourseDrawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        steps={lessonSteps}
+        currentStepId={current.id}
+        onStepClick={navigateToStep}
+        lessonTitle={`${copy.lessonLabel} 1 / 44`}
+      />
+    </>
   );
 }
 
@@ -1005,6 +973,16 @@ function parseJsonResponse(value: string): {
   } catch {
     return null;
   }
+}
+
+function getNearbySteps(steps: NavigationStep[], currentStepId: string) {
+  const currentIndex = Math.max(
+    steps.findIndex((step) => step.id === currentStepId),
+    0
+  );
+  const start = Math.max(0, currentIndex - 1);
+  const end = Math.min(steps.length, currentIndex + 5);
+  return steps.slice(start, end);
 }
 
 function AdminPanel({ copy }: { copy: (typeof uiCopy)[Locale] }) {

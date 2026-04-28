@@ -30,10 +30,11 @@ const defaultItems: SidebarItem[] = [
 ];
 
 export function Sidebar({ activeKey = "today", items = defaultItems, className }: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   useEffect(() => {
-    setCollapsed(window.localStorage.getItem(collapsedKey) === "true");
+    const stored = window.localStorage.getItem(collapsedKey);
+    setCollapsed(stored === null ? true : stored === "true");
   }, []);
 
   function toggleCollapsed() {
