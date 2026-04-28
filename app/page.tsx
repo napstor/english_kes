@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import type { FormEvent } from "react";
 import { useEffect, useRef, useState } from "react";
-import { AuthShell } from "@/components/auth";
+import { AuthLoadingScreen, AuthShell } from "@/components/auth";
 import { CourseMap, ReviewDashboard, TodayDashboard, TutorChat } from "@/components/dashboard";
 import { AppShell, BottomTabs, Sidebar, TopBar } from "@/components/layout";
 import { CourseDrawer, StepRail, type NavigationStep } from "@/components/navigation";
@@ -814,14 +814,7 @@ export default function Home() {
   }
 
   if (authLoading) {
-    return (
-      <main className="auth-shell">
-        <section className="auth-card">
-          <div className="brand-mark">K</div>
-          <h1>{copy.loadingSession}</h1>
-        </section>
-      </main>
-    );
+    return <AuthLoadingScreen />;
   }
 
   if (!authUser) {
