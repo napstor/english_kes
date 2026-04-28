@@ -1,7 +1,3 @@
-"use client";
-
-import { ChevronDown } from "lucide-react";
-import { useState } from "react";
 import type { NavigationStep } from "@/components/navigation";
 import type { CourseLessonMock } from "@/lib/mockData";
 import { MasteryRing } from "./MasteryRing";
@@ -17,7 +13,6 @@ type CourseMapProps = {
 };
 
 export function CourseMap({ steps, lessons, progress, onLessonClick, onStepClick }: CourseMapProps) {
-  const [expandedAll, setExpandedAll] = useState(false);
   const completedCount = progress.completedSteps.length;
 
   return (
@@ -61,17 +56,11 @@ export function CourseMap({ steps, lessons, progress, onLessonClick, onStepClick
         })}
       </div>
 
-      {!expandedAll ? (
-        <button className={styles.disclosure} type="button" onClick={() => setExpandedAll(true)}>
-          <ChevronDown size={18} aria-hidden="true" />
-          + ещё 41 урок
-        </button>
-      ) : (
-        <section className={styles.placeholder}>
-          <div className={styles.placeholderLine} aria-hidden="true" />
-          <p>Stage 2-4 курса в разработке. Сейчас доступен Lesson 1 — Я делаю это обычно (Present Simple).</p>
-        </section>
-      )}
+      <section className={styles.placeholder}>
+        <div className={styles.placeholderLine} aria-hidden="true" />
+        <h2>Уроки 2–44</h2>
+        <p>В разработке. Сейчас доступен Lesson 1 — Я делаю это обычно (Present Simple).</p>
+      </section>
     </section>
   );
 }

@@ -77,24 +77,6 @@ export const mockCourseLessons: CourseLessonMock[] = [
     stepCount: 74,
     completedSteps: 0,
     mastery: 32
-  },
-  {
-    id: "lesson-02",
-    number: 2,
-    title: "Я сделал это вчера",
-    description: "Past Simple regular verbs, -ed и отрицания через did not.",
-    stepCount: 68,
-    completedSteps: 0,
-    mastery: 0
-  },
-  {
-    id: "lesson-03",
-    number: 3,
-    title: "Я буду делать это завтра",
-    description: "Future Simple, will/won't и быстрые вопросительные трансформации.",
-    stepCount: 71,
-    completedSteps: 0,
-    mastery: 0
   }
 ];
 
