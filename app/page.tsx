@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import type { FormEvent } from "react";
 import { useEffect, useRef, useState } from "react";
+import { AuthShell } from "@/components/auth";
 import { lessonOne, uiCopy, type Locale, type TrainingStep } from "@/lib/course";
 import { compareAnswer, detectGrammarHint, tokenize, type GrammarHint } from "@/lib/scoring";
 
@@ -788,7 +789,7 @@ export default function Home() {
   }
 
   if (!authUser) {
-    return <LoginScreen copy={copy} error={authError} onLogin={login} />;
+    return <AuthShell error={authError} onSubmit={login} />;
   }
 
   return (
@@ -1004,74 +1005,6 @@ function parseJsonResponse(value: string): {
   } catch {
     return null;
   }
-}
-
-function LoginScreen({
-  copy,
-  error,
-  onLogin
-}: {
-  copy: (typeof uiCopy)[Locale];
-  error: string;
-  onLogin: (username: string, password: string) => Promise<void>;
-}) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [loginError, setLoginError] = useState(error);
-
-  useEffect(() => {
-    setLoginError(error);
-  }, [error]);
-
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setSubmitting(true);
-    setLoginError("");
-
-    try {
-      await onLogin(username, password);
-    } catch (loginError) {
-      setLoginError(loginError instanceof Error ? loginError.message : copy.loginFailed);
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  return (
-    <main className="auth-shell">
-      <form className="auth-card" onSubmit={submit}>
-        <div className="brand">
-          <div className="brand-mark">K</div>
-          <div>
-            <p>English KES</p>
-            <span>{copy.productRole}</span>
-          </div>
-        </div>
-        <div>
-          <p className="eyebrow">{copy.authLabel}</p>
-          <h1>{copy.loginTitle}</h1>
-        </div>
-        <label className="field-label">
-          <span>{copy.username}</span>
-          <input value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" />
-        </label>
-        <label className="field-label">
-          <span>{copy.password}</span>
-          <input
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            type="password"
-            autoComplete="current-password"
-          />
-        </label>
-        {loginError ? <div className="auth-error">{loginError}</div> : null}
-        <button className="primary-button wide" type="submit" disabled={submitting || !username.trim() || !password}>
-          {submitting ? copy.signingIn : copy.signIn}
-        </button>
-      </form>
-    </main>
-  );
 }
 
 function AdminPanel({ copy }: { copy: (typeof uiCopy)[Locale] }) {

@@ -8,18 +8,9 @@
 }
 
 .emblem {
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  display: grid;
-  place-items: center;
-  background:
-    linear-gradient(135deg, rgba(91, 107, 255, 0.95), rgba(138, 149, 255, 0.7)),
-    var(--bg-elevated-2);
-  box-shadow: var(--inset-stroke);
-  color: #ffffff;
-  font-family: var(--font-mono);
-  font-weight: 900;
-  letter-spacing: 0.04em;
+  display: block;
+  flex: 0 0 auto;
+  color: currentColor;
 }
 
 .text {
@@ -59,9 +50,8 @@
 }
 
 .default .emblem {
-  width: 34px;
-  height: 34px;
-  font-size: 12px;
+  width: 28px;
+  height: 28px;
 }
 
 .default .kes,
@@ -76,8 +66,6 @@
 .authHero .emblem {
   width: 56px;
   height: 56px;
-  border-radius: var(--r-lg);
-  font-size: 16px;
 }
 
 .authHero .kes,
@@ -96,7 +84,6 @@
 .compact .emblem {
   width: 32px;
   height: 32px;
-  font-size: 11px;
 }
 
 .compact .text {

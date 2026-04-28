@@ -1,0 +1,113 @@
+.sidebar {
+  position: sticky;
+  top: 56px;
+  align-self: start;
+  width: 220px;
+  height: calc(100dvh - 56px);
+  border-right: 1px solid var(--border);
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 16px;
+  padding: 14px 10px;
+  background: rgba(15, 15, 24, 0.78);
+  backdrop-filter: blur(18px);
+  transition: width var(--d-slow) var(--e-out);
+}
+
+.collapsed {
+  width: 56px;
+}
+
+.nav {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+}
+
+.item,
+.toggle {
+  min-width: 0;
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 10px 0 0;
+  background: transparent;
+  color: var(--fg-muted);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: none;
+  transition:
+    background-color var(--d-base) var(--e-out),
+    border-color var(--d-base) var(--e-out),
+    color var(--d-base) var(--e-out);
+}
+
+.item:hover,
+.toggle:hover {
+  border-color: var(--border);
+  background: var(--bg-elevated-2);
+  color: var(--fg-primary);
+}
+
+.item:focus-visible,
+.toggle:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 3px;
+}
+
+.active {
+  border-color: rgba(138, 149, 255, 0.28);
+  background: rgba(91, 107, 255, 0.16);
+  color: var(--fg-primary);
+}
+
+.icon {
+  display: inline-flex;
+  justify-content: center;
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.collapsed .item,
+.collapsed .toggle {
+  grid-template-columns: 34px;
+  justify-content: center;
+  padding: 0;
+}
+
+.collapsed .label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.toggle {
+  width: 100%;
+  cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .sidebar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .item,
+  .toggle {
+    transition: none;
+  }
+}
