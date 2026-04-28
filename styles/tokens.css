@@ -25,9 +25,9 @@
   --border: rgba(245, 245, 248, 0.1);
   --border-strong: rgba(245, 245, 248, 0.16);
 
-  --font-display: "Bricolage Grotesque", system-ui, sans-serif;
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-display: var(--font-onest), var(--font-bricolage), system-ui, sans-serif;
+  --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, monospace;
 
   --r-sm: 8px;
   --r-md: 12px;

@@ -1,24 +1,30 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Inter, JetBrains_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Inter, JetBrains_Mono, Onest } from "next/font/google";
 import "../styles/tokens.css";
 import "./globals.css";
 
-const display = Bricolage_Grotesque({
+const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-display"
+  variable: "--font-bricolage"
+});
+
+const onest = Onest({
+  subsets: ["cyrillic", "latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-onest"
 });
 
 const inter = Inter({
-  subsets: ["latin", "cyrillic"],
+  subsets: ["cyrillic", "latin"],
   weight: ["400", "500", "600"],
-  variable: "--font-sans"
+  variable: "--font-inter"
 });
 
 const mono = JetBrains_Mono({
-  subsets: ["latin", "cyrillic"],
+  subsets: ["latin"],
   weight: ["400", "500"],
-  variable: "--font-mono"
+  variable: "--font-jetbrains-mono"
 });
 
 export const metadata: Metadata = {
@@ -38,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru" className={`${display.variable} ${inter.variable} ${mono.variable}`}>
+    <html lang="ru" className={`${onest.variable} ${bricolage.variable} ${inter.variable} ${mono.variable}`}>
       <body>{children}</body>
     </html>
   );
