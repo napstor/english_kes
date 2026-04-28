@@ -25,7 +25,7 @@ import {
 } from "@/components/steps";
 import { IconButton } from "@/components/ui";
 import { lessonOne, uiCopy, type Locale, type TrainingStep } from "@/lib/course";
-import { mockConsistencyWeeks, mockCourseLessons, mockReviewPatterns, mockStreakDays } from "@/lib/mockData";
+import { mockCourseLessons, mockReviewPatterns, mockStreakDays } from "@/lib/mockData";
 import { compareAnswer, detectGrammarHint, type GrammarHint } from "@/lib/scoring";
 
 type AppView = "today" | "course" | "review" | "lesson";
@@ -868,10 +868,9 @@ export default function Home() {
         {currentView === "today" ? (
           <TodayDashboard
             userName={authUser.username}
-            progress={progress}
             streakDays={mockStreakDays}
-            consistencyWeeks={mockConsistencyWeeks}
             onContinue={() => setCurrentView("lesson")}
+            onCourse={() => setCurrentView("course")}
             onReview={() => setCurrentView("review")}
           />
         ) : null}

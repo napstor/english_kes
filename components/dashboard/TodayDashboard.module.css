@@ -1,23 +1,21 @@
 .dashboard {
   display: grid;
-  gap: 22px;
+  gap: 18px;
   width: min(100%, 920px);
   margin: 0 auto;
   color: var(--fg-primary);
 }
 
 .hero {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
+  display: grid;
+  gap: 8px;
   border-bottom: 1px solid var(--border-subtle);
   padding-bottom: 18px;
 }
 
 .eyebrow,
-.meta,
-.recap,
+.statusRow,
+.footerRow,
 .plan article span {
   font-family: var(--font-mono);
   letter-spacing: 0.06em;
@@ -31,7 +29,7 @@
 }
 
 .hero h1 {
-  margin: 8px 0 12px;
+  margin: 0 0 4px;
   font-family: var(--font-display);
   font-size: clamp(36px, 6vw, 52px);
   font-weight: 700;
@@ -39,19 +37,25 @@
   line-height: 1;
 }
 
-.meta {
+.statusRow,
+.footerRow {
   margin: 0;
   color: var(--fg-muted);
   font-size: 12px;
+  line-height: 1.5;
+  white-space: nowrap;
 }
 
-.recap {
-  border: 1px solid rgba(91, 107, 255, 0.22);
-  border-radius: var(--r-lg);
-  padding: 14px 16px;
-  background: rgba(91, 107, 255, 0.07);
+.statusRow a,
+.footerRow a {
   color: var(--accent-glow);
-  font-size: 12px;
+  text-decoration: none;
+}
+
+.statusRow a:hover,
+.footerRow a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .plan {
@@ -60,8 +64,7 @@
   gap: 14px;
 }
 
-.plan article,
-.consistency {
+.plan article {
   border: 1px solid var(--border-subtle);
   border-radius: var(--r-lg);
   padding: 18px;
@@ -78,8 +81,11 @@
   color: var(--accent-secondary);
 }
 
-.card svg,
-.progressCard svg {
+.reviewCard svg {
+  color: var(--accent-warm);
+}
+
+.speechCard svg {
   color: var(--accent-glow);
 }
 
@@ -92,8 +98,20 @@
   text-transform: uppercase;
 }
 
-.plan h2,
-.consistency h2 {
+.primaryCard > span {
+  color: var(--accent-secondary);
+}
+
+/* TODO: Switch Review eyebrow to --accent-coral if that token is added. */
+.reviewCard > span {
+  color: var(--accent-warm);
+}
+
+.speechCard > span {
+  color: var(--accent-glow);
+}
+
+.plan h2 {
   margin: 8px 0;
   font-family: var(--font-display);
   font-size: 22px;
@@ -107,38 +125,6 @@
   line-height: 1.5;
 }
 
-.progressCard {
-  grid-column: 1 / -1;
-}
-
-.progressCard p {
-  min-height: 0;
-}
-
-.bar {
-  height: 7px;
-  overflow: hidden;
-  border-radius: var(--r-full);
-  background: rgba(245, 245, 248, 0.08);
-}
-
-.bar i {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--accent-primary);
-  box-shadow: 0 0 18px rgba(91, 107, 255, 0.45);
-}
-
-.consistency {
-  display: grid;
-  gap: 16px;
-}
-
-.consistency h2 {
-  margin-bottom: 0;
-}
-
 @media (max-width: 980px) {
   .plan {
     grid-template-columns: 1fr;
@@ -147,11 +133,9 @@
   .plan p {
     min-height: 0;
   }
-}
 
-@media (max-width: 720px) {
-  .hero {
-    align-items: stretch;
-    flex-direction: column;
+  .statusRow,
+  .footerRow {
+    white-space: normal;
   }
 }

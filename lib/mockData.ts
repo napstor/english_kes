@@ -1,5 +1,3 @@
-import type { ConsistencyDay } from "@/components/dashboard";
-
 export type CourseLessonMock = {
   id: string;
   number: number;
@@ -56,17 +54,6 @@ export const mockStreakDays = [
   true,
   true
 ];
-
-export const mockConsistencyWeeks: ConsistencyDay[][] = Array.from({ length: 12 }, (_, weekIndex) =>
-  Array.from({ length: 7 }, (_, dayIndex) => {
-    const load = [0, 2, 5, 9, 13, 6, 3][(weekIndex + dayIndex) % 7];
-    return {
-      date: `2026-W${weekIndex + 1}-${dayIndex + 1}`,
-      load,
-      label: load ? `${Math.max(1, Math.round(load / 3))} шага: 1 theory + 1 speaking · ${load + 9} минут` : "Rest day"
-    };
-  })
-);
 
 export const mockCourseLessons: CourseLessonMock[] = [
   {
