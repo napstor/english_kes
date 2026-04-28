@@ -29,12 +29,22 @@
   color: var(--fg-muted);
   font-family: var(--font-mono);
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .counter b {
-  color: var(--fg-primary);
+  color: currentColor;
+  font-weight: 500;
+}
+
+.counterWarm {
+  color: var(--accent-warm);
+}
+
+.counterNegative {
+  color: var(--negative);
 }
 
 .hero {

@@ -3,6 +3,7 @@
 import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui";
+import { cn } from "@/lib/cn";
 import type { TrainingStep } from "@/lib/course";
 import type { compareAnswer } from "@/lib/scoring";
 import styles from "./DrillStep.module.css";
@@ -56,7 +57,7 @@ export function DrillStep({
     <section className={styles.step}>
       <header className={styles.header}>
         <span className={styles.chip}>Drill</span>
-        <span className={styles.counter}>
+        <span className={cn(styles.counter, tryNumber === 2 && styles.counterWarm, tryNumber >= 3 && styles.counterNegative)}>
           Try <b>{tryNumber}</b>/3
         </span>
       </header>
