@@ -1,0 +1,62 @@
+.button {
+  --icon-button-size: 36px;
+
+  width: var(--icon-button-size);
+  min-width: var(--icon-button-size);
+  height: var(--icon-button-size);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-elevated-2);
+  color: var(--fg-secondary);
+  box-shadow: var(--inset-stroke);
+  transition:
+    background-color var(--d-base) var(--e-out),
+    border-color var(--d-base) var(--e-out),
+    color var(--d-base) var(--e-out),
+    transform var(--d-base) var(--e-out);
+}
+
+.button:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  background: var(--bg-elevated-3);
+  color: var(--fg-primary);
+  transform: translateY(-1px);
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 4px;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.sm {
+  --icon-button-size: 28px;
+
+  border-radius: var(--r-sm);
+}
+
+.md {
+  --icon-button-size: 36px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+
+  .button:hover:not(:disabled),
+  .button:active:not(:disabled) {
+    transform: none;
+  }
+}
