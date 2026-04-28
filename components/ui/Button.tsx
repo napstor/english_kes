@@ -3,7 +3,7 @@ import { cn } from "@/lib/cn";
 import styles from "./Button.module.css";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "destructive" | "success";
   size?: "sm" | "md" | "lg";
   iconLeft?: ReactNode;
   iconRight?: ReactNode;

@@ -105,6 +105,26 @@
   --button-fg: var(--fg-primary);
 }
 
+.destructive {
+  --button-bg: transparent;
+  --button-fg: var(--negative);
+  --button-border: var(--negative);
+}
+
+.destructive:hover:not(:disabled) {
+  --button-bg: rgba(255, 92, 122, 0.1);
+}
+
+.success {
+  --button-bg: var(--accent-secondary);
+  --button-fg: var(--bg-base);
+  --button-border: transparent;
+}
+
+.success:hover:not(:disabled) {
+  box-shadow: 0 0 24px rgba(200, 255, 107, 0.3);
+}
+
 .icon {
   display: inline-flex;
   flex: 0 0 auto;
