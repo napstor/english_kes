@@ -2,7 +2,6 @@
 
 import {
   BookOpen,
-  Check,
   ChevronRight,
   Eye,
   EyeOff,
@@ -20,6 +19,12 @@ import { useEffect, useRef, useState } from "react";
 import { AuthShell } from "@/components/auth";
 import { AppShell, BottomTabs, Sidebar, TopBar } from "@/components/layout";
 import { CourseDrawer, StepRail, type NavigationStep } from "@/components/navigation";
+import {
+  CompositionStep as CompositionStepView,
+  DrillStep as DrillStepView,
+  TheoryStep as TheoryStepView,
+  VocabularyStep as VocabularyStepView
+} from "@/components/steps";
 import { IconButton } from "@/components/ui";
 import { lessonOne, uiCopy, type Locale, type TrainingStep } from "@/lib/course";
 import { compareAnswer, detectGrammarHint, tokenize, type GrammarHint } from "@/lib/scoring";
@@ -853,86 +858,120 @@ export default function Home() {
         bottomTabs={<BottomTabs activeKey="course" />}
       >
         <article className="exercise-card" id="today">
-            <div className="exercise-top">
-              <span className={`type-pill ${current.type}`}>{copy.stepTypes[current.type]}</span>
-              <button className="icon-button" type="button" onClick={() => playNativeSample(current.targetText, "normal")}>
-                <Volume2 size={18} />
-              </button>
-            </div>
+          {current.type === "translate" || current.type === "speaking" ? (
+            <>
+              <div className="exercise-top">
+                <span className={`type-pill ${current.type}`}>{copy.stepTypes[current.type]}</span>
+                <button className="icon-button" type="button" onClick={() => playNativeSample(current.targetText, "normal")}>
+                  <Volume2 size={18} />
+                </button>
+              </div>
 
-            <div className="prompt-block">
-              <p className="eyebrow">{copy.task}</p>
-              <h2>{current.prompt[locale]}</h2>
-              {current.sourceText ? (
-                <div className="source-text" lang="ru">
-                  <span>{copy.sourcePhrase}</span>
-                  <p>{current.sourceText}</p>
-                </div>
-              ) : null}
-              {current.hint[locale] ? <p className="hint">{current.hint[locale]}</p> : null}
-            </div>
+              <div className="prompt-block">
+                <p className="eyebrow">{copy.task}</p>
+                <h2>{current.prompt[locale]}</h2>
+                {current.sourceText ? (
+                  <div className="source-text" lang="ru">
+                    <span>{copy.sourcePhrase}</span>
+                    <p>{current.sourceText}</p>
+                  </div>
+                ) : null}
+                {current.hint[locale] ? <p className="hint">{current.hint[locale]}</p> : null}
+              </div>
+            </>
+          ) : null}
 
-            {current.type === "theory" || current.type === "vocabulary" ? (
-              <TheoryStep
-                step={current}
-                locale={locale}
-                onComplete={() => markComplete(2)}
-                onSpeak={(text) => playVocabularyAudio(text)}
-              />
-            ) : null}
+          {current.type === "theory" ? (
+            <TheoryStepView
+              step={current}
+              locale={locale}
+              onComplete={() => {
+                markComplete(2);
+                goNext();
+              }}
+            />
+          ) : null}
 
-            {current.type === "translate" || current.type === "drill" ? (
-              <WritingStep
-                answer={answer}
-                checked={checked}
-                coachError={coachError}
-                coachFeedback={coachFeedback}
-                coachLoading={coachLoading}
-                copy={copy}
-                step={current}
-                onAnswer={setAnswer}
-                onCheck={() => void checkAnswer(current)}
-              />
-            ) : null}
+          {current.type === "vocabulary" ? (
+            <VocabularyStepView
+              step={current}
+              locale={locale}
+              onPlay={(text) => playVocabularyAudio(text)}
+              onComplete={() => {
+                markComplete(2);
+                goNext();
+              }}
+            />
+          ) : null}
 
-            {current.type === "composition" ? (
-              <CompositionStep
-                copy={copy}
-                feedback={compositionFeedback}
-                lines={compositionLines}
-                loading={compositionLoading}
-                error={compositionError}
-                step={current}
-                onChangeLine={(index, value) =>
-                  setCompositionLines((prev) => prev.map((line, lineIndex) => (lineIndex === index ? value : line)))
-                }
-                onAddLine={() =>
-                  setCompositionLines((prev) =>
-                    prev.length >= (current.composition?.maxSentences ?? 20) ? prev : [...prev, ""]
-                  )
-                }
-                onCheck={() => void checkComposition(current)}
-              />
-            ) : null}
+          {current.type === "translate" ? (
+            <WritingStep
+              answer={answer}
+              checked={checked}
+              coachError={coachError}
+              coachFeedback={coachFeedback}
+              coachLoading={coachLoading}
+              copy={copy}
+              step={current}
+              onAnswer={setAnswer}
+              onCheck={() => void checkAnswer(current)}
+            />
+          ) : null}
 
-            {current.type === "speaking" ? (
-              <SpeakingStep
-                copy={copy}
-                elapsed={elapsed}
-                recorded={recorded}
-                recordingMessage={recordingMessage}
-                recordingStatus={recordingStatus}
-                recording={recording}
-                speechReview={speechReview}
-                nativeAudio={nativeAudio}
-                step={current}
-                onStart={startRecording}
-                onStop={stopRecording}
-                onPlayNative={(mode) => playNativeSample(current.targetText, mode)}
-                onPlayRecording={(audioUrl) => void playUserRecording(audioUrl)}
-              />
-            ) : null}
+          {current.type === "drill" ? (
+            <DrillStepView
+              step={current}
+              answer={answer}
+              checked={checked}
+              attemptCount={progress.attempts[current.id] ?? 0}
+              coachError={coachError}
+              coachFeedback={coachFeedback}
+              coachLoading={coachLoading}
+              onAnswer={setAnswer}
+              onCheck={() => void checkAnswer(current)}
+              onComplete={() => {
+                markComplete(2);
+                goNext();
+              }}
+            />
+          ) : null}
 
+          {current.type === "composition" ? (
+            <CompositionStepView
+              step={current}
+              locale={locale}
+              feedback={compositionFeedback}
+              lines={compositionLines}
+              loading={compositionLoading}
+              error={compositionError}
+              onLinesChange={setCompositionLines}
+              onCheck={() => void checkComposition(current)}
+              onComplete={() => {
+                markComplete(4);
+                goNext();
+              }}
+            />
+          ) : null}
+
+          {current.type === "speaking" ? (
+            <SpeakingStep
+              copy={copy}
+              elapsed={elapsed}
+              recorded={recorded}
+              recordingMessage={recordingMessage}
+              recordingStatus={recordingStatus}
+              recording={recording}
+              speechReview={speechReview}
+              nativeAudio={nativeAudio}
+              step={current}
+              onStart={startRecording}
+              onStop={stopRecording}
+              onPlayNative={(mode) => playNativeSample(current.targetText, mode)}
+              onPlayRecording={(audioUrl) => void playUserRecording(audioUrl)}
+            />
+          ) : null}
+
+          {current.type === "translate" || current.type === "speaking" ? (
             <div className="footer-actions">
               <button className="secondary-button" type="button" onClick={() => setChecked(null)}>
                 {copy.retry}
@@ -942,6 +981,7 @@ export default function Home() {
                 <ChevronRight size={18} />
               </button>
             </div>
+          ) : null}
         </article>
         <StepRail steps={nearbySteps} currentStepId={current.id} onStepClick={navigateToStep} onCourseClick={() => setDrawerOpen(true)} />
       </AppShell>
@@ -1067,219 +1107,6 @@ function AdminPanel({ copy }: { copy: (typeof uiCopy)[Locale] }) {
           </li>
         ))}
       </ul>
-    </section>
-  );
-}
-
-function TheoryStep({
-  step,
-  locale,
-  onComplete,
-  onSpeak
-}: {
-  step: TrainingStep;
-  locale: Locale;
-  onComplete: () => void;
-  onSpeak: (text: string) => void;
-}) {
-  if (step.theory) {
-    return (
-      <div className="content-panel theory-panel">
-        <section className="theory-lead">
-          <span>{uiCopy[locale].theoryCore}</span>
-          <p>{step.theory.lead[locale]}</p>
-        </section>
-
-        <section className="theory-card-grid">
-          {step.theory.cards.map((card) => (
-            <article className="theory-card" key={card.title[locale]}>
-              <h3>{card.title[locale]}</h3>
-              <p>{card.body[locale]}</p>
-              {card.formula ? <code>{card.formula}</code> : null}
-              {card.example ? <small>{card.example[locale]}</small> : null}
-            </article>
-          ))}
-        </section>
-
-        <section className="theory-examples">
-          <div>
-            <span>{uiCopy[locale].theoryExamples}</span>
-            <h3>{uiCopy[locale].theoryExamplesTitle}</h3>
-          </div>
-          {step.theory.examples.map((example) => (
-            <article className="example-row" key={example.ru}>
-              <p>{example.ru}</p>
-              <strong>{example.en}</strong>
-              <small>{example.note[locale]}</small>
-            </article>
-          ))}
-        </section>
-
-        <section className="theory-pitfalls">
-          {step.theory.pitfalls.map((pitfall) => (
-            <article key={pitfall.title[locale]}>
-              <span>{pitfall.title[locale]}</span>
-              <p>{pitfall.body[locale]}</p>
-              {pitfall.formula ? <code>{pitfall.formula}</code> : null}
-            </article>
-          ))}
-        </section>
-
-        <section className="method-strip">
-          <span>{uiCopy[locale].methodTitle}</span>
-          <ol>
-            {step.theory.method[locale].map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ol>
-        </section>
-
-        <button className="primary-button wide" type="button" onClick={onComplete}>
-          <Check size={18} /> {uiCopy[locale].understood}
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="content-panel">
-      <ul className="lesson-notes">
-        {step.vocabulary
-          ? step.vocabulary.map((item) => (
-              <li className="vocab-row" key={`${item.ru}-${item.en}`}>
-                <span>
-                  <strong>{item.en}</strong>
-                  <small>{item.ru}</small>
-                </span>
-                <button className="icon-button" type="button" onClick={() => onSpeak(item.en)}>
-                  <Volume2 size={16} />
-                </button>
-              </li>
-            ))
-          : step.notes[locale].map((note) => <li key={note}>{note}</li>)}
-      </ul>
-      <button className="primary-button wide" type="button" onClick={onComplete}>
-        <Check size={18} /> {uiCopy[locale].understood}
-      </button>
-    </div>
-  );
-}
-
-function CompositionStep({
-  copy,
-  feedback,
-  lines,
-  loading,
-  error,
-  step,
-  onChangeLine,
-  onAddLine,
-  onCheck
-}: {
-  copy: (typeof uiCopy)[Locale];
-  feedback: CompositionFeedback | null;
-  lines: string[];
-  loading: boolean;
-  error: string;
-  step: TrainingStep;
-  onChangeLine: (index: number, value: string) => void;
-  onAddLine: () => void;
-  onCheck: () => void;
-}) {
-  const filledCount = lines.filter((line) => line.trim()).length;
-  const minSentences = step.composition?.minSentences ?? 10;
-  const maxSentences = step.composition?.maxSentences ?? 20;
-  const issuesByLine = new Map(feedback?.issues.map((issue) => [issue.line, issue]) ?? []);
-
-  return (
-    <div className="content-panel composition-panel">
-      <section className="composition-brief">
-        <div>
-          <span>{copy.compositionTitle}</span>
-          <h3>{step.composition?.model.ru ?? step.targetText}</h3>
-        </div>
-        <ul>
-          {step.composition?.requirements.ru.map((requirement) => <li key={requirement}>{requirement}</li>)}
-        </ul>
-      </section>
-
-      <section className="composition-editor" aria-label={copy.compositionTitle}>
-        {lines.map((line, index) => {
-          const lineIssue = issuesByLine.get(index + 1);
-          return (
-            <label
-              className={[
-                "composition-line",
-                lineIssue ? "has-issue" : "",
-                lineIssue?.severity === "polish" ? "polish" : "",
-                lineIssue?.severity === "fix" ? "fix" : ""
-              ].join(" ")}
-              key={index}
-            >
-              <span>{index + 1}</span>
-              <input
-                value={line}
-                onChange={(event) => onChangeLine(index, event.target.value)}
-                placeholder={`${copy.compositionPlaceholder} ${index + 1}`}
-                aria-invalid={lineIssue?.severity === "fix"}
-              />
-              {lineIssue ? <em>{lineIssue.severity === "fix" ? "исправить" : "улучшить"}</em> : null}
-            </label>
-          );
-        })}
-      </section>
-
-      <div className="composition-actions">
-        <button className="secondary-button" type="button" onClick={onAddLine} disabled={lines.length >= maxSentences}>
-          + {Math.min(lines.length + 1, maxSentences)}
-        </button>
-        <span>
-          {filledCount}/{minSentences}
-        </span>
-        <button className="primary-button" type="button" onClick={onCheck} disabled={loading || filledCount < minSentences}>
-          {loading ? copy.compositionLoading : copy.compositionCheck}
-        </button>
-      </div>
-
-      {error ? <div className="coach-feedback error">{error}</div> : null}
-      {feedback ? <CompositionFeedbackPanel feedback={feedback} copy={copy} /> : null}
-    </div>
-  );
-}
-
-function CompositionFeedbackPanel({
-  feedback,
-  copy
-}: {
-  feedback: CompositionFeedback;
-  copy: (typeof uiCopy)[Locale];
-}) {
-  return (
-    <section className={`composition-feedback ${feedback.verdict}`}>
-      <div className="coach-feedback-head">
-        <strong>{feedback.summaryRu}</strong>
-        <span>{feedback.score}/100</span>
-      </div>
-      <div className="grammar-brief">
-        <span>{copy.compositionTheory}</span>
-        <p>{feedback.theoryRu}</p>
-      </div>
-      {feedback.issues.length ? (
-        <div className="socratic-list">
-          <h3>{copy.compositionQuestions}</h3>
-          {feedback.issues.map((issue) => (
-            <article key={`${issue.line}-${issue.focusRu}`}>
-              <span>#{issue.line}</span>
-              <div>
-                <strong>{issue.focusRu}</strong>
-                <p>{issue.questionRu}</p>
-                <small>{issue.hintRu}</small>
-              </div>
-            </article>
-          ))}
-        </div>
-      ) : null}
-      <div className="drill-note">{feedback.nextActionRu}</div>
     </section>
   );
 }
