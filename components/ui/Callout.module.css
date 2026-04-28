@@ -1,0 +1,37 @@
+.callout {
+  border: 1px solid var(--callout-border);
+  border-radius: var(--r-lg);
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  background: var(--callout-bg);
+  color: var(--fg-secondary);
+  box-shadow: var(--inset-stroke);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.callout strong {
+  color: var(--fg-primary);
+}
+
+.info {
+  --callout-bg: rgba(138, 149, 255, 0.12);
+  --callout-border: rgba(138, 149, 255, 0.28);
+}
+
+.warn {
+  --callout-bg: rgba(255, 180, 84, 0.12);
+  --callout-border: rgba(255, 180, 84, 0.3);
+}
+
+.error {
+  --callout-bg: rgba(255, 92, 122, 0.12);
+  --callout-border: rgba(255, 92, 122, 0.32);
+}
+
+.ok {
+  --callout-bg: rgba(200, 255, 107, 0.11);
+  --callout-border: rgba(200, 255, 107, 0.28);
+}
