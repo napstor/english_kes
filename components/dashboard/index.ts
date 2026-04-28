@@ -5,3 +5,4 @@ export { MasteryRing } from "./MasteryRing";
 export { ReviewDashboard } from "./ReviewDashboard";
 export { StreakDisplay } from "./StreakDisplay";
 export { TodayDashboard } from "./TodayDashboard";
+export { TutorChat } from "./TutorChat";
