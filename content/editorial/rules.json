@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "description": "Editorial checks for source-book extraction and course data. These rules catch known typos, OCR artifacts, dated learner patterns, and variants that should not become primary training material.",
+  "targets": [
+    {
+      "id": "source-book",
+      "path": "content/source/givental-kak-eto-skazat-po-angliyski-2013.md",
+      "kind": "source"
+    },
+    {
+      "id": "course-data",
+      "path": "lib/course.ts",
+      "kind": "course"
+    },
+    {
+      "id": "scoring",
+      "path": "lib/scoring.ts",
+      "kind": "course"
+    }
+  ],
+  "rules": [
+    {
+      "id": "week-days-hyphenated",
+      "severity": "block",
+      "scope": ["source", "course"],
+      "pattern": "\\bweek[- ]days\\b",
+      "recommendation": "Use the modern closed form `weekdays`; in phrases use `on weekdays`."
+    },
+    {
+      "id": "week-ends-hyphenated",
+      "severity": "block",
+      "scope": ["source", "course"],
+      "pattern": "\\bweek[- ]ends\\b",
+      "recommendation": "Use `weekends`; BrE: `at weekends`, AmE: `on weekends`."
+    },
+    {
+      "id": "weeek-misspelling",
+      "severity": "block",
+      "scope": ["source", "course"],
+      "pattern": "\\bwe{3,}k(?:days|ends)?\\b",
+      "recommendation": "Likely typo. Use `week`, `weekdays`, or `weekends` depending on context."
+    },
+    {
+      "id": "beautify-oneself",
+      "severity": "block",
+      "scope": ["source", "course"],
+      "pattern": "\\bbeautif(?:y|ying|ies) oneself\\b",
+      "recommendation": "Do not teach this as a default phrase for makeup. Use `put on makeup` or `do one's makeup`."
+    },
+    {
+      "id": "come-in-time-last-minute",
+      "severity": "block",
+      "scope": ["source", "course"],
+      "pattern": "\\bto come in time\\b",
+      "recommendation": "For `в последнюю минуту`, use `to come at the last minute`. `In time` means before it is too late."
+    },
+    {
+      "id": "do-the-room",
+      "severity": "block",
+      "scope": ["source", "course"],
+      "pattern": "\\bto do the room\\b",
+      "recommendation": "Use `to clean the room` or `to tidy the room`."
+    },
+    {
+      "id": "specific-restaurant-with-general-meaning",
+      "severity": "block",
+      "scope": ["source", "course"],
+      "pattern": "\\bat the restaurant\\b",
+      "recommendation": "For a general restaurant, use `at a restaurant` or `in a restaurant`. Use `the` only when the restaurant is specific/known."
+    },
+    {
+      "id": "supper-as-primary",
+      "severity": "warn",
+      "scope": ["source"],
+      "pattern": "\\bsupper\\b",
+      "recommendation": "`Supper` is possible but dated/regional for many learners. Prefer `dinner` as primary; keep `supper` only as an accepted alternative when appropriate."
+    },
+    {
+      "id": "seldom-as-primary",
+      "severity": "warn",
+      "scope": ["source"],
+      "pattern": "\\bseldom\\b",
+      "recommendation": "`Seldom` is correct but formal. Prefer `rarely` as the modern primary beginner pattern; accept `seldom` where the book uses it."
+    },
+    {
+      "id": "wash-themselves-default",
+      "severity": "warn",
+      "scope": ["source", "course"],
+      "pattern": "\\bwash themselves\\b",
+      "recommendation": "For Russian `умываться`, prefer `wash`, `wash one's face`, or a concrete routine phrase. `Wash themselves` is grammatical but often unnatural as a default."
+    },
+    {
+      "id": "ocr-cyrillic-a-in-english",
+      "severity": "block",
+      "scope": ["source", "course"],
+      "pattern": "[A-Za-z]\\sа\\s[A-Za-z]",
+      "recommendation": "OCR artifact: Cyrillic `а` appears inside an English phrase. Replace with Latin `a`."
+    },
+    {
+      "id": "ocr-cyrillic-tv",
+      "severity": "block",
+      "scope": ["source", "course"],
+      "pattern": "ТV|Тv",
+      "recommendation": "OCR artifact: Cyrillic `Т` in `TV`. Use Latin `TV`."
+    },
+    {
+      "id": "ocr-on-time-011",
+      "severity": "block",
+      "scope": ["source", "course"],
+      "pattern": "\\b0?11 time\\b",
+      "recommendation": "OCR/source artifact around `on time`. Verify against the PDF image and normalize to `on time`."
+    },
+    {
+      "id": "ocr-usually-backslash",
+      "severity": "block",
+      "scope": ["source", "course"],
+      "pattern": "usual\\\\y",
+      "recommendation": "OCR/source artifact. Use `usually`."
+    },
+    {
+      "id": "book-weekend-preposition",
+      "severity": "info",
+      "scope": ["source", "course"],
+      "pattern": "\\bon weekends\\b",
+      "recommendation": "Acceptable AmE. If lesson is British-first, display `at weekends` as primary and accept `on weekends` as an alternative."
+    }
+  ]
+}

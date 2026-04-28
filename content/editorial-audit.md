@@ -43,3 +43,25 @@ This file tracks source-book forms that should not be blindly copied into the tr
 - Accept major British/American preposition variants when natural: `at weekends` and `on weekends`.
 - Do not accept visibly misspelled/hyphenated source-book forms as correct answers if they create bad learner patterns.
 - When the book uses a valid but dated form, make the modern form primary and add the book form as an accepted alternative only if it will not harm the learner.
+
+## Repeatable Audit Pipeline
+
+- Rules live in `content/editorial/rules.json`.
+- Run `npm run audit:editorial` after parsing a new source or adding/changing course data.
+- The script scans:
+  - `content/source/givental-kak-eto-skazat-po-angliyski-2013.md`
+  - `lib/course.ts`
+  - `lib/scoring.ts`
+- The generated report is `content/editorial-report.md`.
+
+## Lesson Build Policy
+
+Before a lesson is added to `lib/course.ts`:
+
+1. Find the lesson text and keys in the extracted markdown.
+2. Extract vocabulary, idioms, drills, keys, and method notes.
+3. Run the editorial audit.
+4. Promote only modern/natural English to primary answers.
+5. Keep book variants as accepted alternatives only if they are grammatical and do not create bad beginner patterns.
+6. Add every new correction class to `content/editorial/rules.json`, not only to this note.
+7. Re-run `npm run audit:editorial` and `npm run build`.
