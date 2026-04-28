@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, Layers } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import type { NavigationStep } from "@/components/navigation";
 import type { CourseLessonMock } from "@/lib/mockData";
@@ -18,7 +18,6 @@ type CourseMapProps = {
 
 export function CourseMap({ steps, lessons, progress, onLessonClick, onStepClick }: CourseMapProps) {
   const [expandedAll, setExpandedAll] = useState(false);
-  const visibleLessons = expandedAll ? buildAllLessons(lessons) : lessons;
   const completedCount = progress.completedSteps.length;
 
   return (
@@ -30,7 +29,7 @@ export function CourseMap({ steps, lessons, progress, onLessonClick, onStepClick
       </header>
 
       <div className={styles.timeline}>
-        {visibleLessons.map((lesson) => {
+        {lessons.map((lesson) => {
           const current = lesson.number === 1;
           return (
             <article className={current ? styles.currentLesson : styles.lesson} key={lesson.id}>
@@ -67,25 +66,12 @@ export function CourseMap({ steps, lessons, progress, onLessonClick, onStepClick
           <ChevronDown size={18} aria-hidden="true" />
           + ещё 41 урок
         </button>
-      ) : null}
-
-      <div className={styles.note}>
-        <Layers size={18} aria-hidden="true" />
-        <span>Уроки 4-44 показаны как mock timeline до подключения real course index.</span>
-      </div>
+      ) : (
+        <section className={styles.placeholder}>
+          <div className={styles.placeholderLine} aria-hidden="true" />
+          <p>Stage 2-4 курса в разработке. Сейчас доступен Lesson 1 — Я делаю это обычно (Present Simple).</p>
+        </section>
+      )}
     </section>
   );
-}
-
-function buildAllLessons(lessons: CourseLessonMock[]) {
-  const rest = Array.from({ length: 41 }, (_, index) => ({
-    id: `lesson-${String(index + 4).padStart(2, "0")}`,
-    number: index + 4,
-    title: `Урок ${index + 4}`,
-    description: "Collapsed course placeholder for upcoming curriculum map.",
-    stepCount: 64 + (index % 8),
-    completedSteps: 0,
-    mastery: 0
-  }));
-  return [...lessons, ...rest];
 }

@@ -16,7 +16,7 @@
 .num,
 .step small,
 .disclosure,
-.note {
+.placeholder {
   font-family: var(--font-mono);
   letter-spacing: 0.06em;
 }
@@ -37,7 +37,7 @@
 
 .header p,
 .lessonButton p,
-.note {
+.placeholder p {
   margin: 0;
   color: var(--fg-muted);
   line-height: 1.5;
@@ -178,13 +178,41 @@
   font-weight: 700;
 }
 
-.note {
-  display: flex;
-  gap: 10px;
+.placeholder {
+  display: grid;
+  gap: 14px;
   border: 1px dashed var(--border);
   border-radius: var(--r-md);
-  padding: 12px 14px;
+  padding: 18px;
+  background: linear-gradient(90deg, rgba(91, 107, 255, 0.06), rgba(245, 245, 248, 0.015));
   font-size: 12px;
+}
+
+.placeholderLine {
+  position: relative;
+  height: 1px;
+  overflow: hidden;
+  border-radius: var(--r-full);
+  background: linear-gradient(90deg, transparent, rgba(138, 149, 255, 0.45), transparent);
+}
+
+.placeholderLine::before,
+.placeholderLine::after {
+  position: absolute;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border: 1px solid rgba(138, 149, 255, 0.28);
+  border-radius: 50%;
+  content: "";
+}
+
+.placeholderLine::before {
+  left: 18%;
+}
+
+.placeholderLine::after {
+  right: 18%;
 }
 
 @media (max-width: 720px) {
