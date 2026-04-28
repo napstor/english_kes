@@ -1,0 +1,884 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>English KES — Foundation</title>
+<template id="__bundler_thumbnail" data-bg-color="#07070C">
+  <svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
+    <rect x="90" y="80" width="30" height="160" fill="#F5F5F8" rx="6"/>
+    <path d="M 120 160 L 220 80 M 120 160 L 220 240" stroke="#5B6BFF" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </svg>
+</template>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap&subset=latin,cyrillic" rel="stylesheet" />
+<style>
+:root{
+  /* surfaces */
+  --bg-base:#07070C;
+  --bg-elevated:#0F0F18;
+  --bg-elevated-2:#161624;
+  --bg-overlay:rgba(15,15,24,.78);
+
+  /* fg */
+  --fg-primary:#F5F5F8;
+  --fg-muted:rgba(245,245,248,.62);
+  --fg-subtle:rgba(245,245,248,.38);
+  --fg-disabled:rgba(245,245,248,.20);
+
+  /* accents */
+  --accent-primary:#5B6BFF;
+  --accent-glow:#8A95FF;
+  --accent-secondary:#C8FF6B;
+  --accent-warm:#FFB454;
+
+  /* status */
+  --positive:#4ADE80;
+  --negative:#FF5C7A;
+  --info:#5B6BFF;
+  --warning:#FFB454;
+
+  /* borders */
+  --border-subtle:rgba(245,245,248,.06);
+  --border:rgba(245,245,248,.10);
+  --border-strong:rgba(245,245,248,.16);
+  --border-accent:#5B6BFF;
+
+  /* radii */
+  --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:20px; --r-2xl:28px; --r-full:9999px;
+
+  /* shadows + effects */
+  --shadow-soft:0 8px 30px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.04) inset;
+  --shadow-elevated:0 24px 60px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.05) inset;
+  --glow-accent:0 0 0 1px rgba(91,107,255,.45), 0 0 24px rgba(91,107,255,.35);
+  --inset-stroke:inset 0 1px 0 rgba(255,255,255,.08);
+  --grain-opacity:.03;
+
+  /* motion */
+  --d-fast:120ms; --d-base:200ms; --d-slow:400ms;
+  --e-out:cubic-bezier(.22,1,.36,1);
+  --e-spring:cubic-bezier(.34,1.56,.64,1);
+
+  /* fonts */
+  --font-display:"Bricolage Grotesque","Inter",system-ui,sans-serif;
+  --font-sans:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg-base);
+  color:var(--fg-primary);
+  font-family:var(--font-sans);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:geometricPrecision;
+  font-feature-settings:"cv02","cv03","cv04","ss01";
+  min-height:100vh;
+}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit;padding:0}
+input,textarea{font:inherit;color:inherit}
+a{color:inherit}
+::selection{background:rgba(91,107,255,.35);color:var(--fg-primary)}
+
+/* aurora bg utility — used only on auth/empty later, here as ambient hint */
+.aurora{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(60% 40% at 12% 8%, rgba(91,107,255,.18), transparent 60%),
+    radial-gradient(50% 35% at 92% 18%, rgba(138,149,255,.14), transparent 60%),
+    radial-gradient(40% 30% at 70% 90%, rgba(200,255,107,.06), transparent 60%);
+  filter:blur(2px);
+  opacity:.85;
+}
+.aurora::after{
+  /* grain via fractal noise data uri */
+  content:"";position:absolute;inset:0;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity:var(--grain-opacity);
+  mix-blend-mode:overlay;
+}
+
+/* page chrome */
+.page{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:64px 32px 128px}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:48px;border-bottom:1px solid var(--border-subtle);margin-bottom:64px}
+.page-head h1{
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:clamp(36px,5vw,64px);
+  letter-spacing:-.035em;
+  line-height:1;
+  margin:0;
+}
+.page-head .meta{font-family:var(--font-mono);font-size:12px;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.06em}
+.page-head .meta b{color:var(--fg-primary);font-weight:500}
+
+section{margin:96px 0 0}
+section:first-of-type{margin-top:0}
+
+.section-head{display:flex;align-items:baseline;gap:16px;margin-bottom:32px}
+.section-head .num{
+  font-family:var(--font-mono);font-size:12px;color:var(--fg-subtle);
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.section-head h2{
+  font-family:var(--font-display);
+  font-weight:600;font-size:32px;letter-spacing:-.025em;margin:0;line-height:1.1;
+}
+.section-head .lede{color:var(--fg-muted);max-width:540px;margin-left:auto;font-size:14px}
+
+.eyebrow{
+  display:inline-block;font-family:var(--font-mono);font-size:11px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--fg-subtle);
+}
+
+.grid{display:grid;gap:1px;background:var(--border-subtle);border:1px solid var(--border-subtle);border-radius:var(--r-lg);overflow:hidden}
+.grid > .cell{background:var(--bg-elevated);padding:24px}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+.grid-6{grid-template-columns:repeat(6,1fr)}
+@media (max-width:900px){
+  .grid-3,.grid-4,.grid-6{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ── Tokens display */
+.swatch{
+  display:flex;flex-direction:column;gap:12px;
+}
+.swatch .chip{
+  height:96px;border-radius:var(--r-md);border:1px solid var(--border);
+  box-shadow:var(--inset-stroke);
+}
+.swatch .label{
+  display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+  font-family:var(--font-mono);font-size:11px;color:var(--fg-muted);letter-spacing:.04em;
+}
+.swatch .label b{color:var(--fg-primary);font-weight:500;text-transform:none}
+
+/* type spec */
+.type-row{display:grid;grid-template-columns:160px 1fr;gap:32px;align-items:baseline;padding:24px 0;border-bottom:1px solid var(--border-subtle)}
+.type-row:last-child{border-bottom:none}
+.type-row .key{font-family:var(--font-mono);font-size:11px;color:var(--fg-muted);letter-spacing:.06em;text-transform:uppercase}
+.type-row .key small{display:block;color:var(--fg-subtle);margin-top:4px;font-size:10px}
+.t-display-2xl{font-family:var(--font-display);font-weight:800;font-size:clamp(48px,7vw,88px);letter-spacing:-.04em;line-height:.96}
+.t-display-xl{font-family:var(--font-display);font-weight:700;font-size:clamp(36px,5vw,64px);letter-spacing:-.035em;line-height:1}
+.t-display-lg{font-family:var(--font-display);font-weight:700;font-size:clamp(28px,3.5vw,44px);letter-spacing:-.03em;line-height:1.05}
+.t-h1{font-family:var(--font-display);font-weight:700;font-size:28px;letter-spacing:-.025em;line-height:1.1}
+.t-h2{font-family:var(--font-display);font-weight:600;font-size:22px;letter-spacing:-.02em;line-height:1.2}
+.t-h3{font-family:var(--font-sans);font-weight:600;font-size:17px;letter-spacing:-.01em;line-height:1.3}
+.t-body-lg{font-family:var(--font-sans);font-size:16px;line-height:1.5}
+.t-body{font-family:var(--font-sans);font-size:15px;line-height:1.5}
+.t-body-sm{font-family:var(--font-sans);font-size:13px;line-height:1.45}
+.t-caption{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.06em;line-height:1.3;text-transform:uppercase;color:var(--fg-muted)}
+.t-mono{font-family:var(--font-mono);font-size:12px;letter-spacing:0;color:var(--fg-muted)}
+
+/* spec row util */
+.dual{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.dual .pane{padding:24px;border:1px solid var(--border-subtle);border-radius:var(--r-md);background:var(--bg-elevated)}
+.dual .pane .lng{font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+
+/* ── Components — Button */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--font-sans);font-weight:500;font-size:14px;line-height:1;
+  padding:12px 18px;border-radius:var(--r-md);
+  transition:transform var(--d-fast) var(--e-out), background var(--d-base) var(--e-out), box-shadow var(--d-base) var(--e-out), color var(--d-base) var(--e-out), border-color var(--d-base) var(--e-out);
+  letter-spacing:-.005em;
+  white-space:nowrap;
+  user-select:none;
+  position:relative;
+  border:1px solid transparent;
+}
+.btn:active{transform:scale(.98)}
+.btn:focus-visible{outline:2px solid var(--accent-primary);outline-offset:2px}
+.btn .kbd{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.55);padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.08);margin-left:4px}
+
+.btn-primary{
+  background:var(--accent-primary);
+  color:#0B0B14;
+  font-weight:600;
+  box-shadow:var(--inset-stroke), 0 0 0 1px rgba(91,107,255,0), 0 8px 24px rgba(91,107,255,.25);
+}
+.btn-primary:hover{background:var(--accent-glow);box-shadow:var(--inset-stroke), var(--glow-accent), 0 12px 32px rgba(91,107,255,.45)}
+.btn-primary svg{stroke-width:2}
+.btn-primary .kbd{background:rgba(11,11,20,.18);color:rgba(11,11,20,.6)}
+
+.btn-secondary{
+  background:var(--bg-elevated-2);
+  color:var(--fg-primary);
+  border-color:var(--border);
+  box-shadow:var(--inset-stroke);
+}
+.btn-secondary:hover{border-color:var(--border-strong);background:#1B1B2C}
+
+.btn-ghost{color:var(--fg-muted)}
+.btn-ghost:hover{color:var(--fg-primary);background:rgba(255,255,255,.04)}
+
+.btn-destructive{
+  background:transparent;color:var(--negative);border-color:rgba(255,92,122,.30);
+}
+.btn-destructive:hover{background:rgba(255,92,122,.08);border-color:rgba(255,92,122,.50)}
+
+.btn-success{
+  background:var(--accent-secondary);color:#0A1606;font-weight:600;
+  box-shadow:var(--inset-stroke), 0 8px 24px rgba(200,255,107,.25);
+}
+
+.btn-block{display:flex;width:100%;justify-content:center;padding:14px 20px;font-size:15px}
+.btn-sm{padding:8px 12px;font-size:13px;border-radius:var(--r-sm)}
+.btn-lg{padding:16px 22px;font-size:15px;border-radius:var(--r-md)}
+
+/* IconButton */
+.icon-btn{
+  width:36px;height:36px;display:inline-grid;place-items:center;
+  border-radius:var(--r-md);color:var(--fg-muted);
+  transition:background var(--d-base) var(--e-out), color var(--d-base) var(--e-out), border-color var(--d-base) var(--e-out);
+  border:1px solid transparent;
+}
+.icon-btn:hover{background:rgba(255,255,255,.05);color:var(--fg-primary)}
+.icon-btn:focus-visible{outline:2px solid var(--accent-primary);outline-offset:2px}
+.icon-btn.active{background:rgba(91,107,255,.16);color:var(--accent-glow);border-color:rgba(91,107,255,.30)}
+.icon-btn-sm{width:28px;height:28px;border-radius:var(--r-sm)}
+.icon-btn-lg{width:44px;height:44px;border-radius:var(--r-md)}
+.icon-btn-bare:hover{background:transparent;color:var(--fg-primary)}
+
+/* TextField */
+.field{display:flex;flex-direction:column;gap:8px}
+.field-label{font-family:var(--font-mono);font-size:11px;color:var(--fg-muted);letter-spacing:.06em;text-transform:uppercase}
+.field-input,.field-area{
+  width:100%;
+  background:var(--bg-elevated-2);
+  color:var(--fg-primary);
+  border:1px solid var(--border);
+  border-radius:var(--r-md);
+  padding:12px 14px;
+  font-family:var(--font-sans);font-size:15px;line-height:1.5;
+  transition:border-color var(--d-base) var(--e-out), box-shadow var(--d-base) var(--e-out), background var(--d-base) var(--e-out);
+  box-shadow:var(--inset-stroke);
+  outline:none;
+}
+.field-area{min-height:96px;resize:vertical;font-family:var(--font-sans)}
+.field-input::placeholder,.field-area::placeholder{color:var(--fg-subtle)}
+.field-input:hover,.field-area:hover{border-color:var(--border-strong)}
+.field-input:focus,.field-area:focus{
+  border-color:var(--border-accent);
+  box-shadow:var(--inset-stroke), 0 0 0 3px rgba(91,107,255,.18);
+}
+.field.is-error .field-input,.field.is-error .field-area{
+  border-color:rgba(255,92,122,.45);
+  box-shadow:var(--inset-stroke), 0 0 0 3px rgba(255,92,122,.12);
+}
+.field-hint{font-family:var(--font-sans);font-size:13px;color:var(--fg-muted)}
+.field-hint.error{color:var(--negative)}
+.field.with-prefix{position:relative}
+.field.with-prefix .field-input{padding-left:38px}
+.field.with-prefix .prefix{position:absolute;left:12px;top:50%;transform:translateY(calc(-50% + 12px));color:var(--fg-subtle)}
+.field.with-prefix.no-label .prefix{transform:translateY(-50%)}
+
+/* TypeChip */
+.chip-type{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 10px;border-radius:var(--r-full);
+  font-family:var(--font-mono);font-size:11px;font-weight:600;
+  letter-spacing:.06em;text-transform:uppercase;
+  background:rgba(91,107,255,.12);color:var(--accent-glow);
+  border:1px solid rgba(91,107,255,.24);
+}
+.chip-type svg{width:12px;height:12px;stroke-width:2}
+.chip-type.theory{background:rgba(91,107,255,.12);color:var(--accent-glow);border-color:rgba(91,107,255,.24)}
+.chip-type.vocabulary{background:rgba(245,245,248,.06);color:var(--fg-primary);border-color:var(--border)}
+.chip-type.composition{background:rgba(245,245,248,.06);color:var(--fg-primary);border-color:var(--border)}
+.chip-type.translate{background:rgba(91,107,255,.12);color:var(--accent-glow);border-color:rgba(91,107,255,.24)}
+.chip-type.drill{background:rgba(255,180,84,.10);color:var(--accent-warm);border-color:rgba(255,180,84,.24)}
+.chip-type.speaking{background:rgba(200,255,107,.10);color:var(--accent-secondary);border-color:rgba(200,255,107,.22)}
+
+/* Generic Badge */
+.badge{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:var(--r-full);
+  font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.04em;
+  background:rgba(245,245,248,.06);color:var(--fg-muted);
+  border:1px solid var(--border-subtle);
+}
+.badge.score{background:rgba(200,255,107,.10);color:var(--accent-secondary);border-color:rgba(200,255,107,.20)}
+.badge.score-mid{background:rgba(255,180,84,.10);color:var(--accent-warm);border-color:rgba(255,180,84,.20)}
+.badge.score-low{background:rgba(255,92,122,.10);color:var(--negative);border-color:rgba(255,92,122,.22)}
+.badge.tag-mono{font-family:var(--font-mono);text-transform:none;letter-spacing:0}
+
+/* Brand mark — both versions */
+.brand-row{display:flex;align-items:center;gap:48px;flex-wrap:wrap}
+.brand-block{display:flex;align-items:center;gap:14px}
+.brand-mono{color:var(--fg-primary)}
+.brand-duo .stem{color:var(--fg-primary)}
+.brand-duo .rays{color:var(--accent-primary)}
+.wordmark{
+  font-family:var(--font-display);font-weight:700;font-size:20px;letter-spacing:-.025em;
+  display:flex;flex-direction:column;line-height:1;
+}
+.wordmark small{
+  font-family:var(--font-mono);font-size:10px;font-weight:500;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--fg-muted);margin-top:4px;
+}
+.brand-stack{
+  font-family:var(--font-display);font-weight:800;letter-spacing:-.04em;line-height:.96;
+  font-size:48px;
+}
+.brand-stack .dot{color:var(--accent-primary)}
+.brand-stack .indent{padding-left:1.2ch}
+
+.size-row{display:flex;align-items:flex-end;gap:32px;flex-wrap:wrap}
+.size-row .demo{display:flex;flex-direction:column;align-items:center;gap:8px}
+.size-row .demo small{font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);letter-spacing:.06em}
+
+/* Eyebrow examples */
+.eyebrow.indigo{color:var(--accent-glow)}
+.eyebrow.lime{color:var(--accent-secondary)}
+.eyebrow.amber{color:var(--accent-warm)}
+
+/* Component preview cell */
+.preview{display:flex;flex-direction:column;gap:16px;align-items:flex-start}
+.preview .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.preview .caption{font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);letter-spacing:.08em;text-transform:uppercase}
+
+/* spacing/radius scale visual */
+.scale{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.scale .unit{display:flex;flex-direction:column;align-items:center;gap:8px}
+.scale .unit .box{background:var(--accent-primary);border-radius:2px}
+.scale .unit small{font-family:var(--font-mono);font-size:10px;color:var(--fg-muted);letter-spacing:.04em}
+.radii{display:flex;gap:16px;flex-wrap:wrap}
+.radii .demo{width:80px;height:80px;background:linear-gradient(135deg,var(--bg-elevated-2),var(--bg-elevated));border:1px solid var(--border);box-shadow:var(--inset-stroke);display:grid;place-items:flex-end;padding:8px;font-family:var(--font-mono);font-size:10px;color:var(--fg-muted)}
+
+/* footer */
+.foot{margin-top:128px;padding-top:32px;border-top:1px solid var(--border-subtle);display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:11px;color:var(--fg-subtle);letter-spacing:.04em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="aurora" aria-hidden="true"></div>
+<main class="page">
+
+  <!-- HEAD -->
+  <header class="page-head">
+    <div>
+      <div class="eyebrow indigo">Stage 1 · Foundation</div>
+      <h1 style="margin-top:16px">Design system<br/><span style="color:var(--fg-muted)">tokens, primitives, brand.</span></h1>
+    </div>
+    <div class="meta">
+      <div><b>English KES</b> · UI redesign</div>
+      <div>v0.1 · 2026-04-28</div>
+    </div>
+  </header>
+
+  <!-- 01 BRAND -->
+  <section>
+    <div class="section-head">
+      <span class="num">01</span>
+      <h2>Brand</h2>
+      <p class="lede">Геометрический monogram: вертикальная палка + два луча-chevron. <code class="t-mono">currentColor</code>-based, читается на 16–56px.</p>
+    </div>
+
+    <div class="grid grid-3">
+      <div class="cell">
+        <div class="caption" style="font-family:var(--font-mono);font-size:11px;color:var(--fg-subtle);letter-spacing:.08em;text-transform:uppercase;margin-bottom:24px">Mono · currentColor</div>
+        <div class="size-row">
+          <div class="demo"><svg class="brand-mono" viewBox="0 0 32 32" width="16" height="16" aria-hidden="true"><rect x="9" y="8" width="3" height="16" fill="currentColor" rx="1"/><path d="M 12 16 L 22 8 M 12 16 L 22 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><small>16</small></div>
+          <div class="demo"><svg class="brand-mono" viewBox="0 0 32 32" width="24" height="24" aria-hidden="true"><rect x="9" y="8" width="3" height="16" fill="currentColor" rx="1"/><path d="M 12 16 L 22 8 M 12 16 L 22 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><small>24</small></div>
+          <div class="demo"><svg class="brand-mono" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><rect x="9" y="8" width="3" height="16" fill="currentColor" rx="1"/><path d="M 12 16 L 22 8 M 12 16 L 22 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><small>32</small></div>
+          <div class="demo"><svg class="brand-mono" viewBox="0 0 32 32" width="56" height="56" aria-hidden="true"><rect x="9" y="8" width="3" height="16" fill="currentColor" rx="1"/><path d="M 12 16 L 22 8 M 12 16 L 22 24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><small>56</small></div>
+        </div>
+      </div>
+      <div class="cell">
+        <div class="caption" style="font-family:var(--font-mono);font-size:11px;color:var(--fg-subtle);letter-spacing:.08em;text-transform:uppercase;margin-bottom:24px">Duo · stem + rays</div>
+        <div class="size-row">
+          <div class="demo brand-duo">
+            <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
+              <rect class="stem" x="9" y="8" width="3" height="16" fill="currentColor" rx="1"/>
+              <path class="rays" d="M 12 16 L 22 8 M 12 16 L 22 24" stroke="#5B6BFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+            <small>32</small>
+          </div>
+          <div class="demo brand-duo">
+            <svg viewBox="0 0 32 32" width="56" height="56" aria-hidden="true">
+              <rect class="stem" x="9" y="8" width="3" height="16" fill="#F5F5F8" rx="1"/>
+              <path class="rays" d="M 12 16 L 22 8 M 12 16 L 22 24" stroke="#5B6BFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+            <small>56</small>
+          </div>
+        </div>
+        <div style="margin-top:24px;padding:16px;background:#F5F5F8;border-radius:var(--r-md);display:flex;gap:24px">
+          <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
+            <rect x="9" y="8" width="3" height="16" fill="#0F0F18" rx="1"/>
+            <path d="M 12 16 L 22 8 M 12 16 L 22 24" stroke="#5B6BFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <small style="font-family:var(--font-mono);font-size:10px;color:#0F0F18;align-self:center">on light surface</small>
+        </div>
+      </div>
+      <div class="cell">
+        <div class="caption" style="font-family:var(--font-mono);font-size:11px;color:var(--fg-subtle);letter-spacing:.08em;text-transform:uppercase;margin-bottom:24px">Wordmark</div>
+        <div class="brand-block" style="margin-bottom:24px">
+          <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
+            <rect x="9" y="8" width="3" height="16" fill="#F5F5F8" rx="1"/>
+            <path d="M 12 16 L 22 8 M 12 16 L 22 24" stroke="#5B6BFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <div class="wordmark">
+            <span>English KES</span>
+            <small>Trainer</small>
+          </div>
+        </div>
+        <div class="brand-stack">
+          ENGLISH<br/>
+          <span class="indent">KES<span class="dot">.</span></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 COLOR -->
+  <section>
+    <div class="section-head">
+      <span class="num">02</span>
+      <h2>Color</h2>
+      <p class="lede">Тёмная база + indigo (главный интерактив) + lime (energy beats, скупо) + amber (warnings only).</p>
+    </div>
+
+    <div class="eyebrow" style="margin-bottom:16px">Surfaces</div>
+    <div class="grid grid-4">
+      <div class="cell swatch"><div class="chip" style="background:#07070C"></div><div class="label"><b>bg-base</b><span>#07070C</span></div></div>
+      <div class="cell swatch"><div class="chip" style="background:#0F0F18"></div><div class="label"><b>bg-elevated</b><span>#0F0F18</span></div></div>
+      <div class="cell swatch"><div class="chip" style="background:#161624"></div><div class="label"><b>bg-elevated-2</b><span>#161624</span></div></div>
+      <div class="cell swatch"><div class="chip" style="background:rgba(15,15,24,.78);backdrop-filter:blur(10px);border-color:rgba(255,255,255,.1)"></div><div class="label"><b>bg-overlay</b><span>78% blur</span></div></div>
+    </div>
+
+    <div class="eyebrow" style="margin:48px 0 16px">Foreground</div>
+    <div class="grid grid-4">
+      <div class="cell swatch"><div class="chip" style="background:#F5F5F8"></div><div class="label"><b>fg-primary</b><span>#F5F5F8</span></div></div>
+      <div class="cell swatch"><div class="chip" style="background:rgba(245,245,248,.62)"></div><div class="label"><b>fg-muted</b><span>62%</span></div></div>
+      <div class="cell swatch"><div class="chip" style="background:rgba(245,245,248,.38)"></div><div class="label"><b>fg-subtle</b><span>38%</span></div></div>
+      <div class="cell swatch"><div class="chip" style="background:rgba(245,245,248,.20)"></div><div class="label"><b>fg-disabled</b><span>20%</span></div></div>
+    </div>
+
+    <div class="eyebrow" style="margin:48px 0 16px">Accents</div>
+    <div class="grid grid-4">
+      <div class="cell swatch"><div class="chip" style="background:#5B6BFF"></div><div class="label"><b>accent-primary</b><span>indigo · #5B6BFF</span></div></div>
+      <div class="cell swatch"><div class="chip" style="background:#8A95FF"></div><div class="label"><b>accent-glow</b><span>halos · #8A95FF</span></div></div>
+      <div class="cell swatch"><div class="chip" style="background:#C8FF6B"></div><div class="label"><b>accent-secondary</b><span>lime · #C8FF6B</span></div></div>
+      <div class="cell swatch"><div class="chip" style="background:#FFB454"></div><div class="label"><b>accent-warm</b><span>amber · #FFB454</span></div></div>
+    </div>
+
+    <div class="eyebrow" style="margin:48px 0 16px">Status</div>
+    <div class="grid grid-4">
+      <div class="cell swatch"><div class="chip" style="background:#4ADE80"></div><div class="label"><b>positive</b><span>#4ADE80</span></div></div>
+      <div class="cell swatch"><div class="chip" style="background:#FF5C7A"></div><div class="label"><b>negative</b><span>#FF5C7A</span></div></div>
+      <div class="cell swatch"><div class="chip" style="background:#5B6BFF"></div><div class="label"><b>info</b><span>= primary</span></div></div>
+      <div class="cell swatch"><div class="chip" style="background:#FFB454"></div><div class="label"><b>warning</b><span>= warm</span></div></div>
+    </div>
+
+    <div style="margin-top:48px;padding:32px;background:linear-gradient(135deg,#1E1B4B 0%,#2A2160 35%,#5B6BFF 70%,#8A95FF 100%);border-radius:var(--r-lg);position:relative;overflow:hidden">
+      <div style="position:absolute;inset:0;background-image:url(&quot;data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>&quot;);opacity:.06;mix-blend-mode:overlay;pointer-events:none"></div>
+      <div class="eyebrow" style="color:rgba(255,255,255,.7)">Special · gradient-aurora</div>
+      <div style="font-family:var(--font-mono);font-size:12px;color:rgba(255,255,255,.85);margin-top:12px">linear-gradient(135deg, #1E1B4B 0%, #2A2160 35%, #5B6BFF 70%, #8A95FF 100%) + 3% grain</div>
+    </div>
+  </section>
+
+  <!-- 03 TYPOGRAPHY -->
+  <section>
+    <div class="section-head">
+      <span class="num">03</span>
+      <h2>Typography</h2>
+      <p class="lede">Bricolage Grotesque (display) + Inter (body) + JetBrains Mono (data, formulas, meta). RU и EN рядом для проверки длин строк.</p>
+    </div>
+
+    <div class="type-row">
+      <div class="key">display-2xl<small>800 · -0.04em · 0.96</small></div>
+      <div>
+        <div class="t-display-2xl">Я делаю это обычно</div>
+        <div class="t-display-2xl" style="color:var(--fg-muted);margin-top:8px">I do this regularly</div>
+      </div>
+    </div>
+    <div class="type-row">
+      <div class="key">display-xl<small>700 · -0.035em · 1.0</small></div>
+      <div>
+        <div class="t-display-xl">Я всегда читаю газеты по утрам.</div>
+        <div class="t-display-xl" style="color:var(--fg-muted);margin-top:8px">I always read newspapers in the mornings.</div>
+      </div>
+    </div>
+    <div class="type-row">
+      <div class="key">display-lg<small>700 · -0.03em · 1.05</small></div>
+      <div>
+        <div class="t-display-lg">Используя новые слова, составь 10–20 предложений.</div>
+        <div class="t-display-lg" style="color:var(--fg-muted);margin-top:8px">Using the new vocabulary, compose 10–20 sentences.</div>
+      </div>
+    </div>
+    <div class="type-row">
+      <div class="key">h1 / h2 / h3<small>28 / 22 / 17</small></div>
+      <div>
+        <div class="t-h1">Present Simple — формула</div>
+        <div class="t-h2" style="margin-top:8px">Place of always</div>
+        <div class="t-h3" style="margin-top:8px">Утверждение, вопрос, отрицание</div>
+      </div>
+    </div>
+    <div class="type-row">
+      <div class="key">body-lg / body / body-sm<small>16 / 15 / 13</small></div>
+      <div>
+        <p class="t-body-lg" style="margin:0">Сначала видишь русскую мысль, затем сам собираешь английскую фразу. Эталон скрыт — раскрывается после попытки.</p>
+        <p class="t-body" style="margin:8px 0;color:var(--fg-muted)">First you see the Russian phrase, then assemble the English version yourself. The standard stays hidden until you've tried.</p>
+        <p class="t-body-sm" style="margin:0;color:var(--fg-subtle)">Hint · место always — перед смысловым глаголом</p>
+      </div>
+    </div>
+    <div class="type-row">
+      <div class="key">caption<small>mono · 12 · 0.06em · uppercase</small></div>
+      <div><span class="t-caption">Lesson 1 / 44 · Step 4 / 74 · Try 1/3 · 95/100</span></div>
+    </div>
+    <div class="type-row">
+      <div class="key">mono inline<small>JetBrains Mono · formulas, data</small></div>
+      <div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <code style="font-family:var(--font-mono);font-size:13px;background:var(--bg-elevated-2);border:1px solid var(--border);padding:6px 10px;border-radius:6px;color:var(--accent-secondary)">I/you/we/they + V</code>
+          <code style="font-family:var(--font-mono);font-size:13px;background:var(--bg-elevated-2);border:1px solid var(--border);padding:6px 10px;border-radius:6px;color:var(--accent-secondary)">he/she/it + V-s</code>
+          <code style="font-family:var(--font-mono);font-size:13px;background:var(--bg-elevated-2);border:1px solid var(--border);padding:6px 10px;border-radius:6px">do/does + subject + V</code>
+          <code style="font-family:var(--font-mono);font-size:13px;background:var(--bg-elevated-2);border:1px solid var(--border);padding:6px 10px;border-radius:6px">do not / does not + V</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 SPACING / RADII / SHADOWS -->
+  <section>
+    <div class="section-head">
+      <span class="num">04</span>
+      <h2>Space, radius, shadow</h2>
+      <p class="lede">4px-baseline. Радиусы 8 / 12 / 16 / 20 / 28. Тени диффузные, без drama.</p>
+    </div>
+    <div class="dual">
+      <div class="pane">
+        <div class="lng">spacing · 4px-baseline</div>
+        <div class="scale">
+          <div class="unit"><div class="box" style="width:4px;height:4px"></div><small>4</small></div>
+          <div class="unit"><div class="box" style="width:8px;height:8px"></div><small>8</small></div>
+          <div class="unit"><div class="box" style="width:12px;height:12px"></div><small>12</small></div>
+          <div class="unit"><div class="box" style="width:16px;height:16px"></div><small>16</small></div>
+          <div class="unit"><div class="box" style="width:20px;height:20px"></div><small>20</small></div>
+          <div class="unit"><div class="box" style="width:24px;height:24px"></div><small>24</small></div>
+          <div class="unit"><div class="box" style="width:32px;height:32px"></div><small>32</small></div>
+          <div class="unit"><div class="box" style="width:40px;height:40px"></div><small>40</small></div>
+          <div class="unit"><div class="box" style="width:48px;height:48px"></div><small>48</small></div>
+          <div class="unit"><div class="box" style="width:64px;height:64px"></div><small>64</small></div>
+          <div class="unit"><div class="box" style="width:80px;height:80px"></div><small>80</small></div>
+          <div class="unit"><div class="box" style="width:96px;height:96px"></div><small>96</small></div>
+        </div>
+      </div>
+      <div class="pane">
+        <div class="lng">radii · 8 → 28 → full</div>
+        <div class="radii">
+          <div class="demo" style="border-radius:8px">8</div>
+          <div class="demo" style="border-radius:12px">12</div>
+          <div class="demo" style="border-radius:16px">16</div>
+          <div class="demo" style="border-radius:20px">20</div>
+          <div class="demo" style="border-radius:28px">28</div>
+          <div class="demo" style="border-radius:9999px">full</div>
+        </div>
+      </div>
+    </div>
+    <div class="dual" style="margin-top:24px">
+      <div class="pane">
+        <div class="lng">shadow-soft · cards</div>
+        <div style="height:120px;border-radius:var(--r-lg);background:var(--bg-elevated);border:1px solid var(--border);box-shadow:var(--shadow-soft);display:grid;place-items:center;color:var(--fg-muted);font-family:var(--font-mono);font-size:12px">.shadow-soft</div>
+      </div>
+      <div class="pane">
+        <div class="lng">glow-accent · CTA, focus</div>
+        <div style="height:120px;border-radius:var(--r-lg);background:var(--bg-elevated);border:1px solid var(--border-accent);box-shadow:var(--glow-accent);display:grid;place-items:center;color:var(--accent-glow);font-family:var(--font-mono);font-size:12px">.glow-accent</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 BUTTONS -->
+  <section>
+    <div class="section-head">
+      <span class="num">05</span>
+      <h2>Button</h2>
+      <p class="lede">Primary · secondary · ghost · destructive · success. Hover — glow, press — scale 98%.</p>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="cell preview">
+        <div class="caption">primary · default / hover / pressed / disabled</div>
+        <div class="row">
+          <button class="btn btn-primary">Готово · <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></button>
+          <button class="btn btn-primary" style="background:var(--accent-glow);box-shadow:var(--inset-stroke), var(--glow-accent), 0 12px 32px rgba(91,107,255,.45)">hover</button>
+          <button class="btn btn-primary" style="transform:scale(.98)">pressed</button>
+          <button class="btn btn-primary" disabled style="opacity:.4;cursor:not-allowed">disabled</button>
+        </div>
+      </div>
+      <div class="cell preview">
+        <div class="caption">secondary</div>
+        <div class="row">
+          <button class="btn btn-secondary">Reset</button>
+          <button class="btn btn-secondary">Show standard</button>
+          <button class="btn btn-secondary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+            Show standard
+          </button>
+        </div>
+      </div>
+      <div class="cell preview">
+        <div class="caption">ghost · low-emphasis</div>
+        <div class="row">
+          <button class="btn btn-ghost">Show answer</button>
+          <button class="btn btn-ghost">Skip</button>
+          <button class="btn btn-ghost">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Ask tutor
+          </button>
+        </div>
+      </div>
+      <div class="cell preview">
+        <div class="caption">destructive · success · sizes</div>
+        <div class="row">
+          <button class="btn btn-destructive">Delete account</button>
+          <button class="btn btn-success">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Mastered
+          </button>
+        </div>
+        <div class="row">
+          <button class="btn btn-primary btn-sm">sm</button>
+          <button class="btn btn-primary">md</button>
+          <button class="btn btn-primary btn-lg">lg</button>
+        </div>
+        <div class="row">
+          <button class="btn btn-primary btn-block">Sign in · block <span class="kbd">⏎</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 ICON BUTTON -->
+  <section>
+    <div class="section-head">
+      <span class="num">06</span>
+      <h2>IconButton</h2>
+      <p class="lede">36px default · 28 sm · 44 lg. Используется в TopBar, на step-rail, в record console.</p>
+    </div>
+    <div class="grid grid-3">
+      <div class="cell preview">
+        <div class="caption">sizes · default state</div>
+        <div class="row">
+          <button class="icon-btn icon-btn-sm" aria-label="prev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <button class="icon-btn" aria-label="settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+          <button class="icon-btn icon-btn-lg" aria-label="record"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
+        </div>
+      </div>
+      <div class="cell preview">
+        <div class="caption">states · hover · active · focus</div>
+        <div class="row">
+          <button class="icon-btn" aria-label="audio" style="background:rgba(255,255,255,.05);color:var(--fg-primary)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button>
+          <button class="icon-btn active" aria-label="active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></button>
+          <button class="icon-btn" aria-label="locked" style="color:var(--fg-disabled);cursor:not-allowed"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
+        </div>
+      </div>
+      <div class="cell preview">
+        <div class="caption">in-context · top-bar mock</div>
+        <div class="row" style="background:var(--bg-elevated);padding:10px 12px;border-radius:var(--r-md);border:1px solid var(--border);box-shadow:var(--inset-stroke);gap:6px">
+          <span class="t-mono" style="color:var(--fg-primary);margin-right:auto">L1 · 4 / 74</span>
+          <button class="icon-btn" aria-label="locale"><span class="t-mono" style="font-size:11px;color:var(--fg-primary);font-weight:600">RU</span></button>
+          <button class="icon-btn" aria-label="settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+          <button class="icon-btn" aria-label="logout"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 TEXTFIELD -->
+  <section>
+    <div class="section-head">
+      <span class="num">07</span>
+      <h2>TextField · Textarea</h2>
+      <p class="lede">Заметный focus-ring indigo. Mono-label сверху, body-input. Error — inline hint.</p>
+    </div>
+    <div class="grid grid-2">
+      <div class="cell preview" style="gap:24px">
+        <div class="field" style="width:100%;max-width:380px">
+          <label class="field-label">Логин</label>
+          <input class="field-input" placeholder="alex.ivanov" />
+        </div>
+        <div class="field" style="width:100%;max-width:380px">
+          <label class="field-label">Username</label>
+          <input class="field-input" placeholder="alex.ivanov" value="alex.ivanov" style="border-color:var(--border-accent);box-shadow:var(--inset-stroke), 0 0 0 3px rgba(91,107,255,.18)" />
+          <div class="field-hint">Focus state · indigo ring</div>
+        </div>
+        <div class="field is-error" style="width:100%;max-width:380px">
+          <label class="field-label">Пароль</label>
+          <input class="field-input" type="password" value="••••" />
+          <div class="field-hint error">Wrong username or password</div>
+        </div>
+      </div>
+      <div class="cell preview" style="gap:24px">
+        <div class="field" style="width:100%">
+          <label class="field-label">Your answer · Translate</label>
+          <textarea class="field-area" placeholder="Type in English..."></textarea>
+        </div>
+        <div class="field" style="width:100%">
+          <label class="field-label">Composition · Line 3</label>
+          <textarea class="field-area" rows="3">He often plays the fool. Does he often play the fool? He doesn't often play the fool.</textarea>
+          <div class="field-hint">Three forms per line · use lesson vocab</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 TYPECHIP / BADGES -->
+  <section>
+    <div class="section-head">
+      <span class="num">08</span>
+      <h2>TypeChip · Badge · Score</h2>
+      <p class="lede">Один TypeChip на step. Indigo для translate/theory. Amber для drill. Lime для speaking. Score-цвет растёт от красного к лайму.</p>
+    </div>
+    <div class="grid grid-2">
+      <div class="cell preview">
+        <div class="caption">step type chips</div>
+        <div class="row">
+          <span class="chip-type theory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.7.5 1 1.3 1 2.1V18h6v-1.2c0-.8.3-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg>Theory</span>
+          <span class="chip-type vocabulary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/></svg>Vocabulary</span>
+          <span class="chip-type composition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Composition</span>
+          <span class="chip-type translate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Translate</span>
+          <span class="chip-type drill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v1a4 4 0 0 1-4 4H3"/></svg>Drill</span>
+          <span class="chip-type speaking"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Speaking</span>
+        </div>
+        <div class="caption" style="margin-top:24px">eyebrows</div>
+        <div class="row">
+          <span class="eyebrow indigo">RU PHRASE</span>
+          <span class="eyebrow">RU ФРАЗА</span>
+          <span class="eyebrow lime">DONE</span>
+          <span class="eyebrow amber">TRY 1 / 3</span>
+        </div>
+      </div>
+      <div class="cell preview">
+        <div class="caption">badges · meta</div>
+        <div class="row">
+          <span class="badge">Lesson 1 / 44</span>
+          <span class="badge">Step 4 / 74</span>
+          <span class="badge tag-mono">Try 1 / 3</span>
+          <span class="badge tag-mono">14s</span>
+          <span class="badge tag-mono">5 days</span>
+        </div>
+        <div class="caption" style="margin-top:24px">score</div>
+        <div class="row">
+          <span class="badge score">95 / 100</span>
+          <span class="badge score">Готово · 100 / 100</span>
+          <span class="badge score-mid">Близко · 80 / 100</span>
+          <span class="badge score-low">Doesn't match · 45 / 100</span>
+        </div>
+        <div class="caption" style="margin-top:24px">grammar tags · mono inline</div>
+        <div class="row">
+          <span class="badge tag-mono">verb</span>
+          <span class="badge tag-mono">phrasal</span>
+          <span class="badge tag-mono">C1</span>
+          <span class="badge tag-mono">Present Simple</span>
+          <span class="badge tag-mono">3rd person</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 SAMPLE PAGE COMPOSITION -->
+  <section>
+    <div class="section-head">
+      <span class="num">09</span>
+      <h2>Composition preview</h2>
+      <p class="lede">Как примитивы складываются в каркас translate-шага. Бенчмарк плотности на 1280×720 — без скролла.</p>
+    </div>
+    <div style="background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow-soft)">
+      <!-- mini topbar -->
+      <div style="display:flex;align-items:center;gap:16px;padding:12px 20px;border-bottom:1px solid var(--border-subtle);background:var(--bg-overlay);backdrop-filter:blur(20px)">
+        <div class="brand-block">
+          <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true">
+            <rect x="9" y="8" width="3" height="16" fill="#F5F5F8" rx="1"/>
+            <path d="M 12 16 L 22 8 M 12 16 L 22 24" stroke="#5B6BFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span style="font-family:var(--font-display);font-weight:700;font-size:15px;letter-spacing:-.02em">English KES</span>
+        </div>
+        <span class="badge">Lesson 1 / 44</span>
+        <span class="badge">Step 4 / 74</span>
+        <div style="flex:1"></div>
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:4px 6px;background:var(--bg-elevated-2);border:1px solid var(--border);border-radius:var(--r-full);font-family:var(--font-mono);font-size:11px;font-weight:600">
+          <span style="background:var(--accent-primary);color:#0B0B14;padding:3px 8px;border-radius:var(--r-full)">RU</span>
+          <span style="padding:3px 8px;color:var(--fg-muted)">EN</span>
+        </div>
+        <button class="icon-btn" aria-label="settings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+        <button class="icon-btn" aria-label="logout"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+      </div>
+
+      <!-- exercise -->
+      <div style="padding:32px 40px 40px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:32px">
+          <span class="chip-type translate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Translate</span>
+          <span class="t-mono" style="color:var(--fg-subtle)">TR 1.1 · Я делаю это обычно</span>
+        </div>
+
+        <div class="eyebrow indigo">RU PHRASE</div>
+        <div class="t-display-xl" style="margin:12px 0 12px;text-wrap:pretty">Я всегда читаю газеты по утрам.</div>
+        <div class="t-body" style="color:var(--fg-muted);margin-bottom:24px">Hint · место <code class="t-mono" style="color:var(--accent-secondary)">always</code> — перед смысловым глаголом.</div>
+
+        <div class="field" style="margin-bottom:28px">
+          <textarea class="field-area" rows="3" placeholder="Type in English..."></textarea>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:12px;border-top:1px solid var(--border-subtle);padding-top:20px">
+          <button class="btn btn-secondary">Reset</button>
+          <div style="flex:1"></div>
+          <button class="btn btn-ghost">Show answer <span class="kbd">⌥⏎</span></button>
+          <button class="btn btn-primary">Check<span class="kbd">⏎</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 NEXT STEPS -->
+  <section>
+    <div class="section-head">
+      <span class="num">10</span>
+      <h2>Next</h2>
+      <p class="lede">Stage 2: Auth screen + AppShell (TopBar, Sidebar, BottomTabs, StepRail). Stage 3: TranslateStep с полным Sokratic flow и TutorChat sheet.</p>
+    </div>
+    <div class="grid grid-3">
+      <div class="cell">
+        <div class="eyebrow lime">Принято</div>
+        <ul style="margin:12px 0 0;padding:0 0 0 18px;color:var(--fg-muted);font-size:14px;line-height:1.6">
+          <li>Палитра indigo + lime + amber</li>
+          <li>Bricolage Grotesque вместо Inter Display</li>
+          <li>Geometric monogram (stem + chevron rays)</li>
+          <li>Mono caption / score / counters</li>
+          <li>Voice: Готово · Дальше / Эталон / Drill</li>
+        </ul>
+      </div>
+      <div class="cell">
+        <div class="eyebrow indigo">Следующий шаг</div>
+        <ul style="margin:12px 0 0;padding:0 0 0 18px;color:var(--fg-muted);font-size:14px;line-height:1.6">
+          <li>AuthShell с aurora + grain</li>
+          <li>AppShell · TopBar 56 · Sidebar 56/220</li>
+          <li>StepRail · scroll-snap, prev/next</li>
+          <li>CourseDrawer · полный список шагов</li>
+          <li>BottomTabs · mobile (sm/md)</li>
+        </ul>
+      </div>
+      <div class="cell">
+        <div class="eyebrow amber">Под вопрос</div>
+        <ul style="margin:12px 0 0;padding:0 0 0 18px;color:var(--fg-muted);font-size:14px;line-height:1.6">
+          <li>Glass-объекты — рендеры, ассеты позже</li>
+          <li>Aurora animation — сейчас static, позже cycle 20–30s</li>
+          <li>Tutor chat streaming UI — на Stage 3</li>
+          <li>Mastery ring · variants idle/active/mastered</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>English KES · v0.1 · Stage 1 of 7</span>
+    <span>1280 baseline · dark only · WCAG AA</span>
+  </div>
+</main>
+</body>
+</html>

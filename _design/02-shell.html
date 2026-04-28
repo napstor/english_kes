@@ -1,0 +1,987 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>English KES — Shell</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Onest:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+@font-face{font-family:"KES Display";src:local("Bricolage Grotesque"),local("BricolageGrotesque-Regular");unicode-range:U+0000-007F,U+0080-00FF,U+0100-017F,U+0180-024F,U+2000-206F,U+20A0-20CF;font-weight:100 900;font-display:swap}
+@font-face{font-family:"KES Display";src:local("Onest"),local("Onest-Regular");unicode-range:U+0400-04FF,U+0500-052F,U+2DE0-2DFF,U+A640-A69F;font-weight:100 900;font-display:swap}
+
+:root{
+  --bg-base:#07070C; --bg-elevated:#0F0F18; --bg-elevated-2:#161624; --bg-overlay:rgba(15,15,24,.78);
+  --fg-primary:#F5F5F8; --fg-muted:rgba(245,245,248,.62); --fg-subtle:rgba(245,245,248,.38); --fg-disabled:rgba(245,245,248,.20);
+  --accent-primary:#5B6BFF; --accent-glow:#8A95FF; --accent-secondary:#C8FF6B; --accent-warm:#FFB454;
+  --positive:#4ADE80; --negative:#FF5C7A;
+  --border-subtle:rgba(245,245,248,.06); --border:rgba(245,245,248,.10); --border-strong:rgba(245,245,248,.16); --border-accent:#5B6BFF;
+  --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:20px; --r-2xl:28px; --r-full:9999px;
+  --shadow-soft:0 8px 30px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.04) inset;
+  --shadow-elevated:0 24px 60px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.05) inset;
+  --glow-accent:0 0 0 1px rgba(91,107,255,.45), 0 0 24px rgba(91,107,255,.35);
+  --inset-stroke:inset 0 1px 0 rgba(255,255,255,.08);
+  --grain-opacity:.03;
+  --d-fast:120ms; --d-base:200ms; --d-slow:400ms;
+  --e-out:cubic-bezier(.22,1,.36,1); --e-spring:cubic-bezier(.34,1.56,.64,1);
+  --font-display:"KES Display","Bricolage Grotesque","Onest","Inter",system-ui,sans-serif;
+  --font-sans:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg-base);color:var(--fg-primary);font-family:var(--font-sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:geometricPrecision;font-feature-settings:"cv02","cv03","cv04","ss01"}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit;padding:0}
+input,textarea{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+::selection{background:rgba(91,107,255,.35);color:var(--fg-primary)}
+
+/* page chrome */
+.page{position:relative;z-index:1;max-width:1440px;margin:0 auto;padding:48px 24px 96px}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:36px;border-bottom:1px solid var(--border-subtle);margin-bottom:48px}
+.page-head h1{font-family:var(--font-display);font-weight:700;font-size:clamp(32px,4vw,52px);letter-spacing:-.035em;line-height:1;margin:0}
+.page-head .meta{font-family:var(--font-mono);font-size:12px;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.06em}
+.page-head .meta b{color:var(--fg-primary);font-weight:500}
+.eyebrow{display:inline-block;font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-subtle)}
+.eyebrow.indigo{color:var(--accent-glow)} .eyebrow.lime{color:var(--accent-secondary)} .eyebrow.amber{color:var(--accent-warm)}
+
+.section{margin:96px 0 0}
+.section:first-of-type{margin-top:0}
+.section-head{display:flex;align-items:baseline;gap:16px;margin-bottom:28px}
+.section-head .num{font-family:var(--font-mono);font-size:12px;color:var(--fg-subtle);letter-spacing:.06em;text-transform:uppercase}
+.section-head h2{font-family:var(--font-display);font-weight:600;font-size:28px;letter-spacing:-.025em;margin:0;line-height:1.1}
+.section-head .lede{color:var(--fg-muted);max-width:520px;margin-left:auto;font-size:14px}
+
+/* Frame: an actual-size container that reproduces a target viewport width */
+.frame{
+  position:relative;background:var(--bg-base);
+  border:1px solid var(--border-subtle);border-radius:var(--r-lg);
+  overflow:hidden;box-shadow:var(--shadow-soft);
+  isolation:isolate; /* contain stacking */
+}
+.frame .frame-meta{
+  position:absolute;top:12px;right:12px;z-index:10;
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 10px;border-radius:var(--r-full);
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  background:var(--bg-overlay);backdrop-filter:blur(20px);color:var(--fg-muted);
+  border:1px solid var(--border);
+}
+.frame.desktop{aspect-ratio:1280/720}
+.frame.desktop-tall{aspect-ratio:1280/900}
+.frame.mobile{aspect-ratio:375/812;max-width:375px;margin:0 auto}
+
+/* ============================================================================
+   Shared shell parts — used by both AuthShell and AppShell
+   ============================================================================ */
+
+/* aurora utility */
+.aurora{position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(60% 40% at 12% 8%, rgba(91,107,255,.22), transparent 60%),
+    radial-gradient(50% 35% at 92% 18%, rgba(138,149,255,.16), transparent 60%),
+    radial-gradient(40% 30% at 70% 90%, rgba(200,255,107,.06), transparent 60%);
+  filter:blur(2px); opacity:.95;
+}
+.aurora::after{
+  content:"";position:absolute;inset:0;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size:200px 200px; opacity:var(--grain-opacity); mix-blend-mode:screen;
+}
+/* Stronger aurora for auth: bigger gradients + slow drift */
+.aurora.auth{
+  background:
+    radial-gradient(70% 50% at 20% 20%, rgba(91,107,255,.40), transparent 60%),
+    radial-gradient(55% 40% at 85% 25%, rgba(138,149,255,.28), transparent 60%),
+    radial-gradient(50% 40% at 60% 95%, rgba(91,107,255,.20), transparent 60%),
+    radial-gradient(35% 25% at 95% 80%, rgba(200,255,107,.08), transparent 60%);
+  animation:auroraDrift 36s var(--e-out) infinite alternate;
+}
+@keyframes auroraDrift{
+  0%   {transform:translate(0,0) scale(1)}
+  100% {transform:translate(-12px,8px) scale(1.04)}
+}
+@media (prefers-reduced-motion:reduce){ .aurora.auth{animation:none} }
+
+/* Brand mark + wordmark */
+.brand{display:inline-flex;align-items:center;gap:10px;color:var(--fg-primary)}
+.brand svg .stem{fill:currentColor}
+.brand svg .rays{stroke:var(--accent-primary)}
+.brand .wm{font-family:var(--font-display);font-weight:700;font-size:15px;letter-spacing:-.02em;line-height:1}
+.brand .wm small{display:block;font-family:var(--font-mono);font-weight:500;font-size:9px;letter-spacing:.12em;color:var(--fg-muted);text-transform:uppercase;margin-top:3px}
+
+/* Buttons (subset for shell) */
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-sans);font-weight:500;font-size:14px;line-height:1;padding:11px 16px;border-radius:var(--r-md);transition:all var(--d-base) var(--e-out);letter-spacing:-.005em;white-space:nowrap;user-select:none;border:1px solid transparent}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--accent-primary);color:#0B0B14;font-weight:600;box-shadow:var(--inset-stroke), 0 8px 24px rgba(91,107,255,.25)}
+.btn-primary:hover{background:var(--accent-glow);box-shadow:var(--inset-stroke), var(--glow-accent)}
+.btn-secondary{background:var(--bg-elevated-2);color:var(--fg-primary);border-color:var(--border);box-shadow:var(--inset-stroke)}
+.btn-secondary:hover{border-color:var(--border-strong);background:#1B1B2C}
+.btn-ghost{color:var(--fg-muted)}
+.btn-ghost:hover{color:var(--fg-primary);background:rgba(255,255,255,.04)}
+.btn-block{display:flex;width:100%;justify-content:center;padding:14px 18px;font-size:15px}
+.btn .kbd{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.55);padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.08);margin-left:4px}
+.btn-primary .kbd{background:rgba(11,11,20,.18);color:rgba(11,11,20,.55)}
+
+.icon-btn{width:36px;height:36px;display:inline-grid;place-items:center;border-radius:var(--r-md);color:var(--fg-muted);transition:all var(--d-base) var(--e-out);border:1px solid transparent;flex-shrink:0}
+.icon-btn:hover{background:rgba(255,255,255,.05);color:var(--fg-primary)}
+.icon-btn.active{background:rgba(91,107,255,.16);color:var(--accent-glow);border-color:rgba(91,107,255,.30)}
+.icon-btn-sm{width:28px;height:28px;border-radius:var(--r-sm)}
+
+/* Field */
+.field{display:flex;flex-direction:column;gap:6px}
+.field-label{font-family:var(--font-mono);font-size:11px;color:var(--fg-muted);letter-spacing:.06em;text-transform:uppercase}
+.field-input{width:100%;background:var(--bg-elevated-2);color:var(--fg-primary);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;font-family:var(--font-sans);font-size:15px;line-height:1.4;transition:all var(--d-base) var(--e-out);box-shadow:var(--inset-stroke);outline:none}
+.field-input:hover{border-color:var(--border-strong)}
+.field-input:focus{border-color:var(--border-accent);box-shadow:var(--inset-stroke), 0 0 0 3px rgba(91,107,255,.18)}
+
+/* Badge */
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:var(--r-full);font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.04em;background:rgba(245,245,248,.06);color:var(--fg-muted);border:1px solid var(--border-subtle)}
+.badge.score{background:rgba(200,255,107,.10);color:var(--accent-secondary);border-color:rgba(200,255,107,.20)}
+.badge.amber{background:rgba(255,180,84,.10);color:var(--accent-warm);border-color:rgba(255,180,84,.22)}
+
+/* TypeChip — used in StepRail */
+.chip-type{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:var(--r-full);font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:rgba(91,107,255,.12);color:var(--accent-glow);border:1px solid rgba(91,107,255,.24)}
+.chip-type svg{width:11px;height:11px;stroke-width:2}
+.chip-type.theory{background:rgba(91,107,255,.12);color:var(--accent-glow);border-color:rgba(91,107,255,.24)}
+.chip-type.vocabulary,.chip-type.composition{background:rgba(245,245,248,.06);color:var(--fg-primary);border-color:var(--border)}
+.chip-type.translate{background:rgba(91,107,255,.12);color:var(--accent-glow);border-color:rgba(91,107,255,.24)}
+.chip-type.drill{background:rgba(255,180,84,.10);color:var(--accent-warm);border-color:rgba(255,180,84,.24)}
+.chip-type.speaking{background:transparent;color:var(--accent-secondary);border-color:rgba(200,255,107,.55)}
+
+/* Locale segmented */
+.locale{display:inline-flex;align-items:center;gap:2px;padding:3px;background:var(--bg-elevated-2);border:1px solid var(--border);border-radius:var(--r-full);font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.04em}
+.locale span{padding:3px 9px;border-radius:var(--r-full);color:var(--fg-muted);transition:all var(--d-base) var(--e-out);cursor:pointer}
+.locale span.on{background:var(--accent-primary);color:#0B0B14}
+
+/* ============================================================================
+   AuthShell
+   ============================================================================ */
+.auth-stage{position:relative;width:100%;height:100%;display:grid;place-items:center;padding:48px;background:radial-gradient(120% 80% at 50% 0%, #0F0F18 0%, #07070C 70%);overflow:hidden}
+.auth-card{
+  position:relative;z-index:2;width:100%;max-width:420px;
+  background:rgba(22,22,36,.55);
+  backdrop-filter:blur(24px) saturate(140%);
+  -webkit-backdrop-filter:blur(24px) saturate(140%);
+  border:1px solid rgba(245,245,248,.10);
+  border-radius:var(--r-2xl);
+  padding:36px 32px 32px;
+  box-shadow:var(--shadow-elevated);
+}
+.auth-card .auth-brand{display:flex;align-items:center;gap:10px;margin-bottom:32px}
+.auth-card h2{font-family:var(--font-display);font-weight:700;font-size:32px;letter-spacing:-.03em;line-height:1.1;margin:0}
+.auth-card h2.ru-display{font-weight:720}
+.auth-card p.lede{color:var(--fg-muted);font-size:14px;margin:8px 0 28px;line-height:1.5}
+.auth-card .field + .field{margin-top:14px}
+.auth-card .footer{display:flex;justify-content:space-between;align-items:center;margin-top:24px;font-family:var(--font-mono);font-size:11px;color:var(--fg-subtle);letter-spacing:.04em}
+.auth-card .footer .locale{font-size:10px}
+
+/* ============================================================================
+   AppShell — TopBar + Sidebar + Main
+   ============================================================================ */
+.app{position:relative;width:100%;height:100%;display:grid;grid-template-rows:56px 1fr;background:var(--bg-base)}
+
+/* TopBar */
+.topbar{
+  position:relative;z-index:5;
+  display:flex;align-items:center;gap:14px;
+  padding:0 16px;border-bottom:1px solid var(--border-subtle);
+  background:rgba(7,7,12,.78);backdrop-filter:blur(20px);
+}
+.topbar .crumbs{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--fg-muted);letter-spacing:.04em;padding:6px 10px;border-radius:var(--r-sm);transition:background var(--d-base) var(--e-out);cursor:pointer}
+.topbar .crumbs:hover{background:rgba(255,255,255,.04);color:var(--fg-primary)}
+.topbar .crumbs b{color:var(--fg-primary);font-weight:600}
+.topbar .crumbs svg{opacity:.6}
+.topbar .progress{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--fg-muted)}
+.topbar .progress .bar{width:64px;height:4px;border-radius:var(--r-full);background:rgba(245,245,248,.08);position:relative;overflow:hidden}
+.topbar .progress .bar i{position:absolute;left:0;top:0;height:100%;background:var(--accent-primary);box-shadow:0 0 8px rgba(91,107,255,.5);border-radius:var(--r-full)}
+.topbar .spacer{flex:1}
+
+/* AppShell body */
+.app-body{display:grid;grid-template-columns:56px 1fr;min-height:0}
+.app-body.expanded{grid-template-columns:220px 1fr}
+.app-body.with-rail{grid-template-rows:auto 1fr}
+
+/* Sidebar */
+.sidebar{
+  position:relative;z-index:3;
+  border-right:1px solid var(--border-subtle);
+  background:var(--bg-base);
+  display:flex;flex-direction:column;padding:14px 8px;gap:12px;
+}
+.sidebar.expanded{padding:14px 12px;gap:4px}
+.sidebar .nav-item{
+  display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:var(--r-md);
+  color:var(--fg-muted);transition:all var(--d-base) var(--e-out);cursor:pointer;
+  font-family:var(--font-sans);font-size:14px;font-weight:500;
+  position:relative;
+}
+.sidebar .nav-item svg{width:18px;height:18px;flex-shrink:0;stroke-width:1.75}
+.sidebar .nav-item:hover{background:rgba(255,255,255,.04);color:var(--fg-primary)}
+.sidebar .nav-item.active{color:var(--accent-glow)}
+.sidebar .nav-item.active::before{content:"";position:absolute;left:-8px;top:8px;bottom:8px;width:2px;background:var(--accent-primary);border-radius:2px;box-shadow:0 0 8px rgba(91,107,255,.6)}
+/* Collapsed: keep subtle bg fill so active is visible without label */
+.sidebar:not(.expanded) .nav-item.active{background:rgba(91,107,255,.14)}
+.sidebar.expanded .nav-item.active::before{left:-12px}
+.sidebar .nav-item .label{display:none;white-space:nowrap}
+.sidebar.expanded .nav-item .label{display:inline}
+.sidebar .nav-item .badge-dot{margin-left:auto;width:6px;height:6px;border-radius:50%;background:var(--accent-secondary);box-shadow:0 0 6px rgba(200,255,107,.6)}
+.sidebar .nav-item.locked{color:var(--fg-disabled);cursor:not-allowed}
+.sidebar .sep{height:1px;background:var(--border-subtle);margin:6px 4px}
+.sidebar:not(.expanded) .sep{margin:6px 6px}
+
+/* When drawer is open: chrome dimmed and inert */
+.drawer-open .sidebar,.drawer-open .step-rail{pointer-events:none;opacity:.7}
+
+/* Main */
+.app-main{position:relative;overflow:auto;background:var(--bg-base)}
+
+/* StepRail */
+.step-rail{
+  position:relative;display:flex;align-items:center;gap:8px;
+  padding:10px 14px;border-bottom:1px solid var(--border-subtle);
+  background:var(--bg-base);
+}
+.step-rail .arrow{flex-shrink:0}
+.step-rail .track{flex:1;display:flex;gap:6px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 0}
+.step-rail .track::-webkit-scrollbar{display:none}
+.step-rail .step{
+  flex-shrink:0;scroll-snap-align:start;
+  display:inline-flex;align-items:center;gap:8px;
+  height:36px;padding:0 12px 0 10px;border-radius:var(--r-full);
+  background:var(--bg-elevated);border:1px solid var(--border-subtle);
+  font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.04em;
+  color:var(--fg-muted);transition:all var(--d-base) var(--e-out);cursor:pointer;
+  position:relative;
+}
+.step-rail .step:hover{border-color:var(--border-strong);color:var(--fg-primary)}
+.step-rail .step .num{font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);width:14px;text-align:right}
+.step-rail .step .ico{width:14px;height:14px;display:grid;place-items:center}
+.step-rail .step .ico svg{width:13px;height:13px;stroke-width:2}
+.step-rail .step .lbl{font-family:var(--font-sans);font-weight:500;font-size:12px;letter-spacing:-.005em;text-transform:none;color:inherit}
+
+.step-rail .step.done{color:var(--fg-muted);background:transparent;border-color:transparent}
+.step-rail .step.done .num{color:var(--accent-secondary)}
+.step-rail .step.done .check{width:14px;height:14px;border-radius:50%;background:rgba(200,255,107,.16);color:var(--accent-secondary);display:grid;place-items:center}
+.step-rail .step.done .check svg{width:9px;height:9px;stroke-width:3}
+
+.step-rail .step.active{
+  background:var(--accent-primary);color:#0B0B14;border-color:transparent;
+  box-shadow:0 4px 16px rgba(91,107,255,.35), var(--inset-stroke);
+}
+.step-rail .step.active .num{color:rgba(11,11,20,.55)}
+.step-rail .step.active .lbl{color:#0B0B14}
+
+.step-rail .step.locked{color:var(--fg-disabled);cursor:not-allowed}
+.step-rail .step.locked:hover{border-color:var(--border-subtle)}
+
+.step-rail .all{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:0 12px;height:36px;border-radius:var(--r-full);background:transparent;border:1px solid var(--border-subtle);font-family:var(--font-mono);font-size:11px;color:var(--fg-muted);cursor:pointer;transition:all var(--d-base) var(--e-out)}
+.step-rail .all:hover{border-color:var(--border-strong);color:var(--fg-primary);background:var(--bg-elevated)}
+
+/* Mock canvas content for desktop frame */
+.canvas{padding:40px 48px;color:var(--fg-muted);font-size:14px}
+.canvas .placeholder{
+  height:380px;border:1px dashed rgba(245,245,248,.10);border-radius:var(--r-lg);
+  display:grid;place-items:center;font-family:var(--font-mono);font-size:11px;color:var(--fg-subtle);letter-spacing:.06em;text-transform:uppercase;
+  background:repeating-linear-gradient(45deg, transparent 0 12px, rgba(245,245,248,.015) 12px 24px);
+}
+
+/* ============================================================================
+   CourseDrawer
+   ============================================================================ */
+.drawer{position:absolute;top:56px;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr;z-index:7;pointer-events:none}
+.drawer .scrim{position:absolute;inset:0;background:rgba(7,7,12,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:1;pointer-events:auto}
+.drawer .panel{
+  position:absolute;top:0;right:0;bottom:0;width:min(420px,82%);
+  background:var(--bg-elevated);border-left:1px solid var(--border);
+  box-shadow:-30px 0 60px rgba(0,0,0,.45);
+  display:flex;flex-direction:column;pointer-events:auto;
+}
+.drawer .panel-head{padding:18px 20px;border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;gap:12px}
+.drawer .panel-head h3{font-family:var(--font-display);font-weight:600;font-size:18px;letter-spacing:-.02em;margin:0}
+.drawer .panel-head .meta{font-family:var(--font-mono);font-size:11px;color:var(--fg-muted);margin-left:auto;letter-spacing:.04em}
+.drawer .panel-body{flex:1;overflow:auto;padding:8px 0}
+.drawer .lesson-group{padding:8px 0}
+.drawer .lesson-head{display:flex;align-items:center;gap:10px;padding:10px 20px;font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-muted)}
+.drawer .lesson-head .n{color:var(--fg-subtle)}
+.drawer .lesson-head .t{color:var(--fg-primary);text-transform:none;font-family:var(--font-sans);font-size:13px;font-weight:500;letter-spacing:-.005em}
+.drawer .lesson-head .progress{margin-left:auto;font-family:var(--font-mono);font-size:10px;color:var(--accent-secondary)}
+.drawer .step-row{display:flex;align-items:center;gap:10px;padding:7px 20px 7px 32px;font-size:13px;color:var(--fg-muted);cursor:pointer;transition:background var(--d-base) var(--e-out);position:relative}
+.drawer .step-row:hover{background:rgba(255,255,255,.03)}
+.drawer .step-row .marker{
+  width:18px;height:18px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;
+  border:1.5px solid var(--border);font-family:var(--font-mono);font-size:9px;color:var(--fg-subtle);
+}
+.drawer .step-row.done .marker{background:rgba(200,255,107,.12);border-color:transparent;color:var(--accent-secondary)}
+.drawer .step-row.done .marker svg{width:10px;height:10px;stroke-width:3}
+.drawer .step-row.active{color:var(--fg-primary)}
+.drawer .step-row.active .marker{background:var(--accent-primary);border-color:transparent;color:#0B0B14;box-shadow:0 0 12px rgba(91,107,255,.45)}
+.drawer .step-row.locked{color:var(--fg-disabled);cursor:not-allowed}
+.drawer .step-row.locked .marker{color:var(--fg-disabled);border-color:rgba(245,245,248,.08)}
+.drawer .step-row.locked .marker svg{opacity:.5}
+.drawer .step-row .lbl{flex:1;text-overflow:ellipsis;overflow:hidden;white-space:nowrap}
+.drawer .step-row .type{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-subtle)}
+.drawer .step-row.active .type{color:var(--accent-glow)}
+
+/* ============================================================================
+   Mobile shell
+   ============================================================================ */
+.mobile-app{position:relative;width:100%;height:100%;background:var(--bg-base);display:grid;grid-template-rows:48px 1fr 64px}
+.mobile-top{display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--border-subtle);background:rgba(7,7,12,.85);backdrop-filter:blur(20px)}
+.mobile-top .crumbs{font-family:var(--font-mono);font-size:11px;color:var(--fg-muted);flex:1;display:flex;align-items:center;gap:6px}
+.mobile-top .crumbs b{color:var(--fg-primary);font-weight:600}
+.mobile-main{overflow:auto;padding:0 0 8px}
+
+.bottom-tabs{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-top:1px solid var(--border-subtle);background:rgba(7,7,12,.92);backdrop-filter:blur(20px);
+  padding:8px 4px env(safe-area-inset-bottom,8px);
+}
+.bottom-tabs .tab{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;color:var(--fg-muted);font-family:var(--font-mono);font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;border-radius:var(--r-sm);position:relative}
+.bottom-tabs .tab svg{width:20px;height:20px;stroke-width:1.75}
+.bottom-tabs .tab.active{color:var(--accent-glow)}
+.bottom-tabs .tab.active::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:2px;background:var(--accent-primary);border-radius:2px;box-shadow:0 0 6px rgba(91,107,255,.6)}
+
+/* mobile step-rail variant — inherits .step styles via shared markup */
+.mobile-rail{display:flex;gap:6px;overflow-x:auto;padding:8px 12px;border-bottom:1px solid var(--border-subtle);scroll-snap-type:x mandatory}
+.mobile-rail::-webkit-scrollbar{display:none}
+.mobile-rail .step{flex-shrink:0;scroll-snap-align:start;display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 12px 0 10px;border-radius:var(--r-full);background:var(--bg-elevated);border:1px solid var(--border-subtle);font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--fg-muted);transition:all var(--d-base) var(--e-out)}
+.mobile-rail .step .num{font-size:10px;color:var(--fg-subtle);width:14px;text-align:right}
+.mobile-rail .step .ico{width:14px;height:14px;display:grid;place-items:center}
+.mobile-rail .step .ico svg{width:13px;height:13px;stroke-width:2}
+.mobile-rail .step .lbl{font-family:var(--font-sans);font-weight:500;font-size:12px;letter-spacing:-.005em;text-transform:none}
+.mobile-rail .step.done{background:transparent;border-color:transparent;color:var(--fg-muted)}
+.mobile-rail .step.done .num{color:var(--accent-secondary)}
+.mobile-rail .step.done .check{width:14px;height:14px;border-radius:50%;background:rgba(200,255,107,.16);color:var(--accent-secondary);display:grid;place-items:center}
+.mobile-rail .step.done .check svg{width:9px;height:9px;stroke-width:3}
+.mobile-rail .step.active{background:var(--accent-primary);color:#0B0B14;border-color:transparent;box-shadow:0 4px 16px rgba(91,107,255,.35),var(--inset-stroke)}
+.mobile-rail .step.active .num{color:rgba(11,11,20,.55)}
+.mobile-rail .step.active .lbl{color:#0B0B14}
+.mobile-rail .step.locked{color:var(--fg-disabled)}
+
+/* footer */
+.foot{margin-top:96px;padding-top:24px;border-top:1px solid var(--border-subtle);display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:11px;color:var(--fg-subtle);letter-spacing:.04em;text-transform:uppercase}
+
+/* utility: split layout cell */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start}
+@media (max-width:1100px){.split{grid-template-columns:1fr}}
+
+.callout{padding:14px 18px;border-radius:var(--r-md);background:rgba(91,107,255,.06);border:1px solid rgba(91,107,255,.18);font-size:13px;color:var(--fg-muted)}
+.callout b{color:var(--fg-primary)}
+
+/* ru-display utility from foundation */
+.ru-display{font-weight:720 !important}
+</style>
+</head>
+<body>
+
+<!-- Inline brand SVG, reused -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="brand" viewBox="0 0 32 32">
+    <rect x="9" y="8" width="3" height="16" rx="1" fill="#F5F5F8"/>
+    <path d="M 12 16 L 22 8 M 12 16 L 22 24" stroke="#5B6BFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </symbol>
+  <!-- step-type icons -->
+  <symbol id="i-theory" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.7.5 1 1.3 1 2.1V18h6v-1.2c0-.8.3-1.6 1-2.1A7 7 0 0 0 12 2z" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-vocab" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 6h20M2 12h12M2 18h16" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-comp" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-translate" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="17 1 21 5 17 9" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11V9a4 4 0 0 1 4-4h14" stroke-linecap="round" stroke-linejoin="round"/><polyline points="7 23 3 19 7 15" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 13v2a4 4 0 0 1-4 4H3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-drill" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 2l4 4-4 4M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v1a4 4 0 0 1-4 4H3" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-speak" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="19" x2="12" y2="23" stroke-linecap="round"/><line x1="8" y1="23" x2="16" y2="23" stroke-linecap="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <!-- nav icons -->
+  <symbol id="n-today" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="n-course" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5z" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 4.5v17M9 7h7M9 11h5" stroke-linecap="round"/></symbol>
+  <symbol id="n-review" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="n-admin" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="7" r="4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="n-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="n-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="n-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1" stroke-linecap="round" stroke-linejoin="round"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-linecap="round" stroke-linejoin="round"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="n-chevron-r" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 18 15 12 9 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="n-chevron-l" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="n-x" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke-width="2" stroke-linecap="round"/></symbol>
+</svg>
+
+<main class="page">
+
+  <header class="page-head">
+    <div>
+      <div class="eyebrow indigo">Stage 2 · Shell</div>
+      <h1 style="margin-top:14px">AuthShell + AppShell<br/><span style="color:var(--fg-muted)">TopBar · Sidebar · StepRail · CourseDrawer.</span></h1>
+    </div>
+    <div class="meta">
+      <div><b>English KES</b> · UI redesign</div>
+      <div>v0.2 · 2026-04-28</div>
+    </div>
+  </header>
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+       01 · AuthShell
+       ════════════════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">01</span>
+      <h2>AuthShell</h2>
+      <p class="lede">Aurora-фон + drift-анимация (36s) + screen-grain. Glass-card по центру. RU и EN рядом для проверки длин.</p>
+    </div>
+    <div class="split">
+      <div>
+        <div class="eyebrow" style="margin-bottom:10px">RU</div>
+        <div class="frame desktop" style="aspect-ratio:560/720">
+          <span class="frame-meta">Auth · 560 × 720</span>
+          <div class="auth-stage">
+            <div class="aurora auth"></div>
+            <div class="auth-card">
+              <div class="auth-brand">
+                <svg width="26" height="26"><use href="#brand"/></svg>
+                <div class="wm">English KES<small>Trainer · v0.2</small></div>
+              </div>
+              <h2 class="ru-display">С возвращением</h2>
+              <p class="lede">Войди, чтобы продолжить. Прогресс уроков и записи устной речи синхронизируются автоматически.</p>
+              <div class="field">
+                <label class="field-label">Логин</label>
+                <input class="field-input" placeholder="alex.ivanov" />
+              </div>
+              <div class="field">
+                <label class="field-label">Пароль</label>
+                <input class="field-input" type="password" value="••••••••" />
+              </div>
+              <div style="margin-top:24px"><button class="btn btn-primary btn-block">Войти<span class="kbd">⏎</span></button></div>
+              <div class="footer">
+                <span>OFFLINE-FIRST · LOCAL CACHE</span>
+                <span class="locale"><span class="on">RU</span><span>EN</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:10px">EN</div>
+        <div class="frame desktop" style="aspect-ratio:560/720">
+          <span class="frame-meta">Auth · 560 × 720</span>
+          <div class="auth-stage">
+            <div class="aurora auth"></div>
+            <div class="auth-card">
+              <div class="auth-brand">
+                <svg width="26" height="26"><use href="#brand"/></svg>
+                <div class="wm">English KES<small>Trainer · v0.2</small></div>
+              </div>
+              <h2>Welcome back</h2>
+              <p class="lede">Sign in to continue. Lesson progress and voice recordings sync automatically.</p>
+              <div class="field">
+                <label class="field-label">Username</label>
+                <input class="field-input" placeholder="alex.ivanov" />
+              </div>
+              <div class="field">
+                <label class="field-label">Password</label>
+                <input class="field-input" type="password" value="••••••••" />
+              </div>
+              <div style="margin-top:24px"><button class="btn btn-primary btn-block">Sign in<span class="kbd">⏎</span></button></div>
+              <div class="footer">
+                <span>OFFLINE-FIRST · LOCAL CACHE</span>
+                <span class="locale"><span>RU</span><span class="on">EN</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:24px">
+      <b>Spec.</b> Aurora opacity 0.85, drift 36s, grain 3% screen-blend. Card backdrop-blur 24, saturate 140%, shadow-elevated. Card max-width 420, padding 36/32. Footer mono 11.
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+       02 · AppShell — desktop, collapsed sidebar
+       ════════════════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">02</span>
+      <h2>AppShell · Desktop</h2>
+      <p class="lede">TopBar 56 · Sidebar 56 (collapsed). Translate-step active в StepRail. Lesson 1 / 44 · Step 4 / 74.</p>
+    </div>
+    <div class="frame desktop">
+      <span class="frame-meta">Desktop · 1280 × 720</span>
+      <div class="app">
+        <!-- TopBar -->
+        <div class="topbar">
+          <a class="brand" href="#"><svg width="22" height="22"><use href="#brand"/></svg><span class="wm" style="font-size:14px">English KES<small style="font-size:8px;margin-top:2px">Trainer</small></span></a>
+          <div class="crumbs"><b>Lesson 1</b><span style="color:var(--fg-subtle)">/ 44</span><svg width="10" height="10"><use href="#n-chevron-r"/></svg><b>Step 4</b><span style="color:var(--fg-subtle)">/ 74</span></div>
+          <div class="progress"><div class="bar"><i style="width:5%"></i></div><span>5%</span></div>
+          <div class="spacer"></div>
+          <div class="locale" title="locale"><span class="on">RU</span><span>EN</span></div>
+          <button class="icon-btn" aria-label="settings"><svg width="16" height="16"><use href="#n-settings"/></svg></button>
+          <button class="icon-btn" aria-label="logout"><svg width="16" height="16"><use href="#n-logout"/></svg></button>
+        </div>
+
+        <div class="app-body">
+          <!-- Sidebar collapsed -->
+          <aside class="sidebar">
+            <div class="nav-item active" title="Today"><svg><use href="#n-today"/></svg></div>
+            <div class="nav-item" title="Course"><svg><use href="#n-course"/></svg></div>
+            <div class="nav-item" title="Review"><svg><use href="#n-review"/></svg><span class="badge-dot" title="3 due"></span></div>
+            <div class="sep"></div>
+            <div class="nav-item" title="Accounts (owner)"><svg><use href="#n-admin"/></svg></div>
+            <div class="nav-item" title="Settings" style="margin-top:auto"><svg><use href="#n-settings"/></svg></div>
+          </aside>
+
+          <!-- Main -->
+          <main class="app-main" style="display:grid;grid-template-rows:auto 1fr">
+            <!-- StepRail -->
+            <div class="step-rail">
+              <button class="icon-btn icon-btn-sm arrow" aria-label="prev"><svg width="14" height="14"><use href="#n-chevron-l"/></svg></button>
+              <div class="track">
+                <div class="step done"><span class="check"><svg><use href="#i-check"/></svg></span><span class="num">01</span><span class="ico"><svg style="opacity:.55"><use href="#i-theory"/></svg></span><span class="lbl">Дух времени</span></div>
+                <div class="step done"><span class="check"><svg><use href="#i-check"/></svg></span><span class="num">02</span><span class="ico"><svg style="opacity:.55"><use href="#i-vocab"/></svg></span><span class="lbl">Словарь</span></div>
+                <div class="step done"><span class="check"><svg><use href="#i-check"/></svg></span><span class="num">03</span><span class="ico"><svg style="opacity:.55"><use href="#i-comp"/></svg></span><span class="lbl">Composition</span></div>
+                <div class="step active"><span class="num">04</span><span class="ico"><svg><use href="#i-translate"/></svg></span><span class="lbl">Translate</span></div>
+                <div class="step"><span class="num">05</span><span class="ico"><svg><use href="#i-translate"/></svg></span><span class="lbl">Translate · cont.</span></div>
+                <div class="step"><span class="num">06</span><span class="ico"><svg><use href="#i-drill"/></svg></span><span class="lbl">Drill</span></div>
+                <div class="step locked"><span class="num">07</span><span class="ico"><svg><use href="#i-speak"/></svg></span><span class="lbl">Speaking</span></div>
+                <div class="step locked"><span class="num">08</span><span class="ico"><svg><use href="#i-translate"/></svg></span><span class="lbl">Translate</span></div>
+              </div>
+              <button class="icon-btn icon-btn-sm arrow" aria-label="next"><svg width="14" height="14"><use href="#n-chevron-r"/></svg></button>
+              <button class="all"><svg width="12" height="12"><use href="#n-grid"/></svg>All 74</button>
+            </div>
+            <!-- Canvas -->
+            <div class="canvas">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+                <span class="chip-type translate"><svg><use href="#i-translate"/></svg>Translate</span>
+                <span class="badge">TR 1.1</span>
+              </div>
+              <div class="eyebrow indigo">RU PHRASE</div>
+              <div class="ru-display" style="font-family:var(--font-display);font-size:48px;font-weight:720;letter-spacing:-.035em;line-height:1;margin:10px 0 12px">Я всегда читаю газеты по утрам.</div>
+              <div style="color:var(--fg-muted);margin-bottom:20px;font-size:14px">Hint · место <code style="font-family:var(--font-mono);color:var(--accent-secondary);font-size:13px">always</code> — перед смысловым глаголом.</div>
+              <div class="placeholder" style="height:200px">Translate exercise body · Stage 3</div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+       03 · AppShell — desktop, expanded sidebar
+       ════════════════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">03</span>
+      <h2>AppShell · expanded</h2>
+      <p class="lede">Sidebar 220px (hover-toggle или persistent). Метки на русском показывают длинные строки — все помещаются.</p>
+    </div>
+    <div class="frame desktop">
+      <span class="frame-meta">Desktop · sidebar 220</span>
+      <div class="app">
+        <div class="topbar">
+          <a class="brand" href="#"><svg width="22" height="22"><use href="#brand"/></svg><span class="wm" style="font-size:14px">English KES<small style="font-size:8px;margin-top:2px">Trainer</small></span></a>
+          <div class="crumbs"><b>Lesson 1</b><span style="color:var(--fg-subtle)">/ 44</span><svg width="10" height="10"><use href="#n-chevron-r"/></svg><b>Step 4</b><span style="color:var(--fg-subtle)">/ 74</span></div>
+          <div class="progress"><div class="bar"><i style="width:5%"></i></div><span>5%</span></div>
+          <div class="spacer"></div>
+          <div class="locale"><span class="on">RU</span><span>EN</span></div>
+          <button class="icon-btn"><svg width="16" height="16"><use href="#n-settings"/></svg></button>
+          <button class="icon-btn"><svg width="16" height="16"><use href="#n-logout"/></svg></button>
+        </div>
+
+        <div class="app-body expanded">
+          <aside class="sidebar expanded">
+            <div class="nav-item active"><svg><use href="#n-today"/></svg><span class="label">Сегодня</span></div>
+            <div class="nav-item"><svg><use href="#n-course"/></svg><span class="label">Курс</span></div>
+            <div class="nav-item"><svg><use href="#n-review"/></svg><span class="label">Повторение</span><span class="badge-dot"></span></div>
+            <div class="sep"></div>
+            <div class="nav-item"><svg><use href="#n-admin"/></svg><span class="label">Аккаунты</span><span style="margin-left:auto;font-family:var(--font-mono);font-size:9px;color:var(--fg-subtle);letter-spacing:.06em">OWNER</span></div>
+            <div class="nav-item" style="margin-top:auto"><svg><use href="#n-settings"/></svg><span class="label">Настройки</span></div>
+          </aside>
+
+          <main class="app-main" style="display:grid;grid-template-rows:auto 1fr">
+            <div class="step-rail">
+              <button class="icon-btn icon-btn-sm arrow"><svg width="14" height="14"><use href="#n-chevron-l"/></svg></button>
+              <div class="track">
+                <div class="step done"><span class="check"><svg><use href="#i-check"/></svg></span><span class="num">01</span><span class="ico"><svg style="opacity:.55"><use href="#i-theory"/></svg></span><span class="lbl">Theory</span></div>
+                <div class="step done"><span class="check"><svg><use href="#i-check"/></svg></span><span class="num">02</span><span class="ico"><svg style="opacity:.55"><use href="#i-vocab"/></svg></span><span class="lbl">Vocab</span></div>
+                <div class="step done"><span class="check"><svg><use href="#i-check"/></svg></span><span class="num">03</span><span class="ico"><svg style="opacity:.55"><use href="#i-comp"/></svg></span><span class="lbl">Compose</span></div>
+                <div class="step active"><span class="num">04</span><span class="ico"><svg><use href="#i-translate"/></svg></span><span class="lbl">Translate</span></div>
+                <div class="step"><span class="num">05</span><span class="ico"><svg><use href="#i-drill"/></svg></span><span class="lbl">Drill</span></div>
+                <div class="step locked"><span class="num">06</span><span class="ico"><svg><use href="#i-speak"/></svg></span><span class="lbl">Speak</span></div>
+              </div>
+              <button class="icon-btn icon-btn-sm arrow"><svg width="14" height="14"><use href="#n-chevron-r"/></svg></button>
+              <button class="all"><svg width="12" height="12"><use href="#n-grid"/></svg>All 74</button>
+            </div>
+            <div class="canvas">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><span class="chip-type translate"><svg><use href="#i-translate"/></svg>Translate</span><span class="badge">TR 1.1</span></div>
+              <div class="placeholder" style="height:340px">Exercise canvas — Stage 3</div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+       04 · CourseDrawer
+       ════════════════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">04</span>
+      <h2>CourseDrawer · all 74 steps</h2>
+      <p class="lede">Открывается из «All 74», breadcrumb или клавиши <code style="font-family:var(--font-mono);font-size:13px">⌘K</code>. Группировка по урокам, текущий шаг — indigo, пройденные — lime check.</p>
+    </div>
+    <div class="frame desktop">
+      <span class="frame-meta">Drawer open</span>
+      <div class="app drawer-open">
+        <div class="topbar">
+          <a class="brand"><svg width="22" height="22"><use href="#brand"/></svg><span class="wm" style="font-size:14px">English KES<small style="font-size:8px;margin-top:2px">Trainer</small></span></a>
+          <div class="crumbs"><b>Lesson 1</b><span style="color:var(--fg-subtle)">/ 44</span><svg width="10" height="10"><use href="#n-chevron-r"/></svg><b>Step 4</b><span style="color:var(--fg-subtle)">/ 74</span></div>
+          <div class="progress"><div class="bar"><i style="width:5%"></i></div><span>5%</span></div>
+          <div class="spacer"></div>
+          <div class="locale"><span class="on">RU</span><span>EN</span></div>
+          <button class="icon-btn"><svg width="16" height="16"><use href="#n-settings"/></svg></button>
+          <button class="icon-btn"><svg width="16" height="16"><use href="#n-logout"/></svg></button>
+        </div>
+        <div class="app-body">
+          <aside class="sidebar">
+            <div class="nav-item active"><svg><use href="#n-today"/></svg></div>
+            <div class="nav-item"><svg><use href="#n-course"/></svg></div>
+            <div class="nav-item"><svg><use href="#n-review"/></svg></div>
+            <div class="sep"></div>
+            <div class="nav-item"><svg><use href="#n-admin"/></svg></div>
+            <div class="nav-item" style="margin-top:auto"><svg><use href="#n-settings"/></svg></div>
+          </aside>
+          <main class="app-main" style="display:grid;grid-template-rows:auto 1fr;filter:blur(.4px) saturate(.8);opacity:.55">
+            <div class="step-rail">
+              <button class="icon-btn icon-btn-sm arrow"><svg width="14" height="14"><use href="#n-chevron-l"/></svg></button>
+              <div class="track">
+                <div class="step done"><span class="check"><svg><use href="#i-check"/></svg></span><span class="num">03</span><span class="ico"><svg style="opacity:.55"><use href="#i-comp"/></svg></span><span class="lbl">Compose</span></div>
+                <div class="step active"><span class="num">04</span><span class="ico"><svg><use href="#i-translate"/></svg></span><span class="lbl">Translate</span></div>
+                <div class="step"><span class="num">05</span><span class="ico"><svg><use href="#i-drill"/></svg></span><span class="lbl">Drill</span></div>
+              </div>
+              <button class="icon-btn icon-btn-sm arrow"><svg width="14" height="14"><use href="#n-chevron-r"/></svg></button>
+              <button class="all"><svg width="12" height="12"><use href="#n-grid"/></svg>All 74</button>
+            </div>
+            <div class="canvas"><div class="placeholder" style="height:340px"></div></div>
+          </main>
+        </div>
+
+        <!-- Drawer overlay -->
+        <div class="drawer">
+          <div class="scrim"></div>
+          <div class="panel">
+            <div class="panel-head">
+              <button class="icon-btn"><svg width="14" height="14"><use href="#n-x"/></svg></button>
+              <h3>Lesson 1 · Я делаю это обычно</h3>
+              <span class="meta">3 / 74</span>
+            </div>
+            <div class="panel-body" id="drawer-body"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:24px">
+      <b>Drawer behavior.</b> Click outside (scrim) closes; <code style="font-family:var(--font-mono)">Esc</code> closes; click step navigates and closes. Group headers clickable — collapse non-current lessons. Locked steps muted, no hover.
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+       05 · Mobile shell
+       ════════════════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">05</span>
+      <h2>Mobile · 375 × 812</h2>
+      <p class="lede">Sidebar заменяется BottomTabs (4 пункта). TopBar 48. StepRail компактный, scroll-snap. Все hit-targets ≥ 44.</p>
+    </div>
+    <div class="split" style="grid-template-columns:repeat(3,1fr);gap:24px">
+      <div>
+        <div class="eyebrow" style="margin-bottom:10px">Today</div>
+        <div class="frame mobile">
+          <span class="frame-meta">375 × 812</span>
+          <div class="mobile-app">
+            <div class="mobile-top">
+              <a class="brand"><svg width="20" height="20"><use href="#brand"/></svg></a>
+              <div class="crumbs">Сегодня</div>
+              <button class="icon-btn icon-btn-sm"><svg width="14" height="14"><use href="#n-settings"/></svg></button>
+            </div>
+            <div class="mobile-main" style="padding:24px 20px">
+              <div class="eyebrow indigo">5-day streak</div>
+              <div class="ru-display" style="font-family:var(--font-display);font-size:32px;font-weight:720;letter-spacing:-.025em;line-height:1.05;margin:10px 0 16px">С возвращением, Алексей</div>
+              <div style="background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:14px 16px;box-shadow:var(--inset-stroke)">
+                <div class="eyebrow">Сегодня</div>
+                <div style="margin-top:6px;font-family:var(--font-display);font-size:17px;font-weight:600">Продолжить · TR 1.4</div>
+                <div style="color:var(--fg-muted);font-size:12px;margin-top:4px">Translate · 4 / 74</div>
+              </div>
+              <div style="margin-top:12px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:14px 16px;display:flex;align-items:center;gap:12px">
+                <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,180,84,.12);color:var(--accent-warm);display:grid;place-items:center"><svg width="16" height="16"><use href="#n-review"/></svg></div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:14px;font-weight:500">Повторить TR 1.1, TR 1.2</div>
+                  <div style="color:var(--fg-muted);font-size:12px">вчера · 2 шага</div>
+                </div>
+                <svg width="14" height="14" style="color:var(--fg-subtle)"><use href="#n-chevron-r"/></svg>
+              </div>
+            </div>
+            <div class="bottom-tabs">
+              <div class="tab active"><svg><use href="#n-today"/></svg>Today</div>
+              <div class="tab"><svg><use href="#n-course"/></svg>Course</div>
+              <div class="tab"><svg><use href="#n-review"/></svg>Review</div>
+              <div class="tab"><svg><use href="#n-settings"/></svg>Profile</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="eyebrow" style="margin-bottom:10px">Lesson · TopBar + Rail</div>
+        <div class="frame mobile">
+          <span class="frame-meta">in-lesson</span>
+          <div class="mobile-app">
+            <div class="mobile-top">
+              <button class="icon-btn icon-btn-sm"><svg width="14" height="14"><use href="#n-chevron-l"/></svg></button>
+              <div class="crumbs"><b>L1</b> · 4 / 74</div>
+              <button class="icon-btn icon-btn-sm"><svg width="14" height="14"><use href="#n-grid"/></svg></button>
+            </div>
+            <div class="mobile-rail">
+              <div class="step done"><span class="check"><svg><use href="#i-check"/></svg></span><span class="num">02</span></div>
+              <div class="step done"><span class="check"><svg><use href="#i-check"/></svg></span><span class="num">03</span></div>
+              <div class="step active"><span class="num">04</span><span class="ico"><svg><use href="#i-translate"/></svg></span><span class="lbl">Translate</span></div>
+              <div class="step"><span class="num">05</span><span class="ico"><svg><use href="#i-drill"/></svg></span></div>
+              <div class="step locked"><span class="num">06</span><span class="ico"><svg><use href="#i-speak"/></svg></span></div>
+              <div class="step locked"><span class="num">07</span><span class="ico"><svg><use href="#i-translate"/></svg></span></div>
+            </div>
+            <div class="mobile-main" style="padding:18px 18px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+                <span class="chip-type translate"><svg><use href="#i-translate"/></svg>Translate</span>
+                <span class="badge">TR 1.1</span>
+              </div>
+              <div class="eyebrow indigo">RU PHRASE</div>
+              <div class="ru-display" style="font-family:var(--font-display);font-size:26px;font-weight:720;letter-spacing:-.025em;line-height:1.1;margin:8px 0 12px">Я всегда читаю газеты по утрам.</div>
+              <div style="color:var(--fg-muted);font-size:13px;margin-bottom:14px">Hint · место <code style="font-family:var(--font-mono);color:var(--accent-secondary);font-size:12px">always</code> — перед глаголом.</div>
+              <div style="background:var(--bg-elevated-2);border:1px solid var(--border);border-radius:var(--r-md);padding:12px;min-height:96px;color:var(--fg-subtle);font-size:14px">Type in English…</div>
+            </div>
+            <div class="bottom-tabs">
+              <div class="tab"><svg><use href="#n-today"/></svg>Today</div>
+              <div class="tab active"><svg><use href="#n-course"/></svg>Course</div>
+              <div class="tab"><svg><use href="#n-review"/></svg>Review</div>
+              <div class="tab"><svg><use href="#n-settings"/></svg>Profile</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="eyebrow" style="margin-bottom:10px">Auth</div>
+        <div class="frame mobile">
+          <span class="frame-meta">Auth · mobile</span>
+          <div style="position:relative;width:100%;height:100%;display:grid;place-items:center;padding:24px;background:radial-gradient(120% 80% at 50% 0%, #0F0F18 0%, #07070C 70%);overflow:hidden">
+            <div class="aurora auth"></div>
+            <div class="auth-card" style="padding:28px 24px 24px;max-width:none;width:100%;position:relative;z-index:2">
+              <div class="auth-brand" style="margin-bottom:24px">
+                <svg width="24" height="24"><use href="#brand"/></svg>
+                <div class="wm">English KES<small>Trainer</small></div>
+              </div>
+              <h2 class="ru-display" style="font-size:26px">С возвращением</h2>
+              <p class="lede" style="font-size:13px;margin:6px 0 18px">Войди, чтобы продолжить.</p>
+              <div class="field"><label class="field-label">Логин</label><input class="field-input" placeholder="alex.ivanov" /></div>
+              <div class="field" style="margin-top:12px"><label class="field-label">Пароль</label><input class="field-input" type="password" value="••••••" /></div>
+              <div style="margin-top:18px"><button class="btn btn-primary btn-block">Войти</button></div>
+              <div class="footer" style="margin-top:18px"><span>OFFLINE-FIRST</span><span class="locale" style="font-size:9px"><span class="on">RU</span><span>EN</span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+       5b · Mobile BottomTabs · 4-tab vs 5-tab
+       ════════════════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">05b</span>
+      <h2>BottomTabs · student vs owner</h2>
+      <p class="lede">Outline-вариант с Profile (RU «Профиль»). Выбери: <b>A</b> — 4-tab для всех + Accounts вложен в Profile. <b>B</b> — 5-tab для owner. Рекомендую A — owner редко переключается с phone.</p>
+    </div>
+    <div class="split" style="grid-template-columns:repeat(2,1fr);gap:32px">
+      <div>
+        <div class="eyebrow indigo" style="margin-bottom:10px">A · 4-tab (recommended)</div>
+        <div style="background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:0;overflow:hidden">
+          <div class="bottom-tabs" style="border-top:none;background:var(--bg-base)">
+            <div class="tab"><svg><use href="#n-today"/></svg>Today</div>
+            <div class="tab"><svg><use href="#n-course"/></svg>Course</div>
+            <div class="tab"><svg><use href="#n-review"/></svg>Review</div>
+            <div class="tab active"><svg><use href="#n-settings"/></svg>Profile</div>
+          </div>
+          <div style="padding:14px 18px;border-top:1px solid var(--border-subtle);font-size:13px;color:var(--fg-muted)">
+            Внутри Profile: <b style="color:var(--fg-primary)">Settings · Locale · Logout</b>, и для owner — отдельная карточка <b style="color:var(--accent-glow)">Manage accounts →</b>.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:10px">B · 5-tab (owner only)</div>
+        <div style="background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-lg);padding:0;overflow:hidden">
+          <div class="bottom-tabs" style="border-top:none;background:var(--bg-base);grid-template-columns:repeat(5,1fr)">
+            <div class="tab"><svg><use href="#n-today"/></svg>Today</div>
+            <div class="tab"><svg><use href="#n-course"/></svg>Course</div>
+            <div class="tab"><svg><use href="#n-review"/></svg>Review</div>
+            <div class="tab"><svg><use href="#n-admin"/></svg>Accounts</div>
+            <div class="tab active"><svg><use href="#n-settings"/></svg>Profile</div>
+          </div>
+          <div style="padding:14px 18px;border-top:1px solid var(--border-subtle);font-size:13px;color:var(--fg-muted)">
+            Density выше — иконки сжимаются до 18px, label до 9px. Только для owner-аккаунтов.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+       06 · StepRail states
+       ════════════════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">06</span>
+      <h2>StepRail · states</h2>
+      <p class="lede">Done · active · upcoming · locked. Step type icon — slot для индикации, label — первое слово или сокращение.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="callout" style="background:var(--bg-elevated);border-color:var(--border-subtle)">
+        <div class="eyebrow" style="margin-bottom:12px">Mid-lesson · 5 / 74</div>
+        <div class="step-rail" style="border:none;padding:0;background:transparent">
+          <button class="icon-btn icon-btn-sm arrow"><svg width="14" height="14"><use href="#n-chevron-l"/></svg></button>
+          <div class="track">
+            <div class="step done"><span class="check"><svg><use href="#i-check"/></svg></span><span class="num">01</span><span class="ico"><svg style="opacity:.55"><use href="#i-theory"/></svg></span><span class="lbl">Дух времени</span></div>
+            <div class="step done"><span class="check"><svg><use href="#i-check"/></svg></span><span class="num">02</span><span class="ico"><svg style="opacity:.55"><use href="#i-vocab"/></svg></span><span class="lbl">Словарь</span></div>
+            <div class="step done"><span class="check"><svg><use href="#i-check"/></svg></span><span class="num">03</span><span class="ico"><svg style="opacity:.55"><use href="#i-comp"/></svg></span><span class="lbl">Composition</span></div>
+            <div class="step done"><span class="check"><svg><use href="#i-check"/></svg></span><span class="num">04</span><span class="ico"><svg style="opacity:.55"><use href="#i-translate"/></svg></span><span class="lbl">Translate</span></div>
+            <div class="step active"><span class="num">05</span><span class="ico"><svg><use href="#i-drill"/></svg></span><span class="lbl">Drill</span></div>
+            <div class="step"><span class="num">06</span><span class="ico"><svg><use href="#i-translate"/></svg></span><span class="lbl">Translate</span></div>
+            <div class="step"><span class="num">07</span><span class="ico"><svg><use href="#i-translate"/></svg></span><span class="lbl">Translate</span></div>
+            <div class="step locked"><span class="num">08</span><span class="ico"><svg><use href="#i-speak"/></svg></span><span class="lbl">Speaking</span></div>
+            <div class="step locked"><span class="num">09</span><span class="ico"><svg><use href="#i-vocab"/></svg></span><span class="lbl">Vocab II</span></div>
+          </div>
+          <button class="icon-btn icon-btn-sm arrow"><svg width="14" height="14"><use href="#n-chevron-r"/></svg></button>
+          <button class="all"><svg width="12" height="12"><use href="#n-grid"/></svg>All 74</button>
+        </div>
+      </div>
+
+      <div class="callout" style="background:var(--bg-elevated);border-color:var(--border-subtle)">
+        <div class="eyebrow" style="margin-bottom:12px">Lesson start · 1 / 74</div>
+        <div class="step-rail" style="border:none;padding:0;background:transparent">
+          <button class="icon-btn icon-btn-sm arrow" disabled style="opacity:.35;cursor:not-allowed"><svg width="14" height="14"><use href="#n-chevron-l"/></svg></button>
+          <div class="track">
+            <div class="step active"><span class="num">01</span><span class="ico"><svg><use href="#i-theory"/></svg></span><span class="lbl">Дух времени</span></div>
+            <div class="step locked"><span class="num">02</span><span class="ico"><svg><use href="#i-vocab"/></svg></span><span class="lbl">Словарь</span></div>
+            <div class="step locked"><span class="num">03</span><span class="ico"><svg><use href="#i-comp"/></svg></span><span class="lbl">Composition</span></div>
+            <div class="step locked"><span class="num">04</span><span class="ico"><svg><use href="#i-translate"/></svg></span><span class="lbl">Translate</span></div>
+            <div class="step locked"><span class="num">05</span><span class="ico"><svg><use href="#i-drill"/></svg></span><span class="lbl">Drill</span></div>
+            <div class="step locked"><span class="num">06</span><span class="ico"><svg><use href="#i-speak"/></svg></span><span class="lbl">Speaking</span></div>
+          </div>
+          <button class="icon-btn icon-btn-sm arrow"><svg width="14" height="14"><use href="#n-chevron-r"/></svg></button>
+          <button class="all"><svg width="12" height="12"><use href="#n-grid"/></svg>All 74</button>
+        </div>
+      </div>
+
+      <div class="callout" style="background:var(--bg-elevated);border-color:var(--border-subtle)">
+        <div class="eyebrow" style="margin-bottom:12px">Lesson finished</div>
+        <div class="step-rail" style="border:none;padding:0;background:transparent">
+          <button class="icon-btn icon-btn-sm arrow"><svg width="14" height="14"><use href="#n-chevron-l"/></svg></button>
+          <div class="track">
+            <div class="step done"><span class="check"><svg><use href="#i-check"/></svg></span><span class="num">71</span><span class="ico"><svg style="opacity:.55"><use href="#i-translate"/></svg></span><span class="lbl">Translate</span></div>
+            <div class="step done"><span class="check"><svg><use href="#i-check"/></svg></span><span class="num">72</span><span class="ico"><svg style="opacity:.55"><use href="#i-drill"/></svg></span><span class="lbl">Drill</span></div>
+            <div class="step done"><span class="check"><svg><use href="#i-check"/></svg></span><span class="num">73</span><span class="ico"><svg style="opacity:.55"><use href="#i-speak"/></svg></span><span class="lbl">Speaking</span></div>
+            <div class="step done"><span class="check"><svg><use href="#i-check"/></svg></span><span class="num">74</span><span class="ico"><svg style="opacity:.55"><use href="#i-comp"/></svg></span><span class="lbl">Final</span></div>
+          </div>
+          <button class="icon-btn icon-btn-sm arrow" disabled style="opacity:.35;cursor:not-allowed"><svg width="14" height="14"><use href="#n-chevron-r"/></svg></button>
+          <button class="all"><svg width="12" height="12"><use href="#n-grid"/></svg>All 74</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════════════
+       07 · Density check
+       ════════════════════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">07</span>
+      <h2>Density</h2>
+      <p class="lede">Высота shell-chrome измерена явно. Рабочая зона = 720 − TopBar 56 − StepRail 56 = <b id="canvas-h">~608</b>px на 1280×720.</p>
+    </div>
+    <div class="callout">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;font-family:var(--font-mono);font-size:12px">
+        <div><span style="color:var(--fg-subtle)">TopBar</span><br/><b style="color:var(--accent-secondary);font-size:18px">56</b><span style="color:var(--fg-muted)">px</span></div>
+        <div><span style="color:var(--fg-subtle)">StepRail</span><br/><b style="color:var(--accent-secondary);font-size:18px">56</b><span style="color:var(--fg-muted)">px</span></div>
+        <div><span style="color:var(--fg-subtle)">Sidebar</span><br/><b style="color:var(--accent-secondary);font-size:18px">56 / 220</b><span style="color:var(--fg-muted)">px</span></div>
+        <div><span style="color:var(--fg-subtle)">Canvas free</span><br/><b style="color:var(--accent-secondary);font-size:18px" id="canvas-h-2">608</b><span style="color:var(--fg-muted)">px @ 1280×720</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- next -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">08</span>
+      <h2>Next</h2>
+      <p class="lede">Stage 3: TranslateStep с полным Sokratic flow + TutorChat sheet — ключевой экран продукта.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>English KES · v0.2 · Stage 2 of 7</span>
+    <span>1280 baseline · dark only · WCAG AA</span>
+  </div>
+</main>
+
+<script>
+  // Build CourseDrawer body from synthetic data
+  (function(){
+    var body = document.getElementById('drawer-body');
+    if(!body) return;
+    var lessons = [
+      { n:1, title:"Я делаю это обычно", state:"current", progress:"3 / 74",
+        steps:[
+          {n:"01", type:"Theory",      label:"Дух времени",    state:"done"},
+          {n:"02", type:"Vocabulary",  label:"Базовый словарь", state:"done"},
+          {n:"03", type:"Composition", label:"5 предложений",   state:"done"},
+          {n:"04", type:"Translate",   label:"Я всегда читаю газеты по утрам", state:"active"},
+          {n:"05", type:"Translate",   label:"He often plays the fool", state:"upcoming"},
+          {n:"06", type:"Drill",       label:"Drill TR 1.1–1.2", state:"upcoming"},
+          {n:"07", type:"Speaking",    label:"Произнеси 5 фраз", state:"locked"},
+          {n:"08", type:"Translate",   label:"Они никогда не опаздывают", state:"locked"}
+        ]
+      },
+      { n:2, title:"Сейчас или вообще", state:"locked", progress:"0 / 12",
+        steps:[
+          {n:"09", type:"Theory",     label:"Present Simple vs Continuous", state:"locked"},
+          {n:"10", type:"Vocabulary", label:"Time markers", state:"locked"}
+        ]
+      },
+      { n:3, title:"То, что было", state:"locked", progress:"0 / 14",
+        steps:[ {n:"\u2026", type:"", label:"\u2026 4 урока ниже", state:"locked"} ]
+      }
+    ];
+    var html = lessons.map(function(L){
+      var rows = L.steps.map(function(s){
+        var marker;
+        if (s.state==="done") marker = '<span class="marker"><svg width="10" height="10" fill="none" stroke="currentColor"><use href="#i-check"/></svg></span>';
+        else if (s.state==="active") marker = '<span class="marker">'+s.n+'</span>';
+        else if (s.state==="locked") marker = '<span class="marker"><svg width="9" height="9" fill="none" stroke="currentColor"><use href="#i-lock"/></svg></span>';
+        else marker = '<span class="marker">'+s.n+'</span>';
+        return '<div class="step-row '+s.state+'">'+marker+'<span class="lbl">'+s.label+'</span>'+(s.type?'<span class="type">'+s.type+'</span>':'')+'</div>';
+      }).join('');
+      var lock = L.state==="locked" ? '<svg width="12" height="12" fill="none" stroke="currentColor" style="color:var(--fg-disabled);margin-left:6px"><use href="#i-lock"/></svg>' : '';
+      return '<div class="lesson-group">' +
+        '<div class="lesson-head"><span class="n">L'+L.n+'</span> <span class="t">· '+L.title+'</span>'+lock+'<span class="progress">'+L.progress+'</span></div>' +
+        rows + '</div>';
+    }).join('');
+    body.innerHTML = html;
+  })();
+
+  // Density numbers — purely informational
+  (function(){
+    var v = (720-56-56);
+    var a = document.getElementById('canvas-h'); if(a) a.textContent = v;
+    var b = document.getElementById('canvas-h-2'); if(b) b.textContent = v;
+  })();
+</script>
+</body>
+</html>

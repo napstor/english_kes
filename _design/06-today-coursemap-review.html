@@ -1,0 +1,1215 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>English KES — Today · Course Map · Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Onest:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+@font-face{font-family:"KES Display";src:local("Bricolage Grotesque");unicode-range:U+0000-007F,U+0080-00FF,U+0100-017F,U+0180-024F,U+2000-206F,U+20A0-20CF;font-weight:100 900;font-display:swap}
+@font-face{font-family:"KES Display";src:local("Onest");unicode-range:U+0400-04FF,U+0500-052F,U+2DE0-2DFF,U+A640-A69F;font-weight:100 900;font-display:swap}
+
+:root{
+  --bg-base:#07070C; --bg-elevated:#0F0F18; --bg-elevated-2:#161624; --bg-elevated-3:#1D1D2C; --bg-overlay:rgba(15,15,24,.78);
+  --fg-primary:#F5F5F8; --fg-secondary:rgba(245,245,248,.78); --fg-muted:rgba(245,245,248,.62); --fg-subtle:rgba(245,245,248,.38); --fg-disabled:rgba(245,245,248,.20);
+  --accent-primary:#5B6BFF; --accent-glow:#8A95FF; --accent-secondary:#C8FF6B; --accent-warm:#FFB454;
+  --positive:#4ADE80; --negative:#FF5C7A;
+  --border-subtle:rgba(245,245,248,.06); --border:rgba(245,245,248,.10); --border-strong:rgba(245,245,248,.16);
+  --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:20px; --r-full:9999px;
+  --shadow-soft:0 8px 30px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.04) inset;
+  --inset-stroke:inset 0 1px 0 rgba(255,255,255,.08);
+  --d-base:200ms; --e-out:cubic-bezier(.22,1,.36,1);
+  --font-display:"KES Display","Bricolage Grotesque","Onest","Inter",system-ui,sans-serif;
+  --font-sans:"Inter",system-ui,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg-base);color:var(--fg-primary);font-family:var(--font-sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;font-feature-settings:"cv02","cv03","cv04","ss01"}
+button{font:inherit;cursor:pointer;border:none;background:none;color:inherit;padding:0}
+a{color:inherit;text-decoration:none}
+::selection{background:rgba(91,107,255,.35)}
+
+/* ========== PAGE CHROME ========== */
+.page{position:relative;max-width:1440px;margin:0 auto;padding:48px 24px 96px}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:36px;border-bottom:1px solid var(--border-subtle);margin-bottom:48px}
+.page-head h1{font-family:var(--font-display);font-weight:700;font-size:clamp(32px,4vw,52px);letter-spacing:-.035em;line-height:1;margin:0}
+.page-head h1 + p{margin:14px 0 0;color:var(--fg-muted);font-size:14.5px;max-width:680px;line-height:1.55}
+.page-head .meta{font-family:var(--font-mono);font-size:12px;color:var(--fg-muted);text-transform:uppercase;letter-spacing:.06em}
+.page-head .meta b{color:var(--fg-primary);font-weight:500}
+.eyebrow{display:inline-block;font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-subtle)}
+.eyebrow.indigo{color:var(--accent-glow)} .eyebrow.lime{color:var(--accent-secondary)} .eyebrow.amber{color:var(--accent-warm)}
+
+.section{margin:96px 0 0}
+.section:first-of-type{margin-top:0}
+.section-head{display:flex;align-items:baseline;gap:16px;margin-bottom:28px}
+.section-head .num{font-family:var(--font-mono);font-size:12px;color:var(--fg-subtle);letter-spacing:.06em;text-transform:uppercase}
+.section-head h2{font-family:var(--font-display);font-weight:600;font-size:28px;letter-spacing:-.025em;margin:0;line-height:1.1}
+.section-head .lede{color:var(--fg-muted);max-width:560px;margin-left:auto;font-size:14px}
+
+.callout{padding:14px 18px;border-radius:var(--r-md);background:rgba(91,107,255,.06);border:1px solid rgba(91,107,255,.18);font-size:13px;color:var(--fg-muted)}
+.callout b{color:var(--fg-primary)}
+.callout code{font-family:var(--font-mono);font-size:12px;color:var(--accent-secondary);background:rgba(200,255,107,.06);padding:1px 5px;border-radius:4px}
+.foot{margin-top:96px;padding-top:24px;border-top:1px solid var(--border-subtle);display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:11px;color:var(--fg-subtle);letter-spacing:.04em;text-transform:uppercase}
+
+.frame{position:relative;background:var(--bg-base);border:1px solid var(--border-subtle);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-soft);isolation:isolate}
+.frame .frame-meta{position:absolute;top:12px;right:12px;z-index:10;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:var(--r-full);font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;background:var(--bg-overlay);backdrop-filter:blur(20px);color:var(--fg-muted);border:1px solid var(--border)}
+.frame.desktop{aspect-ratio:1280/900}
+.frame.desktop-tall{aspect-ratio:1280/1100}
+.frame.mobile{aspect-ratio:375/812;max-width:375px;margin:0 auto}
+.content-grid{display:grid;gap:18px}
+.content-grid.two{grid-template-columns:1fr 1fr}
+.content-grid.three{grid-template-columns:repeat(3,1fr)}
+.content-grid.four{grid-template-columns:repeat(4,1fr)}
+
+/* ========== APP SHELL (для Today/Course/Review desktop frames) ========== */
+.app{position:relative;width:100%;height:100%;display:grid;grid-template-rows:56px 1fr;background:var(--bg-base)}
+.topbar{display:flex;align-items:center;gap:14px;padding:0 16px;border-bottom:1px solid var(--border-subtle);background:rgba(7,7,12,.78);backdrop-filter:blur(20px)}
+.brand{display:inline-flex;align-items:center;gap:10px}
+.brand .wm{font-family:var(--font-display);font-weight:700;font-size:14px;letter-spacing:-.02em;line-height:1}
+.brand .wm small{display:block;font-family:var(--font-mono);font-weight:500;font-size:8px;letter-spacing:.12em;color:var(--fg-muted);text-transform:uppercase;margin-top:2px}
+.crumbs{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;color:var(--fg-muted);letter-spacing:.04em;padding:6px 10px;border-radius:var(--r-sm)}
+.crumbs b{color:var(--fg-primary);font-weight:600}
+.topbar .spacer{flex:1}
+.locale{display:inline-flex;align-items:center;gap:2px;padding:3px;background:var(--bg-elevated-2);border:1px solid var(--border);border-radius:var(--r-full);font-family:var(--font-mono);font-size:11px;font-weight:600}
+.locale span{padding:3px 9px;border-radius:var(--r-full);color:var(--fg-muted)}
+.locale span.on{background:var(--accent-primary);color:#0B0B14}
+.icon-btn{width:36px;height:36px;display:inline-grid;place-items:center;border-radius:var(--r-md);color:var(--fg-muted);border:1px solid transparent;flex-shrink:0}
+.app-body{display:grid;grid-template-columns:56px 1fr;min-height:0}
+.sidebar{border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;padding:14px 8px;gap:12px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:var(--r-md);color:var(--fg-muted);font-size:14px;font-weight:500;position:relative}
+.nav-item svg{width:18px;height:18px;stroke-width:1.75}
+.nav-item.active{background:rgba(91,107,255,.14);color:var(--accent-glow)}
+.nav-item.active::before{content:"";position:absolute;left:-8px;top:8px;bottom:8px;width:2px;background:var(--accent-primary);border-radius:2px;box-shadow:0 0 8px rgba(91,107,255,.6)}
+.app-main{position:relative;overflow:auto;background:var(--bg-base);padding:32px 56px 64px}
+.app-main::-webkit-scrollbar{width:6px}
+.app-main::-webkit-scrollbar-thumb{background:rgba(245,245,248,.08);border-radius:3px}
+
+/* ========== BUTTONS ========== */
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-sans);font-weight:500;font-size:14px;line-height:1;padding:11px 16px;border-radius:var(--r-md);letter-spacing:-.005em;white-space:nowrap;border:1px solid transparent;transition:all var(--d-base) var(--e-out)}
+.btn-primary{background:var(--accent-primary);color:#0B0B14;font-weight:600;box-shadow:var(--inset-stroke), 0 8px 24px rgba(91,107,255,.25)}
+.btn-secondary{background:var(--bg-elevated-2);color:var(--fg-primary);border-color:var(--border);box-shadow:var(--inset-stroke)}
+.btn-ghost{color:var(--fg-muted)}
+.btn-success{background:var(--accent-secondary);color:#0B0F02;font-weight:600;box-shadow:var(--inset-stroke)}
+.btn .kbd{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.55);padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.08);margin-left:4px}
+.btn-primary .kbd,.btn-success .kbd{background:rgba(11,11,20,.18);color:rgba(11,11,20,.55)}
+.btn-sm{padding:8px 12px;font-size:12.5px}
+
+/* ========== STREAK DISPLAY ========== */
+/* Inline in hero — Strava dot row, NO flame emoji, NO popup */
+.streak-inline{display:inline-flex;align-items:center;gap:14px;font-family:var(--font-mono);font-size:12px;color:var(--fg-muted);letter-spacing:.04em}
+.streak-inline .num{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--fg-primary);font-variant-numeric:tabular-nums;letter-spacing:0}
+.streak-inline .lab{text-transform:uppercase;letter-spacing:.08em;font-size:10px;color:var(--fg-subtle)}
+.streak-dots{display:inline-flex;gap:3px;align-items:center}
+.streak-dots .d{width:6px;height:6px;border-radius:50%;background:rgba(245,245,248,.08)}
+.streak-dots .d.on{background:var(--accent-glow)}
+.streak-dots .d.today{background:var(--accent-glow);box-shadow:0 0 0 2px rgba(138,149,255,.18)}
+
+/* Calendar version (zoom) */
+.streak-calendar{display:flex;flex-direction:column;gap:10px}
+.streak-calendar .head{display:flex;align-items:baseline;justify-content:space-between}
+.streak-calendar .num-big{font-family:var(--font-mono);font-size:24px;font-weight:600;color:var(--fg-primary);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.streak-calendar .num-big small{font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);letter-spacing:.08em;text-transform:uppercase;margin-left:8px;font-weight:500}
+.cal-grid{display:grid;grid-template-columns:repeat(30,1fr);gap:3px}
+.cal-grid .c{aspect-ratio:1;border-radius:2px;background:rgba(245,245,248,.05)}
+.cal-grid .c.l1{background:rgba(138,149,255,.18)}
+.cal-grid .c.l2{background:rgba(138,149,255,.36)}
+.cal-grid .c.l3{background:rgba(138,149,255,.62)}
+.cal-grid .c.l4{background:var(--accent-glow)}
+.cal-grid .c.today{outline:1px solid var(--accent-glow);outline-offset:1px}
+.cal-grid .c.skip{background:transparent;border:1px dashed rgba(245,245,248,.10)}
+
+/* ========== MASTERY RING ========== */
+.mr{position:relative;width:32px;height:32px;flex-shrink:0}
+.mr svg{width:100%;height:100%;transform:rotate(-90deg)}
+.mr .track{stroke:rgba(245,245,248,.08);fill:none;stroke-width:3}
+.mr .fill{fill:none;stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset var(--d-base) var(--e-out)}
+.mr.idle .fill{stroke:var(--fg-disabled)}
+.mr.active .fill{stroke:var(--accent-glow)}
+.mr.mastered .fill{stroke:var(--accent-secondary)}
+.mr.mastered.glow{animation:mrGlow 600ms var(--e-out) 1}
+@keyframes mrGlow{
+  0%{filter:drop-shadow(0 0 0 rgba(200,255,107,0))}
+  40%{filter:drop-shadow(0 0 8px rgba(200,255,107,.7))}
+  100%{filter:drop-shadow(0 0 0 rgba(200,255,107,0))}
+}
+.mr .dot{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--font-mono);font-size:9px;color:var(--fg-subtle);letter-spacing:0;font-weight:600;font-variant-numeric:tabular-nums}
+.mr.idle .dot{color:var(--fg-disabled)}
+.mr.active .dot{color:var(--accent-glow)}
+.mr.mastered .dot{color:var(--accent-secondary)}
+.mr.mastered .dot::before{content:"✓";font-size:13px}
+.mr.mastered .dot span{display:none}
+
+.mr.sm{width:24px;height:24px}
+.mr.sm .dot{font-size:8px}
+.mr.sm.mastered .dot::before{font-size:11px}
+.mr.lg{width:48px;height:48px}
+.mr.lg .dot{font-size:11px}
+.mr.lg.mastered .dot::before{font-size:18px}
+
+/* ========== TODAY SCREEN ========== */
+.today-hero{display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
+.today-hero .salut{font-family:var(--font-display);font-size:40px;font-weight:600;letter-spacing:-.03em;line-height:1.1;margin:0}
+.today-hero .sub{display:flex;align-items:center;gap:18px;flex-wrap:wrap;color:var(--fg-muted);font-size:14px}
+
+.section-h{font-family:var(--font-mono);font-size:11px;color:var(--fg-subtle);letter-spacing:.10em;text-transform:uppercase;font-weight:600;margin:0 0 14px;display:flex;align-items:baseline;gap:10px}
+.section-h .meta{margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--fg-muted);letter-spacing:.04em;text-transform:none;font-weight:500}
+
+.plan-list{display:flex;flex-direction:column;gap:10px}
+.plan-card{display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:18px;padding:18px 20px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-lg);transition:all var(--d-base) var(--e-out)}
+.plan-card.primary{background:linear-gradient(180deg, rgba(91,107,255,.08) 0%, var(--bg-elevated) 60%);border-color:rgba(91,107,255,.24)}
+.plan-card .ico{width:44px;height:44px;display:grid;place-items:center;border-radius:var(--r-md);background:var(--bg-elevated-2);color:var(--fg-muted);border:1px solid var(--border-subtle);flex-shrink:0}
+.plan-card.primary .ico{background:rgba(91,107,255,.12);color:var(--accent-glow);border-color:rgba(91,107,255,.24)}
+.plan-card .ico svg{width:20px;height:20px;stroke-width:1.75}
+.plan-card .body{display:flex;flex-direction:column;gap:4px;min-width:0}
+.plan-card .lab{font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.plan-card.primary .lab{color:var(--accent-glow)}
+.plan-card .ttl{font-family:var(--font-display);font-size:18px;font-weight:600;letter-spacing:-.015em;line-height:1.2;color:var(--fg-primary)}
+.plan-card .desc{font-size:12.5px;color:var(--fg-muted);line-height:1.4}
+.plan-card .right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.plan-card .est{font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);letter-spacing:.06em;text-transform:uppercase;font-weight:500}
+
+.last-recap{padding:12px 16px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-md);display:flex;align-items:center;gap:14px;font-size:13px;color:var(--fg-muted);margin-bottom:32px}
+.last-recap .lab{font-family:var(--font-mono);font-size:9px;color:var(--fg-subtle);letter-spacing:.10em;text-transform:uppercase;font-weight:600;flex-shrink:0}
+.last-recap .body{display:flex;align-items:center;gap:14px;flex:1;flex-wrap:wrap;font-size:12.5px}
+.last-recap .body b{color:var(--fg-primary);font-weight:500}
+.last-recap .body .sep{width:3px;height:3px;border-radius:50%;background:var(--fg-disabled)}
+.last-recap .body .delta{color:var(--accent-secondary);font-family:var(--font-mono);font-weight:600;font-size:11px}
+
+/* ========== MASTERY DASHBOARD ========== */
+.mastery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.mastery-row{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-md)}
+.mastery-row .body{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.mastery-row .name{font-family:var(--font-sans);font-size:13px;font-weight:600;color:var(--fg-primary);letter-spacing:-.005em;line-height:1.2}
+.mastery-row .meta{font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);letter-spacing:.04em}
+.mastery-row .pct{font-family:var(--font-mono);font-size:12px;color:var(--fg-muted);font-variant-numeric:tabular-nums;font-weight:500}
+
+/* ========== CONSISTENCY CALENDAR ========== */
+.consistency{display:flex;flex-direction:column;gap:10px}
+.consistency .head{display:flex;align-items:baseline;justify-content:space-between}
+.consistency .h-lab{font-family:var(--font-mono);font-size:11px;color:var(--fg-subtle);letter-spacing:.10em;text-transform:uppercase;font-weight:600}
+.consistency .h-meta{font-family:var(--font-mono);font-size:11px;color:var(--fg-muted)}
+.cc-grid{display:grid;grid-template-columns:auto 1fr;gap:8px}
+.cc-day-labels{display:grid;grid-template-rows:repeat(7,1fr);gap:3px;font-family:var(--font-mono);font-size:9px;color:var(--fg-disabled);letter-spacing:.04em;align-items:center;height:84px}
+.cc-cells{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;height:84px}
+.cc-cells .col{display:grid;grid-template-rows:repeat(7,1fr);gap:3px}
+.cc-cells .c{border-radius:2px;background:rgba(245,245,248,.04)}
+.cc-cells .c.l1{background:rgba(138,149,255,.18)}
+.cc-cells .c.l2{background:rgba(138,149,255,.40)}
+.cc-cells .c.l3{background:rgba(138,149,255,.68)}
+.cc-cells .c.l4{background:var(--accent-glow)}
+.cc-month{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;font-family:var(--font-mono);font-size:9px;color:var(--fg-subtle);letter-spacing:.04em;text-transform:uppercase;margin-left:24px;margin-top:4px}
+.cc-legend{display:flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:10px;color:var(--fg-muted);letter-spacing:.04em;margin-top:8px;justify-content:flex-end}
+.cc-legend .dots{display:inline-flex;gap:3px}
+.cc-legend .dots .c{width:11px;height:11px;border-radius:2px;background:rgba(245,245,248,.04)}
+.cc-legend .dots .c.l1{background:rgba(138,149,255,.18)}
+.cc-legend .dots .c.l2{background:rgba(138,149,255,.40)}
+.cc-legend .dots .c.l3{background:rgba(138,149,255,.68)}
+.cc-legend .dots .c.l4{background:var(--accent-glow)}
+
+/* ========== COURSE MAP ========== */
+.cm-list{position:relative;display:flex;flex-direction:column;gap:0}
+.cm-list::before{content:"";position:absolute;left:23px;top:24px;bottom:24px;width:1px;background:var(--border-subtle);z-index:0}
+.cm-row{position:relative;display:grid;grid-template-columns:48px 1fr auto;align-items:flex-start;gap:18px;padding:18px 18px 18px 0;border-bottom:1px solid var(--border-subtle);z-index:1;background:var(--bg-base)}
+.cm-row:last-child{border-bottom:none}
+.cm-row .num-circle{width:48px;height:48px;border-radius:50%;background:var(--bg-elevated-2);border:1px solid var(--border);color:var(--fg-muted);display:grid;place-items:center;font-family:var(--font-mono);font-size:14px;font-weight:600;letter-spacing:0;font-variant-numeric:tabular-nums;flex-shrink:0;position:relative;z-index:2}
+.cm-row.done .num-circle{background:rgba(200,255,107,.10);border-color:rgba(200,255,107,.30);color:var(--accent-secondary)}
+.cm-row.active .num-circle{background:var(--accent-primary);border-color:var(--accent-primary);color:#0B0B14;box-shadow:0 0 0 4px rgba(91,107,255,.16), 0 0 24px rgba(91,107,255,.45)}
+.cm-row.locked .num-circle{background:transparent;border-color:var(--border-subtle);color:var(--fg-disabled)}
+.cm-row .meta{display:flex;flex-direction:column;gap:6px;min-width:0;padding-top:4px}
+.cm-row .head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.cm-row .head .lvl{font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);letter-spacing:.08em;text-transform:uppercase;font-weight:600}
+.cm-row .head .lvl.a1{color:var(--accent-secondary)}
+.cm-row .head .lvl.a2{color:var(--accent-glow)}
+.cm-row .head .lvl.b1{color:var(--accent-warm)}
+.cm-row .head .lvl.b2{color:var(--negative)}
+.cm-row .ttl{font-family:var(--font-display);font-size:18px;font-weight:600;letter-spacing:-.015em;line-height:1.25;color:var(--fg-primary)}
+.cm-row.done .ttl{color:var(--fg-muted)}
+.cm-row.locked .ttl{color:var(--fg-disabled)}
+.cm-row .desc{font-size:13px;color:var(--fg-muted);line-height:1.45;text-wrap:pretty}
+.cm-row.locked .desc{color:var(--fg-disabled)}
+.cm-row .badges{display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);letter-spacing:.04em}
+.cm-row .badges .sep{width:2px;height:2px;border-radius:50%;background:var(--fg-disabled)}
+.cm-row .right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;padding-top:8px}
+.cm-row .status{font-family:var(--font-mono);font-size:10px;color:var(--fg-muted);letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.cm-row.done .status{color:var(--accent-secondary)}
+.cm-row.active .status{color:var(--accent-glow)}
+.cm-row.locked .status{color:var(--fg-disabled)}
+.cm-row.expanded{background:var(--bg-elevated)}
+
+/* Lesson expanded — step list */
+.cm-steps{padding:4px 18px 22px 84px;border-bottom:1px solid var(--border-subtle);background:var(--bg-elevated);display:flex;flex-direction:column;gap:4px}
+.cm-step{display:grid;grid-template-columns:24px 1fr auto;align-items:center;gap:12px;padding:8px 12px;border-radius:var(--r-sm);font-size:13px;color:var(--fg-secondary)}
+.cm-step:hover{background:var(--bg-elevated-2)}
+.cm-step .ix{font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);font-variant-numeric:tabular-nums;text-align:right;letter-spacing:0}
+.cm-step .ico{width:14px;height:14px;display:grid;place-items:center;color:var(--fg-muted);flex-shrink:0}
+.cm-step .ico svg{width:12px;height:12px;stroke-width:2}
+.cm-step.done .ico{color:var(--accent-secondary)}
+.cm-step.active .ico{color:var(--accent-glow)}
+.cm-step.locked .ico{color:var(--fg-disabled)}
+.cm-step.locked .name{color:var(--fg-disabled)}
+.cm-step.done .name{color:var(--fg-muted)}
+.cm-step .name{display:flex;align-items:center;gap:8px}
+.cm-step .type{font-family:var(--font-mono);font-size:9px;color:var(--fg-subtle);letter-spacing:.06em;text-transform:uppercase}
+.cm-step .pron{font-family:var(--font-mono);font-size:10px;color:var(--accent-warm);font-variant-numeric:tabular-nums}
+
+.cm-disclosure{display:flex;align-items:center;justify-content:center;gap:10px;padding:22px;border:1px dashed var(--border-subtle);border-radius:var(--r-md);background:transparent;color:var(--fg-muted);font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;margin-top:20px;cursor:pointer}
+.cm-disclosure:hover{border-color:var(--border)}
+.cm-disclosure svg{width:14px;height:14px;stroke-width:2}
+
+/* ========== REVIEW SCREEN ========== */
+.review-section{margin-bottom:32px}
+.review-card{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;padding:14px 18px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-md);margin-bottom:8px}
+.review-card .body{display:flex;flex-direction:column;gap:4px;min-width:0}
+.review-card .ru-line{font-family:var(--font-display);font-size:17px;font-weight:600;letter-spacing:-.01em;color:var(--fg-primary);line-height:1.25;text-wrap:pretty}
+.review-card .meta{font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);letter-spacing:.04em;display:flex;align-items:center;gap:10px}
+.review-card .meta .age{color:var(--fg-muted)}
+.review-card .meta .age.faded{color:var(--fg-subtle)}
+.review-card .meta .pron{color:var(--accent-warm);font-variant-numeric:tabular-nums}
+.review-card .meta .sep{width:2px;height:2px;border-radius:50%;background:var(--fg-disabled)}
+
+/* Pattern review card (weak spots) */
+.pattern-card{display:grid;grid-template-columns:48px 1fr auto auto;align-items:center;gap:18px;padding:16px 18px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-md);margin-bottom:8px;cursor:pointer}
+.pattern-card .body{display:flex;flex-direction:column;gap:3px;min-width:0}
+.pattern-card .ttl{font-family:var(--font-sans);font-size:14px;font-weight:600;color:var(--fg-primary);letter-spacing:-.005em}
+.pattern-card .meta{font-family:var(--font-mono);font-size:11px;color:var(--fg-muted);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+.pattern-card .meta .sep{width:2px;height:2px;border-radius:50%;background:var(--fg-disabled)}
+.pattern-card .pct{font-family:var(--font-mono);font-size:13px;color:var(--accent-warm);font-variant-numeric:tabular-nums;font-weight:600}
+.pattern-card .chev{color:var(--fg-subtle)}
+.pattern-card .chev svg{width:14px;height:14px;stroke-width:2}
+.pattern-card.expanded{border-color:rgba(91,107,255,.18);background:linear-gradient(180deg, rgba(91,107,255,.04) 0%, var(--bg-elevated) 60%)}
+.pattern-card.expanded .chev{color:var(--accent-glow);transform:rotate(90deg)}
+
+.pattern-expand{margin-top:-8px;margin-bottom:8px;padding:8px 18px 14px 84px;background:linear-gradient(180deg, rgba(91,107,255,.04) 0%, transparent 100%);border:1px solid rgba(91,107,255,.18);border-top:none;border-radius:0 0 var(--r-md) var(--r-md);display:flex;flex-direction:column;gap:4px}
+.pattern-phrase{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:14px;padding:8px 0;border-bottom:1px dashed var(--border-subtle)}
+.pattern-phrase:last-of-type{border-bottom:none}
+.pattern-phrase .ru{font-family:var(--font-display);font-size:14px;font-weight:600;color:var(--fg-primary);letter-spacing:-.005em}
+.pattern-phrase .pron{font-family:var(--font-mono);font-size:11px;color:var(--accent-warm);font-variant-numeric:tabular-nums;font-weight:600}
+.pattern-phrase .ago{font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);letter-spacing:.04em}
+.pattern-actions{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border-subtle)}
+
+/* Section meta header */
+.review-h{display:flex;align-items:baseline;gap:10px;margin:0 0 12px}
+.review-h .lab{font-family:var(--font-mono);font-size:11px;color:var(--fg-subtle);letter-spacing:.10em;text-transform:uppercase;font-weight:600}
+.review-h .count{font-family:var(--font-mono);font-size:11px;color:var(--fg-muted);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.review-h .age-hint{font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);letter-spacing:.04em;margin-left:auto;text-transform:none;font-weight:500}
+.review-collapsed{padding:14px 18px;border:1px dashed var(--border-subtle);border-radius:var(--r-md);display:flex;align-items:center;gap:14px;color:var(--fg-muted);font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;cursor:pointer}
+.review-collapsed b{font-family:var(--font-sans);font-weight:600;color:var(--fg-primary);font-size:13px;letter-spacing:-.005em;text-transform:none}
+.review-collapsed .chev{margin-left:auto}
+
+/* Bottom-tabs (mobile) */
+.btabs{position:absolute;bottom:0;left:0;right:0;height:64px;display:grid;grid-template-columns:repeat(4,1fr);background:rgba(7,7,12,.92);backdrop-filter:blur(20px);border-top:1px solid var(--border-subtle)}
+.btabs .t{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:var(--font-mono);font-size:9px;color:var(--fg-subtle);letter-spacing:.04em;text-transform:uppercase}
+.btabs .t svg{width:18px;height:18px;stroke-width:1.75}
+.btabs .t.on{color:var(--accent-glow)}
+.btabs .t.on::before{content:"";position:absolute;top:0;width:32px;height:2px;background:var(--accent-glow);border-radius:0 0 2px 2px;box-shadow:0 0 8px rgba(138,149,255,.6)}
+.btabs .t{position:relative}
+
+/* zoom-card shared */
+.zoom-card{padding:24px;border-radius:var(--r-lg);background:var(--bg-elevated);border:1px solid var(--border-subtle);display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow-soft)}
+.zoom-card .lab{font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);letter-spacing:.10em;text-transform:uppercase;font-weight:600}
+.zoom-card .desc{font-size:12.5px;color:var(--fg-muted);line-height:1.5}
+.zoom-card .desc b{color:var(--fg-primary);font-weight:600}
+
+/* Anti-list callout */
+.anti-card{padding:18px 22px;border-radius:var(--r-lg);background:var(--bg-elevated);border:1px solid var(--border-subtle);display:flex;flex-direction:column;gap:14px}
+.anti-card.no{border-color:rgba(255,92,122,.15);background:linear-gradient(180deg, rgba(255,92,122,.03) 0%, var(--bg-elevated) 60%)}
+.anti-card.yes{border-color:rgba(200,255,107,.18);background:linear-gradient(180deg, rgba(200,255,107,.03) 0%, var(--bg-elevated) 60%)}
+.anti-card h4{font-family:var(--font-mono);font-size:11px;letter-spacing:.10em;text-transform:uppercase;font-weight:600;margin:0;display:flex;align-items:center;gap:8px}
+.anti-card.no h4{color:var(--negative)}
+.anti-card.yes h4{color:var(--accent-secondary)}
+.anti-card ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.anti-card li{font-size:13px;color:var(--fg-secondary);line-height:1.45;display:flex;align-items:flex-start;gap:10px}
+.anti-card li::before{font-family:var(--font-mono);font-size:11px;flex-shrink:0;width:14px;font-weight:600;line-height:1.5}
+.anti-card.no li::before{content:"✗";color:var(--negative)}
+.anti-card.yes li::before{content:"✓";color:var(--accent-secondary)}
+
+/* Spec table */
+.spec-table{display:grid;grid-template-columns:160px repeat(3, 1fr);background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-soft)}
+.spec-table .h{padding:12px 14px;background:var(--bg-elevated-2);border-bottom:1px solid var(--border-subtle);font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.spec-table .h.k{color:var(--fg-muted)}
+.spec-table .c{padding:12px 14px;border-bottom:1px solid var(--border-subtle);font-size:13px;color:var(--fg-secondary)}
+.spec-table .c.k{font-family:var(--font-mono);font-size:11px;color:var(--fg-muted);letter-spacing:.04em;text-transform:uppercase;background:rgba(245,245,248,.02)}
+.spec-table .c code{font-family:var(--font-mono);font-size:11px;color:var(--accent-secondary);background:rgba(200,255,107,.06);padding:1px 5px;border-radius:4px}
+.spec-table .c.muted{color:var(--fg-muted);font-style:italic}
+.spec-table > div:nth-last-child(-n+4){border-bottom:none}
+
+</style>
+</head>
+<body>
+
+<div class="page">
+  <header class="page-head">
+    <div>
+      <span class="eyebrow indigo">Stage 6 / 06</span>
+      <h1>Today · Course Map · Review</h1>
+      <p>Три экрана meta-навигации. Adult-tone gamification: progress без trophy/flame/XP/leaderboards. Visual references: Strava activity feed, Whoop weekly recovery, Things-3 today list, Linear issue tracker. Анти-references: Duolingo, Khan Academy badges, Headspace streaks.</p>
+    </div>
+    <div class="meta">
+      <div>STAGE · <b>06</b></div>
+      <div>VIEWPORTS · <b>1280 + 375</b></div>
+      <div>CRITICAL · <b>NO 🔥 / NO XP / NO confetti</b></div>
+    </div>
+  </header>
+
+  <!-- ============== §00 PRINCIPLES ============== -->
+  <section class="section" style="margin-top:0">
+    <div class="section-head">
+      <span class="num">§ 00 · Principles</span>
+      <h2>Adult-gamification · что мы НЕ делаем</h2>
+      <p class="lede">Streak — side-info. Mastery — состояние, не награда. Calendar — данные, не панель почёта.</p>
+    </div>
+
+    <div class="content-grid two">
+      <div class="anti-card no">
+        <h4><span style="width:6px;height:6px;border-radius:50%;background:currentColor"></span>Banned · Duolingo-кладбище</h4>
+        <ul>
+          <li>🔥 emoji для streak — pressure-design, infantil. Streak — это <em>факт регулярности</em>, а не подвиг.</li>
+          <li>+50 XP popups, leaderboards, leagues — вытесняют intrinsic motivation внешним цирком.</li>
+          <li>Confetti / fireworks / sparkle-bursts при mastered — каждый visit = "отпраздновали третий раз". Адские.</li>
+          <li>Trophy / badge / star / medal — иконография цирка.</li>
+          <li>Daily quest, login bonus, motivational quotes — корпоративный токсичный позитив.</li>
+          <li>Re-celebration: glow на каждое открытие mastered ring. Один acknowledged glow → static.</li>
+        </ul>
+      </div>
+      <div class="anti-card yes">
+        <h4><span style="width:6px;height:6px;border-radius:50%;background:currentColor"></span>Approved · Adult-tone matrix</h4>
+        <ul>
+          <li><b>Streak</b> = inline dot-row рядом с именем. Числу 5 веришь, не отмечаешь.</li>
+          <li><b>Mastery</b> = ring 24–32px фоном. Lime ✓ при mastered. Один 600ms glow на pattern за всю историю.</li>
+          <li><b>Calendar</b> = GitHub-graph. Opacity по study-load (theory=3 vs drill=1) — не сводка минут.</li>
+          <li><b>Last session</b> = single-line recap (вчера: 2h, +12% mastery on Past Simple negative). Connects yesterday→today.</li>
+          <li><b>Copy</b>: «К повтору» (не «Просрочено»), «Зоны фокуса» (не «Слабые места»), «В автоматизме» (не «Automated»).</li>
+          <li><b>Glow rule</b>: mastered transition + один miss-recovery → дальше static. mastery_acknowledged boolean per pattern.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== §01 TODAY SCREEN ============== -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">§ 01 · Today</span>
+      <h2>Утро понедельника, 07:48 · home view после login</h2>
+      <p class="lede">Видишь streak, last session, и сегодняшний план — три задачи, primary CTA. Никаких quotes, badges, mascot.</p>
+    </div>
+
+    <div class="frame desktop-tall" style="aspect-ratio:1280/980">
+      <span class="frame-meta">Today · Mon 14 Oct · 07:48 · Desktop 1280</span>
+      <div class="app">
+        <!-- topbar -->
+        <header class="topbar">
+          <span class="brand">
+            <span class="wm">English KES<small>Course</small></span>
+          </span>
+          <span class="crumbs">Stage 2 · Past tenses · <b>Lesson 14 / 44</b></span>
+          <span class="spacer"></span>
+          <span class="locale" title="UI язык">
+            <span class="on">RU</span><span>EN</span>
+          </span>
+          <button class="icon-btn" aria-label="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18"><circle cx="12" cy="12" r="3" stroke-width="1.75"/><path stroke-width="1.75" stroke-linecap="round" d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
+          <span style="display:inline-flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border:1px solid var(--border);border-radius:var(--r-full);background:var(--bg-elevated-2)">
+            <span style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#5B6BFF,#8A95FF);display:grid;place-items:center;font-family:var(--font-mono);font-size:11px;font-weight:600;color:#0B0B14">КЕ</span>
+            <span style="font-size:12.5px;color:var(--fg-secondary);font-weight:500">Ксения</span>
+          </span>
+        </header>
+        <div class="app-body">
+          <!-- sidebar -->
+          <aside class="sidebar">
+            <a class="nav-item active" title="Today" aria-current="page">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+            </a>
+            <a class="nav-item" title="Course Map">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6l-6 3v12l6-3 6 3 6-3V6l-6 3-6-3zM9 6v15M15 9v12"/></svg>
+            </a>
+            <a class="nav-item" title="Review">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>
+            </a>
+            <a class="nav-item" title="Library" style="margin-top:auto">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H4V4zM20 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H20V4z"/></svg>
+            </a>
+            <a class="nav-item" title="Profile">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4" stroke-width="1.75"/><path stroke-width="1.75" stroke-linecap="round" d="M4 21a8 8 0 0 1 16 0"/></svg>
+            </a>
+          </aside>
+          <!-- main -->
+          <main class="app-main">
+            <!-- HERO -->
+            <div class="today-hero">
+              <h1 class="salut">Доброе утро, Ксения.</h1>
+              <div class="sub">
+                <span>Понедельник · 14 октября</span>
+                <span class="sep" style="width:3px;height:3px;border-radius:50%;background:var(--fg-disabled)"></span>
+                <span class="streak-inline">
+                  <span class="lab">Серия</span>
+                  <span class="streak-dots" aria-label="5-day streak">
+                    <span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d today"></span><span class="d"></span><span class="d"></span>
+                  </span>
+                  <span class="num">5 дней</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- LAST SESSION RECAP -->
+            <div class="last-recap">
+              <span class="lab">Вчера</span>
+              <span class="body">
+                <b>2 ч 14 мин</b>
+                <span class="sep"></span>
+                <span>Past Simple · negative</span>
+                <span class="sep"></span>
+                <span>92% точность · <span class="delta">+12% mastery</span></span>
+                <span class="sep"></span>
+                <span style="color:var(--fg-subtle)">7 паттернов в автоматизм · 3 в работу</span>
+              </span>
+              <button class="btn btn-ghost btn-sm" style="margin-left:auto">Полный разбор →</button>
+            </div>
+
+            <!-- TODAY PLAN -->
+            <h3 class="section-h">
+              План на сегодня
+              <span class="meta">~ 1 ч 40 мин</span>
+            </h3>
+            <div class="plan-list">
+              <!-- Card 1: PRIMARY — continue lesson 14 -->
+              <div class="plan-card primary">
+                <span class="ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M5 4l14 8-14 8V4z"/></svg>
+                </span>
+                <span class="body">
+                  <span class="lab">Продолжить урок</span>
+                  <span class="ttl">Past Simple — вопросы и do-support</span>
+                  <span class="desc">Ты остановилась на шаге 7 из 12 · «Did you understand?» — рефлекс в драфте</span>
+                </span>
+                <span class="right">
+                  <span class="est">~ 35 мин</span>
+                  <button class="btn btn-primary">Продолжить<span class="kbd">↵</span></button>
+                </span>
+              </div>
+              <!-- Card 2: REVIEW -->
+              <div class="plan-card">
+                <span class="ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>
+                </span>
+                <span class="body">
+                  <span class="lab">К повтору</span>
+                  <span class="ttl">14 паттернов нуждаются в speaking-rep</span>
+                  <span class="desc">8 паттернов сегодня · 6 завтра · «I don't know», «Where is...», «Did you...?» и др.</span>
+                </span>
+                <span class="right">
+                  <span class="est">~ 18 мин</span>
+                  <button class="btn btn-secondary">Открыть<span class="kbd">R</span></button>
+                </span>
+              </div>
+              <!-- Card 3: WEAK SPOTS -->
+              <div class="plan-card">
+                <span class="ico">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 9v4m0 4h.01M10.3 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                </span>
+                <span class="body">
+                  <span class="lab">Зоны фокуса</span>
+                  <span class="ttl">3 паттерна с низким автоматизмом</span>
+                  <span class="desc">«Past Simple regular -ed» · 41% · короткий drill на 12 мин</span>
+                </span>
+                <span class="right">
+                  <span class="est">~ 12 мин</span>
+                  <button class="btn btn-secondary">Drill</button>
+                </span>
+              </div>
+            </div>
+
+            <!-- secondary block -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:36px">
+              <div style="padding:14px 18px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-md);display:flex;align-items:center;gap:12px">
+                <span style="width:32px;height:32px;border-radius:var(--r-sm);background:rgba(200,255,107,.08);color:var(--accent-secondary);display:grid;place-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16"><path stroke-width="1.75" stroke-linecap="round" d="M20 6L9 17l-5-5"/></svg></span>
+                <span style="flex:1;font-size:13px;color:var(--fg-secondary)"><b style="color:var(--fg-primary);font-weight:600">142 паттерна</b> в автоматизме · +7 за неделю</span>
+                <button class="btn btn-ghost btn-sm">Карта →</button>
+              </div>
+              <div style="padding:14px 18px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-md);display:flex;align-items:center;gap:12px">
+                <span style="width:32px;height:32px;border-radius:var(--r-sm);background:rgba(91,107,255,.08);color:var(--accent-glow);display:grid;place-items:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16"><circle cx="12" cy="12" r="9" stroke-width="1.75"/><path stroke-width="1.75" stroke-linecap="round" d="M12 7v5l3 2"/></svg></span>
+                <span style="flex:1;font-size:13px;color:var(--fg-secondary)"><b style="color:var(--fg-primary);font-weight:600">Stage 2 / 4</b> · Past tenses · 32% курса пройдено</span>
+                <button class="btn btn-ghost btn-sm">Программа →</button>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <!-- §01b zoom: streak inline detail -->
+    <div class="content-grid two" style="margin-top:24px">
+      <div class="zoom-card">
+        <span class="lab">Zoom · Streak inline (1×)</span>
+        <div style="padding:24px;background:var(--bg-base);border-radius:var(--r-md);border:1px solid var(--border-subtle);display:flex;align-items:center;gap:14px">
+          <span class="streak-inline">
+            <span class="lab" style="font-size:10px">Серия</span>
+            <span class="streak-dots">
+              <span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d on"></span><span class="d today"></span><span class="d"></span><span class="d"></span>
+            </span>
+            <span class="num">5 дней</span>
+          </span>
+        </div>
+        <div class="desc"><b>Adult-tone streak</b> — inline rendering у subtitle. 7-day rolling window: 4 заполненных + сегодня (двойное кольцо) + 2 будущих. Никакого 🔥, никакого «не теряй streak!». Цифру видишь, рендерится фоном.</div>
+      </div>
+      <div class="zoom-card">
+        <span class="lab">Zoom · Last session recap (1×)</span>
+        <div style="padding:18px;background:var(--bg-base);border-radius:var(--r-md);border:1px solid var(--border-subtle)">
+          <div class="last-recap" style="margin:0;background:transparent;border:none;padding:0">
+            <span class="lab">Вчера</span>
+            <span class="body">
+              <b>2 ч 14 мин</b>
+              <span class="sep"></span>
+              <span>Past Simple · negative</span>
+              <span class="sep"></span>
+              <span>92% · <span class="delta">+12% mastery</span></span>
+            </span>
+          </div>
+        </div>
+        <div class="desc"><b>Один-line recap</b> — мост yesterday→today. Ты сразу понимаешь где была, что закрыла, и видишь, что урок №14 продолжается с шага 7. Без «Великолепно!» / «Так держать!» — только данные.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== §02 COURSE MAP ============== -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">§ 02 · Course Map</span>
+      <h2>44 урока · 4 stage · linear progression с возможностью забежать вперёд</h2>
+      <p class="lede">Things-3 list, не Duolingo skill-tree. <b>MVP default</b> · L1 expanded · L2–L3 teaser · L4–L44 collapsed под disclosure. Уровень доступа смягчает overwhelm и держит фокус на текущем шаге.</p>
+    </div>
+
+    <div class="frame desktop-tall" style="aspect-ratio:1280/980">
+      <span class="frame-meta">Course Map · L1 active · MVP default state</span>
+      <div class="app">
+        <header class="topbar">
+          <span class="brand"><span class="wm">English KES<small>Course</small></span></span>
+          <span class="crumbs">Course Map · <b>Программа</b></span>
+          <span class="spacer"></span>
+          <span class="locale"><span class="on">RU</span><span>EN</span></span>
+          <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18"><circle cx="11" cy="11" r="7" stroke-width="1.75"/><path stroke-width="1.75" stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg></button>
+        </header>
+        <div class="app-body">
+          <aside class="sidebar">
+            <a class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10h14V10"/></svg></a>
+            <a class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6l-6 3v12l6-3 6 3 6-3V6l-6 3-6-3zM9 6v15M15 9v12"/></svg></a>
+            <a class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg></a>
+          </aside>
+          <main class="app-main" style="padding:32px 56px 80px">
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:24px">
+              <div>
+                <span class="eyebrow">Stage 1 of 4 · A1 · Foundations</span>
+                <h1 style="font-family:var(--font-display);font-size:32px;font-weight:600;letter-spacing:-.025em;margin:6px 0 4px;line-height:1.1">Английский с нуля</h1>
+                <p style="margin:0;color:var(--fg-muted);font-size:13px;max-width:540px">44 урока · 4 stage · ~ 60 часов. Сейчас — урок 1: «Я / ты / он» и to be в простой форме.</p>
+              </div>
+              <div style="text-align:right">
+                <div style="font-family:var(--font-mono);font-size:11px;color:var(--fg-subtle);letter-spacing:.06em;text-transform:uppercase;font-weight:600">Course progress</div>
+                <div style="font-family:var(--font-mono);font-size:24px;font-weight:600;color:var(--fg-primary);font-variant-numeric:tabular-nums;letter-spacing:-.01em;margin-top:2px">1 / 44</div>
+                <div style="display:flex;gap:2px;margin-top:6px">
+                  <span style="width:6px;height:3px;background:var(--accent-glow);border-radius:1px;box-shadow:0 0 6px rgba(138,149,255,.6)"></span>
+                  <span style="display:inline-flex;gap:2px;padding-left:4px">
+                    <span style="width:6px;height:3px;background:rgba(245,245,248,.10);border-radius:1px"></span>
+                    <span style="width:6px;height:3px;background:rgba(245,245,248,.10);border-radius:1px"></span>
+                    <span style="width:6px;height:3px;background:rgba(245,245,248,.10);border-radius:1px"></span>
+                    <span style="width:6px;height:3px;background:rgba(245,245,248,.10);border-radius:1px"></span>
+                    <span style="width:6px;height:3px;background:rgba(245,245,248,.10);border-radius:1px"></span>
+                    <span style="width:6px;height:3px;background:rgba(245,245,248,.10);border-radius:1px"></span>
+                    <span style="width:6px;height:3px;background:rgba(245,245,248,.10);border-radius:1px"></span>
+                    <span style="width:6px;height:3px;background:rgba(245,245,248,.10);border-radius:1px"></span>
+                    <span style="width:6px;height:3px;background:rgba(245,245,248,.10);border-radius:1px"></span>
+                    <span style="width:6px;height:3px;background:rgba(245,245,248,.10);border-radius:1px"></span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- LESSON LIST · MVP default: L1 expanded + L2-3 teaser + L4-44 disclosure -->
+            <div class="cm-list">
+              <!-- Lesson 1 — ACTIVE expanded (default) -->
+              <div class="cm-row active expanded">
+                <span class="num-circle">01</span>
+                <span class="meta">
+                  <span class="head">
+                    <span class="lvl a1">A1 · Stage 1</span>
+                    <span style="font-family:var(--font-mono);font-size:10px;color:var(--accent-glow);letter-spacing:.06em;text-transform:uppercase;font-weight:600">▸ В работе</span>
+                  </span>
+                  <span class="ttl">«Я / ты / он» и to be в простой форме</span>
+                  <span class="desc">I am, you are, he is · базовые местоимения и copula. Первый кирпич, на нём держится весь A1.</span>
+                  <span class="badges"><span>9 шагов</span><span class="sep"></span><span>12 паттернов</span><span class="sep"></span><span>шаг 3 / 9 · ~ 22 мин до конца</span></span>
+                </span>
+                <span class="right"><span class="status">28%</span><button class="btn btn-primary btn-sm">Продолжить</button></span>
+              </div>
+              <!-- Steps for lesson 1 -->
+              <div class="cm-steps">
+                <div class="cm-step done"><span class="ix">01</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20 6L9 17l-5-5"/></svg></span><span class="name">Контекст · знакомство в самолёте<span class="type">Видео · 1:48</span></span></div>
+                <div class="cm-step done"><span class="ix">02</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20 6L9 17l-5-5"/></svg></span><span class="name">Паттерн · «I am / you are»<span class="type">Объяснение · 3:20</span></span></div>
+                <div class="cm-step done"><span class="ix">03</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20 6L9 17l-5-5"/></svg></span><span class="name">Распознавание<span class="type">Listening · 8 фраз</span></span></div>
+                <div class="cm-step active"><span class="ix">04</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg></span><span class="name" style="color:var(--accent-glow);font-weight:600">Сборка по схеме<span class="type" style="color:var(--accent-glow)">Драфт · 4 / 12</span></span></div>
+                <div class="cm-step locked"><span class="ix">05</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9" stroke-width="1.5"/></svg></span><span class="name">Переключение «он / она»<span class="type">Pair drill · 10 фраз</span></span></div>
+                <div class="cm-step locked"><span class="ix">06</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9" stroke-width="1.5"/></svg></span><span class="name">Mini-dialogue<span class="type">Контекст · 3 варианта</span></span></div>
+                <div class="cm-step locked"><span class="ix">07</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9" stroke-width="1.5"/></svg></span><span class="name">Speaking · самопредставление<span class="type">Speaking · 6 фраз</span></span><span class="pron">esp 6m</span></div>
+                <div class="cm-step locked"><span class="ix">08</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9" stroke-width="1.5"/></svg></span><span class="name">Контроль · 10 фраз<span class="type">Тест</span></span></div>
+                <div class="cm-step locked"><span class="ix">09</span><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9" stroke-width="1.5"/></svg></span><span class="name">Recap · что освоил<span class="type">Итог · 1:10</span></span></div>
+              </div>
+              <!-- Lesson 2 — teaser (locked, abbreviated) -->
+              <div class="cm-row locked">
+                <span class="num-circle">02</span>
+                <span class="meta">
+                  <span class="head"><span class="lvl a1">A1 · Stage 1</span><span style="font-family:var(--font-mono);font-size:10px;color:var(--fg-disabled);letter-spacing:.06em;text-transform:uppercase">teaser</span></span>
+                  <span class="ttl">Простые предложения · I have / you have</span>
+                  <span class="desc">Глагол have в утверждении · «I have a brother», «You have a question»</span>
+                  <span class="badges"><span>10 шагов</span><span class="sep"></span><span>~ 1 ч 10 мин</span></span>
+                </span>
+                <span class="right"><span class="status">Откроется после 1</span></span>
+              </div>
+              <!-- Lesson 3 — teaser -->
+              <div class="cm-row locked">
+                <span class="num-circle">03</span>
+                <span class="meta">
+                  <span class="head"><span class="lvl a1">A1 · Stage 1</span><span style="font-family:var(--font-mono);font-size:10px;color:var(--fg-disabled);letter-spacing:.06em;text-transform:uppercase">teaser</span></span>
+                  <span class="ttl">Вопросы Yes/No с to be</span>
+                  <span class="desc">«Are you tired?», «Is he home?» · инверсия в простом вопросе</span>
+                  <span class="badges"><span>11 шагов</span><span class="sep"></span><span>~ 1 ч 25 мин</span></span>
+                </span>
+                <span class="right"><span class="status">—</span></span>
+              </div>
+            </div>
+
+            <button class="cm-disclosure">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+              <span>Показать ещё 41 урок · Stage 1 (L4–L11) · Stage 2 (L12–L23) · Stage 3 (L24–L34) · Stage 4 (L35–L44)</span>
+            </button>
+          </main>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== §03 REVIEW SCREEN ============== -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">§ 03 · Review</span>
+      <h2>Spaced repetition · 4 секции по возрасту, weak-pattern expand</h2>
+      <p class="lede">«К повтору сегодня» / «Завтра» / «Зоны фокуса» / «В автоматизме». Возраст паттерна — не «Просрочено».</p>
+    </div>
+
+    <div class="frame desktop-tall" style="aspect-ratio:1280/1340">
+      <span class="frame-meta">Review · 14 today · 6 tomorrow · 3 weak · 142 automated</span>
+      <div class="app">
+        <header class="topbar">
+          <span class="brand"><span class="wm">English KES<small>Course</small></span></span>
+          <span class="crumbs">Review · <b>К повтору</b></span>
+          <span class="spacer"></span>
+          <span class="locale"><span class="on">RU</span><span>EN</span></span>
+          <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18"><path stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        </header>
+        <div class="app-body">
+          <aside class="sidebar">
+            <a class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10h14V10"/></svg></a>
+            <a class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6l-6 3v12l6-3 6 3 6-3V6l-6 3-6-3zM9 6v15M15 9v12"/></svg></a>
+            <a class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg></a>
+          </aside>
+          <main class="app-main" style="padding:32px 56px 80px">
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:32px">
+              <div>
+                <span class="eyebrow">Spaced repetition</span>
+                <h1 style="font-family:var(--font-display);font-size:32px;font-weight:600;letter-spacing:-.025em;margin:6px 0 4px;line-height:1.1">К повтору</h1>
+                <p style="margin:0;color:var(--fg-muted);font-size:13px;max-width:540px">8 паттернов сегодня · 6 завтра · 3 в зоне фокуса · оценка ~ 18 мин</p>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-secondary btn-sm">Speaking · 14<span class="kbd">S</span></button>
+                <button class="btn btn-success">Начать сессию<span class="kbd">↵</span></button>
+              </div>
+            </div>
+
+            <!-- TODAY -->
+            <div class="review-section">
+              <div class="review-h">
+                <span class="lab">К повтору · сегодня</span>
+                <span class="count">8 паттернов</span>
+                <span class="age-hint">отсортировано по возрасту записи</span>
+              </div>
+              <div class="review-card">
+                <span class="mr active"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="14"/><circle class="fill" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="32"/></svg><span class="dot"><span>63</span></span></span>
+                <span class="body">
+                  <span class="ru-line">Не знаю где она.</span>
+                  <span class="meta"><span class="age">3-й повтор · interval 4d</span><span class="sep"></span><span>урок 8</span><span class="sep"></span><span class="pron">esp 4m</span></span>
+                </span>
+                <button class="btn btn-ghost btn-sm">→</button>
+              </div>
+              <div class="review-card">
+                <span class="mr active"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="14"/><circle class="fill" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="40"/></svg><span class="dot"><span>54</span></span></span>
+                <span class="body">
+                  <span class="ru-line">Где ты вчера была?</span>
+                  <span class="meta"><span class="age">2-й повтор · interval 2d</span><span class="sep"></span><span>урок 13</span><span class="sep"></span><span class="pron">esp 7m</span></span>
+                </span>
+                <button class="btn btn-ghost btn-sm">→</button>
+              </div>
+              <div class="review-card">
+                <span class="mr active"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="14"/><circle class="fill" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="50"/></svg><span class="dot"><span>43</span></span></span>
+                <span class="body">
+                  <span class="ru-line">Ты понял меня?</span>
+                  <span class="meta"><span class="age">2-й повтор · interval 2d</span><span class="sep"></span><span>урок 14 · сейчас</span><span class="sep"></span><span class="pron">esp 5m</span></span>
+                </span>
+                <button class="btn btn-ghost btn-sm">→</button>
+              </div>
+              <div class="review-card">
+                <span class="mr active"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="14"/><circle class="fill" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="60"/></svg><span class="dot"><span>32</span></span></span>
+                <span class="body">
+                  <span class="ru-line">Я не пошла туда.</span>
+                  <span class="meta"><span class="age">1-й повтор · interval 1d</span><span class="sep"></span><span>урок 13 · вчера</span><span class="sep"></span><span class="pron">esp 4m</span></span>
+                </span>
+                <button class="btn btn-ghost btn-sm">→</button>
+              </div>
+              <div class="review-card" style="opacity:.65">
+                <span class="mr active"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="14"/><circle class="fill" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="68"/></svg><span class="dot"><span>22</span></span></span>
+                <span class="body">
+                  <span class="ru-line">Когда она пришла?</span>
+                  <span class="meta"><span class="age faded">1-й повтор · interval 1d</span><span class="sep"></span><span>урок 14 · сейчас</span><span class="sep"></span><span class="pron">esp 6m</span></span>
+                </span>
+                <button class="btn btn-ghost btn-sm">→</button>
+              </div>
+              <button class="cm-disclosure" style="margin-top:14px">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                Показать ещё 3 паттерна
+              </button>
+            </div>
+
+            <!-- WEAK SPOTS -->
+            <div class="review-section">
+              <div class="review-h">
+                <span class="lab">Зоны фокуса</span>
+                <span class="count">3 паттерна с низким автоматизмом</span>
+              </div>
+              <!-- expanded weak -->
+              <div class="pattern-card expanded">
+                <span class="mr lg active"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="14"/><circle class="fill" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="52" stroke="var(--accent-warm)"/></svg><span class="dot" style="color:var(--accent-warm)"><span>41</span></span></span>
+                <span class="body">
+                  <span class="ttl">Past Simple · regular -ed</span>
+                  <span class="meta"><span>5 фраз · урок 11</span><span class="sep"></span><span>5 повторов · 2 успешных</span><span class="sep"></span><span style="color:var(--accent-warm)">путаешь произношение -ed</span></span>
+                </span>
+                <span class="pct">41%</span>
+                <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+              </div>
+              <div class="pattern-expand">
+                <div class="pattern-phrase">
+                  <span class="ru">Я работала весь день вчера.</span>
+                  <span class="pron">esp 9m</span>
+                  <span class="ago">3 повтора · последний 2д</span>
+                </div>
+                <div class="pattern-phrase">
+                  <span class="ru">Она училась в Москве.</span>
+                  <span class="pron">esp 6m</span>
+                  <span class="ago">2 повтора · последний 4д</span>
+                </div>
+                <div class="pattern-phrase">
+                  <span class="ru">Мы гуляли в парке.</span>
+                  <span class="pron">esp 5m</span>
+                  <span class="ago">2 повтора · последний 3д</span>
+                </div>
+                <div class="pattern-phrase">
+                  <span class="ru">Они ждали час.</span>
+                  <span class="pron">esp 4m</span>
+                  <span class="ago">1 повтор · последний 5д</span>
+                </div>
+                <div class="pattern-phrase">
+                  <span class="ru">Ты остановилась? — Да, я остановилась.</span>
+                  <span class="pron">esp 11m</span>
+                  <span class="ago">1 повтор · последний 6д</span>
+                </div>
+                <div class="pattern-actions">
+                  <button class="btn btn-secondary btn-sm">Drill · 5 фраз</button>
+                  <button class="btn btn-ghost btn-sm">Pron-clinic · 6 мин</button>
+                  <button class="btn btn-ghost btn-sm" style="margin-left:auto">К уроку 11 →</button>
+                </div>
+              </div>
+              <div class="pattern-card">
+                <span class="mr lg active"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="14"/><circle class="fill" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="46" stroke="var(--accent-warm)"/></svg><span class="dot" style="color:var(--accent-warm)"><span>48</span></span></span>
+                <span class="body">
+                  <span class="ttl">Past Simple · do-support в вопросах</span>
+                  <span class="meta"><span>4 фразы · урок 14</span><span class="sep"></span><span>в работе · 2 повтора</span></span>
+                </span>
+                <span class="pct">48%</span>
+                <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+              </div>
+              <div class="pattern-card">
+                <span class="mr lg active"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="14"/><circle class="fill" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="40" stroke="var(--accent-warm)"/></svg><span class="dot" style="color:var(--accent-warm)"><span>54</span></span></span>
+                <span class="body">
+                  <span class="ttl">Articles · a / the с городами и странами</span>
+                  <span class="meta"><span>6 фраз · урок 6</span><span class="sep"></span><span>4 повтора</span></span>
+                </span>
+                <span class="pct">54%</span>
+                <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></span>
+              </div>
+            </div>
+
+            <!-- TOMORROW (collapsed) -->
+            <div class="review-section">
+              <div class="review-h">
+                <span class="lab">Завтра</span>
+                <span class="count">6 паттернов</span>
+              </div>
+              <div class="review-collapsed">
+                <span class="mr sm idle"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="14"/><circle class="fill" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="22"/></svg><span class="dot"><span>75</span></span></span>
+                <b>«Я хорошо спала»</b>
+                <span>+ ещё 5 — interval 1d</span>
+                <span class="chev" style="margin-left:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></span>
+              </div>
+            </div>
+
+            <!-- AUTOMATED -->
+            <div class="review-section">
+              <div class="review-h">
+                <span class="lab">В автоматизме</span>
+                <span class="count">142 паттерна · +7 за неделю</span>
+                <span class="age-hint">graduated · interval ≥ 30d · повторяются раз в месяц</span>
+              </div>
+              <div class="review-collapsed">
+                <span class="mr sm mastered"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="14"/><circle class="fill" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="0"/></svg><span class="dot"></span></span>
+                <b>«I don't know», «Where is...?», «Did you...?»</b>
+                <span>+ ещё 139 — последний повтор 12д назад</span>
+                <span class="chev" style="margin-left:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg></span>
+              </div>
+            </div>
+
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <!-- §03b zoom — MasteryRing 4 states · ordered idle → active → transition → static -->
+    <div class="content-grid four" style="margin-top:24px">
+      <div class="zoom-card">
+        <span class="lab">01 · Idle</span>
+        <div style="display:grid;place-items:center;padding:24px;background:var(--bg-base);border-radius:var(--r-md);border:1px solid var(--border-subtle)">
+          <span class="mr lg idle"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="14"/><circle class="fill" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="87.96"/></svg><span class="dot"><span>0</span></span></span>
+        </div>
+        <div class="desc"><b>Не освоен</b> · 0%. Серый ring без fill. Используется для locked паттернов и новых ещё-не-тренированных.</div>
+      </div>
+      <div class="zoom-card">
+        <span class="lab">02 · Active 63%</span>
+        <div style="display:grid;place-items:center;padding:24px;background:var(--bg-base);border-radius:var(--r-md);border:1px solid var(--border-subtle)">
+          <span class="mr lg active"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="14"/><circle class="fill" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="32"/></svg><span class="dot"><span>63</span></span></span>
+        </div>
+        <div class="desc"><b>В работе</b> · indigo glow всегда (subtle, не animated). mastery = 0.5×accuracy<sub>last 10</sub> + 0.5×SR<sub>days/target</sub>.</div>
+      </div>
+      <div class="zoom-card">
+        <span class="lab">03 · Mastered · transition (600ms, fires once)</span>
+        <div style="display:grid;place-items:center;padding:24px;background:var(--bg-base);border-radius:var(--r-md);border:1px solid var(--border-subtle);position:relative">
+          <span class="mr lg mastered glow" id="glow-demo" style="cursor:pointer" onclick="this.classList.remove('glow');void this.offsetWidth;this.classList.add('glow')"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="14"/><circle class="fill" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="0"/></svg><span class="dot"></span></span>
+          <span style="position:absolute;bottom:6px;right:8px;font-family:var(--font-mono);font-size:9px;color:var(--accent-glow);letter-spacing:.06em;text-transform:uppercase;font-weight:600">click → replay</span>
+        </div>
+        <div class="desc">Срабатывает <b>один раз</b> на active→mastered, либо при первом открытии Today если событие пропущено. Контракт: <code style="font-family:var(--font-mono);font-size:11px;color:var(--accent-secondary);background:rgba(200,255,107,.06);padding:1px 5px;border-radius:4px">mastery_acknowledged: true</code> в state.</div>
+      </div>
+      <div class="zoom-card">
+        <span class="lab">04 · Mastered · static</span>
+        <div style="display:grid;place-items:center;padding:24px;background:var(--bg-base);border-radius:var(--r-md);border:1px solid var(--border-subtle)">
+          <span class="mr lg mastered"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="14"/><circle class="fill" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="0"/></svg><span class="dot"></span></span>
+        </div>
+        <div class="desc"><b>В автоматизме</b> · lime ✓ static forever. Никаких пульсаций при возврате на экран. Anti-Duolingo invariant: re-celebration на каждый visit запрещено.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== §04 CONSISTENCY CALENDAR ============== -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">§ 04 · Consistency · 12-week activity</span>
+      <h2>GitHub-graph, не «панель почёта»</h2>
+      <p class="lede">Opacity = study load (theory=3 vs drill=1). Никаких rewards за заполненные ячейки.</p>
+    </div>
+
+    <div class="zoom-card" style="padding:32px;position:relative">
+      <div class="consistency">
+        <div class="head">
+          <span class="h-lab">Активность · 12 недель</span>
+          <span class="h-meta">68 дней из 84 · сегодня — load 13 (l4)</span>
+        </div>
+        <div class="cc-grid">
+          <div class="cc-day-labels"><span>Пн</span><span></span><span>Ср</span><span></span><span>Пт</span><span></span><span>Вс</span></div>
+          <div class="cc-cells" id="cc-cells"></div>
+        </div>
+        <div class="cc-month">
+          <span>авг</span><span></span><span></span><span>сен</span><span></span><span></span><span></span><span>окт</span><span></span><span></span><span></span><span>сейчас</span>
+        </div>
+        <div class="cc-legend">
+          <span>меньше</span>
+          <span class="dots"><span class="c"></span><span class="c l1"></span><span class="c l2"></span><span class="c l3"></span><span class="c l4"></span></span>
+          <span>больше</span>
+        </div>
+      </div>
+      <!-- Hover breakdown · pinned to today's cell -->
+      <div style="position:absolute;right:32px;top:32px;width:280px;padding:14px 16px;background:var(--bg-elevated-2);border:1px solid var(--border-strong);border-radius:var(--r-md);box-shadow:var(--shadow-soft);font-size:12px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px"><span style="font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);letter-spacing:.08em;text-transform:uppercase;font-weight:600">Сегодня · 14 окт · Пн</span><span style="font-family:var(--font-mono);font-size:11px;color:var(--accent-glow);font-variant-numeric:tabular-nums;font-weight:600">load 13 · l4</span></div>
+        <div style="display:grid;grid-template-columns:auto auto 1fr auto;gap:4px 10px;font-family:var(--font-mono);font-size:11px;color:var(--fg-secondary);font-variant-numeric:tabular-nums">
+          <span style="color:var(--fg-subtle)">×3</span><span>Theory</span><span style="color:var(--fg-subtle)">×1</span><span style="color:var(--fg-primary);text-align:right">3</span>
+          <span style="color:var(--fg-subtle)">×4</span><span>Composition</span><span style="color:var(--fg-subtle)">×1</span><span style="color:var(--fg-primary);text-align:right">4</span>
+          <span style="color:var(--fg-subtle)">×3</span><span>Speaking</span><span style="color:var(--fg-subtle)">×2</span><span style="color:var(--fg-primary);text-align:right">6</span>
+          <span style="color:var(--fg-subtle)">×1</span><span>Drill</span><span style="color:var(--fg-subtle)">×0</span><span style="color:var(--fg-disabled);text-align:right">0</span>
+        </div>
+        <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border-subtle);display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:var(--fg-muted);letter-spacing:.04em"><span>1 урок + 1 speaking-rep</span><span style="color:var(--accent-glow);font-weight:600">∑ 13</span></div>
+      </div>
+    </div>
+    <!-- GitHub-style colour-mapping caption -->
+    <div class="content-grid two" style="margin-top:18px;gap:18px">
+      <div class="callout">
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--accent-glow);letter-spacing:.06em;text-transform:uppercase;font-weight:600;margin-bottom:8px">Composite study-load · weights</div>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-family:var(--font-mono);font-size:12px;color:var(--fg-secondary);font-variant-numeric:tabular-nums">
+          <span style="color:var(--accent-secondary);font-weight:600">×4</span><span>Composition · самое сложное · multi-step Sokratic</span>
+          <span style="color:var(--accent-secondary);font-weight:600">×3</span><span>Theory · explain-it-back · reflective</span>
+          <span style="color:var(--accent-secondary);font-weight:600">×3</span><span>Speaking · pronunciation review</span>
+          <span style="color:var(--fg-muted);font-weight:600">×2</span><span>Translate · context production</span>
+          <span style="color:var(--fg-muted);font-weight:600">×1</span><span>Vocab · recognition</span>
+          <span style="color:var(--fg-disabled);font-weight:600">×1</span><span>Drill · rapid fire</span>
+        </div>
+        <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(91,107,255,.18);font-size:12.5px;color:var(--fg-muted);line-height:1.5">1 рефлексивный <b>theory + speaking</b> = load 6 = ярче, чем 5 одинаковых drill'ов (load 5). Reflective work выигрывает по визуальной интенсивности, потому что он выигрывает по реальному эффекту.</div>
+      </div>
+      <div class="callout" style="background:rgba(245,245,248,.03);border-color:var(--border-subtle)">
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--fg-secondary);letter-spacing:.06em;text-transform:uppercase;font-weight:600;margin-bottom:8px">Colour mapping · 4 stages</div>
+        <div style="display:grid;grid-template-columns:18px auto 1fr;gap:8px 12px;align-items:center;font-family:var(--font-mono);font-size:12px;color:var(--fg-secondary);font-variant-numeric:tabular-nums">
+          <span style="width:14px;height:14px;border-radius:3px;background:rgba(245,245,248,.04);border:1px solid var(--border-subtle)"></span><span style="color:var(--fg-muted)">load 0</span><span style="color:var(--fg-subtle)">пропуск · без judgment</span>
+          <span style="width:14px;height:14px;border-radius:3px;background:rgba(138,149,255,.18)"></span><span style="color:var(--accent-glow)">load 1–3</span><span>review-сессия 5–15 мин</span>
+          <span style="width:14px;height:14px;border-radius:3px;background:rgba(138,149,255,.40)"></span><span style="color:var(--accent-glow)">load 4–7</span><span>drill 15–40 мин</span>
+          <span style="width:14px;height:14px;border-radius:3px;background:rgba(138,149,255,.68)"></span><span style="color:var(--accent-glow)">load 8–12</span><span>урок 40–90 мин</span>
+          <span style="width:14px;height:14px;border-radius:3px;background:var(--accent-glow)"></span><span style="color:var(--accent-glow)">load 13+</span><span>урок + speaking-rep</span>
+        </div>
+        <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border-subtle);font-size:12.5px;color:var(--fg-muted);line-height:1.5">Hover любой клетки → breakdown по типам шагов с весами. Tap (mobile) → же. <b>Никаких</b> «X days streak!» оверлеев на тёмных клетках.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== §05 MOBILE TODAY ============== -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">§ 05 · Mobile</span>
+      <h2>Today · 375 viewport</h2>
+      <p class="lede">Top — streak inline. Hero — приветствие. План — те же 3 карточки. 4 нижних таба: Today / Course / Review / Profile.</p>
+    </div>
+
+    <div class="content-grid two">
+      <div class="frame mobile">
+        <span class="frame-meta">Today · iOS · Mon 14:48</span>
+        <div style="position:relative;width:100%;height:100%;background:var(--bg-base);overflow:hidden">
+          <!-- ios status -->
+          <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-family:var(--font-mono);font-size:14px;font-weight:600;color:var(--fg-primary)">
+            <span>9:41</span>
+            <span style="display:flex;gap:6px;align-items:center"><svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="1"/><rect x="4" y="4" width="3" height="7" rx="1"/><rect x="8" y="2" width="3" height="9" rx="1"/><rect x="12" y="0" width="3" height="11" rx="1"/></svg><svg width="14" height="10" viewBox="0 0 14 10" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 4 Q7 -1 13 4"/><path d="M3 6 Q7 2 11 6"/><circle cx="7" cy="8" r="1" fill="currentColor"/></svg><span style="display:inline-block;width:24px;height:11px;border:1.4px solid currentColor;border-radius:2.5px;position:relative"><span style="position:absolute;inset:1.5px;width:80%;background:var(--fg-primary);border-radius:1px;display:block"></span></span></span>
+          </div>
+          <!-- header -->
+          <div style="padding:16px 20px 0;display:flex;align-items:center;justify-content:space-between">
+            <span class="brand"><span class="wm" style="font-size:13px">English KES</span></span>
+            <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:var(--r-full);background:var(--bg-elevated-2);border:1px solid var(--border)"><span style="width:6px;height:6px;border-radius:50%;background:var(--accent-glow)"></span><span style="font-family:var(--font-mono);font-size:10px;color:var(--fg-secondary);font-weight:600">5 дней</span></span>
+          </div>
+          <!-- content -->
+          <div style="padding:20px 20px 90px;overflow:hidden">
+            <h1 style="font-family:var(--font-display);font-size:24px;font-weight:600;letter-spacing:-.025em;line-height:1.15;margin:8px 0 4px">Доброе утро,<br/>Ксения.</h1>
+            <p style="margin:0 0 18px;color:var(--fg-muted);font-size:12.5px">Понедельник · 14 октября</p>
+            <!-- recap -->
+            <div style="padding:10px 14px;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--r-md);margin-bottom:18px">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--fg-subtle);letter-spacing:.10em;text-transform:uppercase;font-weight:600;margin-bottom:4px">Вчера</div>
+              <div style="font-size:12px;color:var(--fg-secondary);line-height:1.4"><b style="color:var(--fg-primary);font-weight:600">2 ч 14 мин</b> · Past Simple negative · 92% · <span style="color:var(--accent-secondary);font-family:var(--font-mono);font-weight:600">+12%</span></div>
+            </div>
+            <!-- plan -->
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--fg-subtle);letter-spacing:.10em;text-transform:uppercase;font-weight:600;margin-bottom:10px">План · ~ 1 ч 40 мин</div>
+            <!-- primary card -->
+            <div style="padding:14px;border-radius:var(--r-md);background:linear-gradient(180deg, rgba(91,107,255,.10) 0%, var(--bg-elevated) 60%);border:1px solid rgba(91,107,255,.28);margin-bottom:8px">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--accent-glow);letter-spacing:.10em;text-transform:uppercase;font-weight:600;margin-bottom:4px">Продолжить</div>
+              <div style="font-family:var(--font-display);font-size:15px;font-weight:600;letter-spacing:-.01em;line-height:1.25;margin-bottom:8px">Past Simple — вопросы и do-support</div>
+              <div style="font-size:11px;color:var(--fg-muted);line-height:1.4;margin-bottom:12px">Шаг 7 / 12 · ~ 35 мин</div>
+              <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center;padding:10px">Продолжить →</button>
+            </div>
+            <!-- secondary -->
+            <div style="padding:12px 14px;border-radius:var(--r-md);background:var(--bg-elevated);border:1px solid var(--border-subtle);margin-bottom:8px;display:flex;align-items:center;gap:10px">
+              <span style="width:32px;height:32px;border-radius:var(--r-sm);background:var(--bg-elevated-2);display:grid;place-items:center;color:var(--fg-muted)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg></span>
+              <span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-family:var(--font-sans);font-size:13px;font-weight:600;color:var(--fg-primary);letter-spacing:-.005em">К повтору · 14</span><span style="font-size:11px;color:var(--fg-muted)">~ 18 мин · 8 сегодня</span></span>
+              <span style="font-family:var(--font-mono);font-size:14px;color:var(--fg-subtle)">›</span>
+            </div>
+            <div style="padding:12px 14px;border-radius:var(--r-md);background:var(--bg-elevated);border:1px solid var(--border-subtle);display:flex;align-items:center;gap:10px">
+              <span style="width:32px;height:32px;border-radius:var(--r-sm);background:rgba(255,180,84,.10);display:grid;place-items:center;color:var(--accent-warm)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.3 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></span>
+              <span style="flex:1;display:flex;flex-direction:column;gap:2px"><span style="font-family:var(--font-sans);font-size:13px;font-weight:600;color:var(--fg-primary);letter-spacing:-.005em">Зоны фокуса · 3</span><span style="font-size:11px;color:var(--fg-muted)">~ 12 мин · drill</span></span>
+              <span style="font-family:var(--font-mono);font-size:14px;color:var(--fg-subtle)">›</span>
+            </div>
+            <!-- mini calendar -->
+            <div style="margin-top:22px;padding:14px;border-radius:var(--r-md);background:var(--bg-elevated);border:1px solid var(--border-subtle)">
+              <div style="font-family:var(--font-mono);font-size:9px;color:var(--fg-subtle);letter-spacing:.10em;text-transform:uppercase;font-weight:600;margin-bottom:10px">Активность · 4 недели</div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px" id="cc-mobile"></div>
+            </div>
+          </div>
+          <!-- bottom tabs -->
+          <div class="btabs">
+            <span class="t on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>Today</span>
+            <span class="t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 6l-6 3v12l6-3 6 3 6-3V6l-6 3-6-3z"/></svg>Курс</span>
+            <span class="t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>Повтор</span>
+            <span class="t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4" stroke-width="2"/><path stroke-width="2" stroke-linecap="round" d="M4 21a8 8 0 0 1 16 0"/></svg>Я</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="frame mobile">
+        <span class="frame-meta">Review · iOS · expand pattern</span>
+        <div style="position:relative;width:100%;height:100%;background:var(--bg-base);overflow:hidden">
+          <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-family:var(--font-mono);font-size:14px;font-weight:600;color:var(--fg-primary)">
+            <span>9:41</span>
+            <span style="display:flex;gap:6px;align-items:center"><svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><rect x="0" y="6" width="3" height="5" rx="1"/><rect x="4" y="4" width="3" height="7" rx="1"/><rect x="8" y="2" width="3" height="9" rx="1"/><rect x="12" y="0" width="3" height="11" rx="1"/></svg><span style="display:inline-block;width:24px;height:11px;border:1.4px solid currentColor;border-radius:2.5px"></span></span>
+          </div>
+          <div style="padding:14px 20px;display:flex;align-items:center;gap:10px">
+            <button class="icon-btn" style="width:32px;height:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="16" height="16"><path stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></button>
+            <span style="flex:1;font-family:var(--font-display);font-size:18px;font-weight:600;letter-spacing:-.02em">К повтору</span>
+            <button class="btn btn-success btn-sm">Старт</button>
+          </div>
+          <div style="padding:0 20px 90px;overflow:hidden">
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--fg-subtle);letter-spacing:.10em;text-transform:uppercase;font-weight:600;margin:6px 0 8px">Зоны фокуса · 3</div>
+            <!-- expanded weak pattern card -->
+            <div style="padding:12px 14px;border-radius:var(--r-md);background:linear-gradient(180deg, rgba(91,107,255,.06) 0%, var(--bg-elevated) 70%);border:1px solid rgba(91,107,255,.20);margin-bottom:8px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+                <span class="mr active"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="14"/><circle class="fill" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="52" stroke="var(--accent-warm)"/></svg><span class="dot" style="color:var(--accent-warm)"><span>41</span></span></span>
+                <span style="flex:1;display:flex;flex-direction:column;gap:1px">
+                  <span style="font-family:var(--font-sans);font-size:13px;font-weight:600;color:var(--fg-primary);letter-spacing:-.005em">Past Simple · -ed</span>
+                  <span style="font-family:var(--font-mono);font-size:10px;color:var(--fg-muted)">5 фраз · урок 11</span>
+                </span>
+                <span style="font-family:var(--font-mono);font-size:14px;color:var(--accent-warm);font-weight:600">41%</span>
+              </div>
+              <!-- inner phrases -->
+              <div style="border-top:1px dashed var(--border-subtle);padding-top:8px;display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="font-family:var(--font-display);font-weight:600;color:var(--fg-primary);letter-spacing:-.005em">Я работала весь день.</span><span style="font-family:var(--font-mono);font-size:10px;color:var(--accent-warm)">esp 9m</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="font-family:var(--font-display);font-weight:600;color:var(--fg-primary);letter-spacing:-.005em">Она училась в Москве.</span><span style="font-family:var(--font-mono);font-size:10px;color:var(--accent-warm)">esp 6m</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="font-family:var(--font-display);font-weight:600;color:var(--fg-primary);letter-spacing:-.005em">Мы гуляли в парке.</span><span style="font-family:var(--font-mono);font-size:10px;color:var(--accent-warm)">esp 5m</span></div>
+              </div>
+              <button class="btn btn-secondary btn-sm" style="width:100%;justify-content:center;margin-top:10px;padding:9px">Drill · 5 фраз</button>
+            </div>
+            <div style="padding:12px 14px;border-radius:var(--r-md);background:var(--bg-elevated);border:1px solid var(--border-subtle);margin-bottom:8px;display:flex;align-items:center;gap:10px">
+              <span class="mr active" style="width:28px;height:28px"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="14"/><circle class="fill" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="46" stroke="var(--accent-warm)"/></svg><span class="dot" style="color:var(--accent-warm);font-size:8px"><span>48</span></span></span>
+              <span style="flex:1;display:flex;flex-direction:column"><span style="font-size:12.5px;font-weight:600;color:var(--fg-primary)">do-support в вопросах</span><span style="font-family:var(--font-mono);font-size:10px;color:var(--fg-muted)">4 фразы · урок 14</span></span>
+              <span style="font-family:var(--font-mono);font-size:12px;color:var(--accent-warm);font-weight:600">48%</span>
+            </div>
+            <div style="padding:12px 14px;border-radius:var(--r-md);background:var(--bg-elevated);border:1px solid var(--border-subtle);display:flex;align-items:center;gap:10px">
+              <span class="mr active" style="width:28px;height:28px"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="14"/><circle class="fill" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="40" stroke="var(--accent-warm)"/></svg><span class="dot" style="color:var(--accent-warm);font-size:8px"><span>54</span></span></span>
+              <span style="flex:1;display:flex;flex-direction:column"><span style="font-size:12.5px;font-weight:600;color:var(--fg-primary)">a / the с городами</span><span style="font-family:var(--font-mono);font-size:10px;color:var(--fg-muted)">6 фраз · урок 6</span></span>
+              <span style="font-family:var(--font-mono);font-size:12px;color:var(--accent-warm);font-weight:600">54%</span>
+            </div>
+          </div>
+          <div class="btabs">
+            <span class="t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>Today</span>
+            <span class="t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 6l-6 3v12l6-3 6 3 6-3V6l-6 3-6-3z"/></svg>Курс</span>
+            <span class="t on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg>Повтор</span>
+            <span class="t"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4" stroke-width="2"/><path stroke-width="2" stroke-linecap="round" d="M4 21a8 8 0 0 1 16 0"/></svg>Я</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== §06 SPEC ============== -->
+  <section class="section">
+    <div class="section-head">
+      <span class="num">§ 06 · Spec</span>
+      <h2>Implementation contract</h2>
+      <p class="lede">Component / state / glow / data — для Claude Code.</p>
+    </div>
+
+    <div class="spec-table">
+      <div class="h k">Component</div><div class="h">Sizes / variants</div><div class="h">States</div><div class="h">Source data</div>
+
+      <div class="c k">StreakDisplay (inline)</div>
+      <div class="c">7-dot row · <code>10–14px</code> dots · mono label · 2-dot future placeholders</div>
+      <div class="c">past=on (filled) · today=on+ring · future=off · skip-day=hollow</div>
+      <div class="c"><code>users.streak_days</code> · <code>last_7_days[]</code></div>
+
+      <div class="c k">StreakDisplay (calendar)</div>
+      <div class="c">30-cell month grid · level 1–4 opacity · today outline</div>
+      <div class="c">level=ƒ(study_load_minutes / type)</div>
+      <div class="c"><code>sessions[date].load_score</code></div>
+
+      <div class="c k">MasteryRing</div>
+      <div class="c"><code>sm 24px · md 32px · lg 48px</code> · stroke 3px</div>
+      <div class="c"><b>idle</b> 0% gray · <b>active</b> 1–99% indigo · <b>mastered</b> 100% lime ✓</div>
+      <div class="c"><code>pattern.mastery_score</code> · <code>pattern.mastery_acknowledged</code></div>
+
+      <div class="c k">MasteryRing.glow</div>
+      <div class="c">CSS keyframe <code>mrGlow</code> · 600ms · drop-shadow 0→8px→0</div>
+      <div class="c">плеется <b>один раз</b> при transition active→mastered · затем <code>mastery_acknowledged=true</code> · больше не запускается</div>
+      <div class="c">trigger от <code>pattern.last_mastery_event</code></div>
+
+      <div class="c k">CourseLessonRow</div>
+      <div class="c">3 col · num-circle / meta / status · 88px row</div>
+      <div class="c">done · active (expanded with steps) · locked</div>
+      <div class="c"><code>lessons[]</code> · <code>user.current_lesson_id</code></div>
+
+      <div class="c k">ReviewSection</div>
+      <div class="c">groups: today / tomorrow / weak / automated · collapsed by default</div>
+      <div class="c">section.collapsed · pattern.expanded</div>
+      <div class="c"><code>fsrs.due_today[]</code> · <code>fsrs.weak_patterns[]</code></div>
+
+      <div class="c k">Pattern weak-card expand</div>
+      <div class="c">show 5 phrases inline · drill / pron-clinic CTAs</div>
+      <div class="c">collapsed (default) · expanded (one at a time)</div>
+      <div class="c"><code>pattern.phrases[]</code> с last_review · attempts</div>
+
+      <div class="c k">Copy library</div>
+      <div class="c">— «К повтору» (не «Просрочено»)<br/>— «Зоны фокуса» (не «Слабые места»)<br/>— «В автоматизме» (не «Освоено»)<br/>— «Серия» (не «Streak» / «🔥»)</div>
+      <div class="c muted">consistent в RU и EN</div>
+      <div class="c"><code>i18n/today.json</code></div>
+    </div>
+
+    <div class="callout" style="margin-top:18px">
+      <b>Anti-checklist в коде:</b> grep на <code>🔥</code>, <code>fire</code>, <code>flame</code>, <code>XP</code>, <code>level-up</code>, <code>badge</code>, <code>trophy</code>, <code>congrats</code>, <code>celebration</code>, <code>confetti</code> — должен возвращать 0 hits в production бандле.
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div>STAGE 6 · 06-today-coursemap-review.html · complete</div>
+    <div>NEXT · STAGE 7 · §04b zoom → _design-preview/page.tsx</div>
+  </footer>
+</div>
+
+<script>
+// Generate 12-week consistency calendar (84 cells, 7 rows × 12 cols)
+(function(){
+  const grid = document.getElementById('cc-cells');
+  if(!grid) return;
+  // pseudo-random but deterministic activity pattern
+  const seed = [
+    "0231003402313041000231413010240003012301413200023132040013204010240141030010331204010301320041",
+    "1300240301321040030240310321040031321040312040031213040031040312040031203104003121040031203104",
+    "0421040312040031213040312040312040031203104031204031204003121040312040312040031213040031204031",
+    "3041203104003121040031213040031213040312040031204031204031213040031204031213040031204031213040",
+    "0312040312040031213040031204031204031213040031204031213040031213040031213040031213040031204031",
+    "2040031213040312040031213040031213040031213040031213040031204031204031213040031213040031213040",
+    "0312040031213040312040031213040031213040031204031213040031213040031213040031204031213040031213"
+  ];
+  for(let col=0; col<12; col++){
+    const c = document.createElement('div');
+    c.className='col';
+    for(let row=0; row<7; row++){
+      const cell = document.createElement('div');
+      const v = parseInt(seed[row][col*7+row] || '0', 10);
+      cell.className = 'c' + (v>0?` l${Math.min(v,4)}`:'');
+      // mark "today" — last col, today=Mon (row 0)
+      if(col===11 && row===0){ cell.classList.add('l4'); cell.style.outline='1px solid var(--accent-glow)'; cell.style.outlineOffset='1px'; }
+      c.appendChild(cell);
+    }
+    grid.appendChild(c);
+  }
+  // mobile 4-week mini
+  const mob = document.getElementById('cc-mobile');
+  if(mob){
+    mob.style.gridTemplateColumns = 'repeat(28, 1fr)';
+    for(let i=0;i<28;i++){
+      const cell=document.createElement('div');
+      const v = i<26 ? (i%4===2?0:(i%5)+1) : (i===27?4:0);
+      cell.style.aspectRatio='1';
+      cell.style.borderRadius='2px';
+      const colors = ['rgba(245,245,248,.05)','rgba(138,149,255,.18)','rgba(138,149,255,.40)','rgba(138,149,255,.68)','#8A95FF'];
+      cell.style.background = colors[Math.min(v,4)];
+      if(i===27){ cell.style.outline='1px solid var(--accent-glow)'; cell.style.outlineOffset='1px'; }
+      mob.appendChild(cell);
+    }
+  }
+})();
+</script>
+
+</div>
+</body>
+</html>
