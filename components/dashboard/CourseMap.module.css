@@ -1,0 +1,212 @@
+.map {
+  display: grid;
+  gap: 22px;
+  width: min(100%, 920px);
+  margin: 0 auto;
+  color: var(--fg-primary);
+}
+
+.header {
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 18px;
+}
+
+.eyebrow,
+.meta,
+.num,
+.step small,
+.disclosure,
+.note {
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+}
+
+.eyebrow {
+  color: var(--fg-subtle);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.header h1 {
+  margin: 8px 0;
+  font-family: var(--font-display);
+  font-size: clamp(36px, 6vw, 52px);
+  line-height: 1;
+}
+
+.header p,
+.lessonButton p,
+.note {
+  margin: 0;
+  color: var(--fg-muted);
+  line-height: 1.5;
+}
+
+.timeline {
+  position: relative;
+  display: grid;
+  gap: 14px;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 23px;
+  width: 1px;
+  background: var(--border);
+}
+
+.lesson,
+.currentLesson {
+  position: relative;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-lg);
+  background: var(--bg-elevated);
+  box-shadow: var(--inset-stroke);
+}
+
+.currentLesson {
+  border-color: rgba(91, 107, 255, 0.3);
+}
+
+.lessonButton {
+  width: 100%;
+  border: 0;
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  gap: 16px;
+  align-items: start;
+  padding: 18px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.num {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--bg-elevated-2);
+  color: var(--accent-glow);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.lessonButton h2 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1.15;
+}
+
+.meta {
+  display: block;
+  margin-top: 10px;
+  color: var(--fg-subtle);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.steps {
+  display: grid;
+  gap: 8px;
+  border-top: 1px solid var(--border-subtle);
+  padding: 14px 18px 18px 82px;
+}
+
+.step,
+.activeStep {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-md);
+  display: grid;
+  grid-template-columns: 34px 90px 1fr;
+  gap: 10px;
+  align-items: center;
+  min-height: 42px;
+  padding: 8px 12px;
+  background: var(--bg-elevated-2);
+  color: var(--fg-muted);
+  text-align: left;
+}
+
+.activeStep {
+  border-color: rgba(91, 107, 255, 0.38);
+  background: rgba(91, 107, 255, 0.14);
+  color: var(--fg-primary);
+}
+
+.step span,
+.activeStep span {
+  color: var(--fg-subtle);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.step small,
+.activeStep small {
+  color: var(--accent-glow);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.step strong,
+.activeStep strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.disclosure {
+  justify-self: center;
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--bg-elevated);
+  color: var(--fg-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.note {
+  display: flex;
+  gap: 10px;
+  border: 1px dashed var(--border);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  font-size: 12px;
+}
+
+@media (max-width: 720px) {
+  .lessonButton {
+    grid-template-columns: 42px 1fr;
+  }
+
+  .lessonButton > span:last-child {
+    grid-column: 2;
+  }
+
+  .steps {
+    padding-left: 18px;
+  }
+
+  .step,
+  .activeStep {
+    grid-template-columns: 28px 1fr;
+  }
+
+  .step small,
+  .activeStep small {
+    display: none;
+  }
+}
