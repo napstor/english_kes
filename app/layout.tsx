@@ -1,31 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Inter, JetBrains_Mono, Onest } from "next/font/google";
-import "../styles/tokens.css";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-bricolage"
-});
-
-const onest = Onest({
-  subsets: ["cyrillic", "latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-onest"
-});
-
-const inter = Inter({
-  subsets: ["cyrillic", "latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-inter"
-});
-
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-jetbrains-mono"
-});
+const inter = Inter({ subsets: ["latin", "cyrillic"] });
 
 export const metadata: Metadata = {
   title: "English KES Trainer",
@@ -44,8 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru" className={`${onest.variable} ${bricolage.variable} ${inter.variable} ${mono.variable}`}>
-      <body>{children}</body>
+    <html lang="ru">
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
